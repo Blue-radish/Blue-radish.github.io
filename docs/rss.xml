@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Sat, 01 Mar 2025 08:42:30 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>各品牌主板进BIOS方法</title><link>https://Blue-radish.github.io/post/ge-pin-pai-zhu-ban-jin-BIOS-fang-fa.html</link><description>一般是狂按Delete(del)键，如果不行，请按照下面表格进行尝试：
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Mon, 21 Apr 2025 14:03:40 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>Python在算法竞赛中的常见小技巧</title><link>https://Blue-radish.github.io/post/Python-zai-suan-fa-jing-sai-zhong-de-chang-jian-xiao-ji-qiao.html</link><description>## 输入
+用input()
+```bash
+n, m = map(int, input().split()) # 接收两个整数，以空格隔开
+arr = list(map(int, input().split())) # 接收 n 个整数的数组，以空格隔开
+```
+
+使用 sys.stdin.readline() 替代 input() 提高输入速度。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/Python-zai-suan-fa-jing-sai-zhong-de-chang-jian-xiao-ji-qiao.html</guid><pubDate>Mon, 21 Apr 2025 14:03:15 +0000</pubDate></item><item><title>各品牌主板进BIOS方法</title><link>https://Blue-radish.github.io/post/ge-pin-pai-zhu-ban-jin-BIOS-fang-fa.html</link><description>一般是狂按Delete(del)键，如果不行，请按照下面表格进行尝试：
 
 | 主板品牌 | 启动键 | 笔记本电脑品牌 | 启动键 |
 |----------|--------|----------------|--------|
