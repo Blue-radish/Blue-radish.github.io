@@ -10,7 +10,18 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 输入
+<meta name="description" content="## 模板
+```bash
+import sys
+
+def main():
+    # 主逻辑代码
+
+if __name__ == '__main__':
+    main()
+```
+
+## 输入
 用input()
 ```bash
 n, m = map(int, input().split()) # 接收两个整数，以空格隔开
@@ -19,7 +30,18 @@ arr = list(map(int, input().split())) # 接收 n 个整数的数组，以空格�
 
 使用 sys.stdin.readline() 替代 input() 提高输入速度。">
 <meta property="og:title" content="Python在算法竞赛中的常见小技巧">
-<meta property="og:description" content="## 输入
+<meta property="og:description" content="## 模板
+```bash
+import sys
+
+def main():
+    # 主逻辑代码
+
+if __name__ == '__main__':
+    main()
+```
+
+## 输入
 用input()
 ```bash
 n, m = map(int, input().split()) # 接收两个整数，以空格隔开
@@ -97,7 +119,15 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>输入</h2>
+<div class="markdown-body" id="postBody"><h2>模板</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">import sys
+
+def <span class="pl-en">main</span>():
+    <span class="pl-c"><span class="pl-c">#</span> 主逻辑代码</span>
+
+<span class="pl-k">if</span> __name__ == <span class="pl-s"><span class="pl-pds">"</span>__main__<span class="pl-pds">"</span></span>:
+    <span class="pl-en">main</span>()</pre></div>
+<h2>输入</h2>
 <p>用input()</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">n, m = map(int, <span class="pl-en">input().split</span>()) <span class="pl-c"><span class="pl-c">#</span> 接收两个整数，以空格隔开</span>
 arr = list(map(int, <span class="pl-en">input().split</span>())) <span class="pl-c"><span class="pl-c">#</span> 接收 n 个整数的数组，以空格隔开</span></pre></div>
@@ -115,76 +145,190 @@ arr = list(map(int, <span class="pl-en">sys.stdin.readline().split</span>())) <s
 <p>使用 print(*list) 解包列表输出空格分隔的结果，换行输出时设置 sep='\n'。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">print(<span class="pl-k">*</span>result, sep = <span class="pl-s"><span class="pl-pds">"</span>\n<span class="pl-pds">"</span></span>)</pre></div>
 <h2>常用函数</h2>
-<h3>print</h3>
-<p>输出内容到控制台。<br>
-参数：*values（多个值）, sep=' '（分隔符）, end='\n'（结束符）, file=sys.stdout（输出流）, flush=False（是否强制刷新）。</p>
-<h3>type</h3>
-<p>返回对象的类型。<br>
-参数：object（要检查的对象）。</p>
-<h3>range</h3>
-<p>生成整数序列。<br>
-参数：start（起始值，默认 0）, stop（结束值）, step=1（步长）。</p>
-<h3>enumerate</h3>
-<p>返回带索引的迭代器。<br>
-参数：iterable（可迭代对象）, start=0（起始索引）。</p>
-<h3>zip</h3>
-<p>将多个可迭代对象组合为元组迭代器。<br>
-参数：*iterables（多个可迭代对象）。</p>
-<h3>ord</h3>
-<p>返回字符的 Unicode 码点。<br>
-参数：char（单个字符）。</p>
-<h3>chr</h3>
-<p>返回 Unicode 码点对应的字符。<br>
-参数：integer（整数码点）。</p>
-<h3>reversed</h3>
-<p>反转序列并返回迭代器。<br>
-参数：seq（可反转的序列，如列表、元组）。</p>
-<h3>sorted</h3>
-<p>返回排序后的新列表。<br>
-参数：iterable（可迭代对象）, key=None（排序规则）, reverse=False（是否降序）。</p>
-<h3>round</h3>
-<p>四舍五入浮点数。<br>
-参数：number（要舍入的数）, ndigits=0（保留小数位数）。</p>
-<h3>map</h3>
-<p>对可迭代对象应用函数。<br>
-参数：func（函数）, iterable（可迭代对象，可传多个）。</p>
+<ul>
+<li>print(*values, sep=' ', end='\n', file=sys.stdout, flush=False)<br>
+输出内容到控制台。<code class="notranslate">*values</code> 表示多个值，<code class="notranslate">sep</code> 是分隔符，默认为空格，<code class="notranslate">end</code> 是结束符，默认为换行符，<code class="notranslate">file</code> 是输出流，默认为标准输出，<code class="notranslate">flush</code> 表示是否强制刷新，默认为 False。</li>
+<li>type(object)<br>
+返回对象的类型。<code class="notranslate">object</code> 是要检查的对象。</li>
+<li>range(start, stop, step=1)<br>
+生成整数序列。<code class="notranslate">start</code> 是起始值，默认为 0，<code class="notranslate">stop</code> 是结束值，<code class="notranslate">step</code> 是步长，默认为 1。</li>
+<li>enumerate(iterable, start=0)<br>
+返回带索引的迭代器。<code class="notranslate">iterable</code> 是可迭代对象，<code class="notranslate">start</code> 是起始索引，默认为 0。</li>
+<li>zip(*iterables)<br>
+将多个可迭代对象组合为元组迭代器。<code class="notranslate">*iterables</code> 是多个可迭代对象。</li>
+<li>ord(char)<br>
+返回字符的 Unicode 码点。<code class="notranslate">char</code> 是单个字符。</li>
+<li>chr(integer)<br>
+返回 Unicode 码点对应的字符。<code class="notranslate">integer</code> 是整数码点。</li>
+<li>reversed(seq)<br>
+反转序列并返回迭代器。<code class="notranslate">seq</code> 是可反转的序列，如列表、元组。</li>
+<li>sorted(iterable, key=None, reverse=False)<br>
+返回排序后的新列表。<code class="notranslate">iterable</code> 是可迭代对象，<code class="notranslate">key</code> 是排序规则，默认为 None，<code class="notranslate">reverse</code> 表示是否降序，默认为 False。</li>
+<li>round(number, ndigits=0)<br>
+四舍五入浮点数。<code class="notranslate">number</code> 是要舍入的数，<code class="notranslate">ndigits</code> 是保留小数位数，默认为 0。</li>
+<li>map(func, iterable)<br>
+对可迭代对象应用函数。<code class="notranslate">func</code> 是函数，<code class="notranslate">iterable</code> 是可迭代对象，可传多个。</li>
+</ul>
 <h2>常用方法</h2>
 <h3>字符串</h3>
-<h4>split(sep=None, maxsplit=-1)</h4>
-<p>按 sep 分割字符串，返回列表。maxsplit 指定最大分割次数。</p>
-<h4>join(iterable)</h4>
-<p>将 iterable 中的元素用当前字符串连接。</p>
-<h4>upper() / lower()</h4>
-<p>返回全大写/全小写字符串（无参数）。</p>
-<h4>strip(chars=None)</h4>
-<p>去除两侧的 chars 字符（默认去空格）。</p>
-<h4>lstrip() / rstrip()</h4>
-<p>仅去除左侧/右侧字符（参数同 strip）。</p>
-<h4>find(sub, start=0, end=None)</h4>
-<p>返回 sub 首次出现的索引，找不到返回 -1。</p>
-<h4>replace(old, new, count=-1)</h4>
-<p>替换 old 为 new，count 指定替换次数（默认全部）。</p>
-<h4>count(sub, start=0, end=None)</h4>
-<p>统计 sub 出现的次数。</p>
-<h4>startswith(prefix, start=0, end=None)</h4>
-<p>检查是否以 prefix 开头（支持元组多匹配）。</p>
-<h4>endswith(suffix, start=0, end=None)</h4>
-<p>检查是否以 suffix 结尾（用法同 startswith）。</p>
+<ul>
+<li>split(sep=None, maxsplit=-1)<br>
+按 sep 分割字符串，返回列表。maxsplit 指定最大分割次数。</li>
+<li>join(iterable)<br>
+将 iterable 中的元素用当前字符串连接。</li>
+<li>upper() / lower()<br>
+返回全大写/全小写字符串（无参数）。</li>
+<li>strip(chars=None)<br>
+去除两侧的 chars 字符（默认去空格）。</li>
+<li>lstrip() / rstrip()<br>
+仅去除左侧/右侧字符（参数同 strip）。</li>
+<li>find(sub, start=0, end=None)<br>
+返回 sub 首次出现的索引，找不到返回 -1。</li>
+<li>replace(old, new, count=-1)<br>
+替换 old 为 new，count 指定替换次数（默认全部）。</li>
+<li>count(sub, start=0, end=None)<br>
+统计 sub 出现的次数。</li>
+<li>startswith(prefix, start=0, end=None)<br>
+检查是否以 prefix 开头（支持元组多匹配）。</li>
+<li>endswith(suffix, start=0, end=None)<br>
+检查是否以 suffix 结尾（用法同 startswith）。</li>
+</ul>
 <h3>字典</h3>
-<h4>get(key, default=None)</h4>
-<p>返回 key 对应的值，不存在时返回 default（默认 None）。</p>
-<h4>setdefault(key, default=None)</h4>
-<p>若 key 存在返回其值，否则设置 key: default 并返回 default。</p>
-<h4>update(other_dict/iterable, **kwargs)</h4>
-<p>合并字典或键值对（可接受另一个字典、键值对列表，或关键字参数）。</p>
-<h4>pop(key, default)</h4>
-<p>删除 key 并返回其值，若 key 不存在且未提供 default 则报错。</p>
-<h4>keys() / values() / items()</h4>
-<p>返回键、值、键值对的动态视图（无参数）。</p>
-<h4>dict.fromkeys(iterable, value=None)（类方法）</h4>
-<p>用 iterable 的元素作为键，所有值设为 value（默认 None）。</p>
-<h2>常用包</h2>
-<h3>math</h3></div>
+<ul>
+<li>get(key, default=None)<br>
+返回 key 对应的值，不存在时返回 default（默认 None）。</li>
+<li>setdefault(key, default=None)<br>
+若 key 存在返回其值，否则设置 key: default 并返回 default。</li>
+<li>update(other_dict/iterable, **kwargs)<br>
+合并字典或键值对（可接受另一个字典、键值对列表，或关键字参数）。</li>
+<li>pop(key, default)<br>
+删除 key 并返回其值，若 key 不存在且未提供 default 则报错。</li>
+<li>keys() / values() / items()<br>
+返回键、值、键值对的动态视图（无参数）。</li>
+<li>dict.fromkeys(iterable, value=None)（类方法）<br>
+用 iterable 的元素作为键，所有值设为 value（默认 None）。</li>
+</ul>
+<h3>列表</h3>
+<ul>
+<li>append(obj)<br>
+在列表末尾添加单个元素 obj。</li>
+<li>extend(iterable)<br>
+将 iterable 的元素逐个添加到列表末尾。</li>
+<li>insert(index, obj)<br>
+在指定 index 处插入 obj，原元素后移。</li>
+<li>remove(obj)<br>
+删除第一个匹配的 obj，不存在时抛出 ValueError。</li>
+<li>pop(index=-1)<br>
+删除并返回指定 index 处的元素（默认最后一个）。</li>
+<li>index(obj, start=0, end=None)<br>
+返回 obj 第一次出现的索引，不存在时抛出 ValueError。</li>
+<li>count(obj)<br>
+统计 obj 在列表中出现的次数。</li>
+<li>sort(key=None, reverse=False)<br>
+原地排序列表，key 指定排序规则，reverse 控制降序。</li>
+<li>reverse()<br>
+原地反转列表（无参数）。</li>
+</ul>
+<h3>元组</h3>
+<ul>
+<li>count(obj)<br>
+统计 obj 在元组中出现的次数。</li>
+<li>index(obj, start=0, end=None)<br>
+返回 obj 第一次出现的索引，不存在时抛出 ValueError。</li>
+</ul>
+<h3>集合</h3>
+<ul>
+<li>add(obj)<br>
+向集合添加一个元素 obj。</li>
+<li>remove(obj) / discard(obj)<br>
+删除集合中的 obj，remove 在元素不存在时抛出 KeyError，discard 不会报错。</li>
+<li>union(*others) / |<br>
+返回当前集合与其他集合的并集（不修改原集合）。</li>
+<li>intersection(*others) / &amp;<br>
+返回当前集合与其他集合的交集。</li>
+<li>difference(*others) / -<br>
+返回当前集合与其他集合的差集（当前有但其他没有的元素）。</li>
+<li>symmetric_difference(other) / ^<br>
+返回当前集合与 other 的对称差集（仅出现在其中一个集合的元素）。</li>
+</ul>
+<h2>常用库</h2>
+<h3>math</h3>
+<ul>
+<li>ceil(x)<br>
+向上取整（返回 ≥ x 的最小整数）。</li>
+<li>floor(x)<br>
+向下取整（返回 ≤ x 的最大整数）。</li>
+<li>fabs(x)<br>
+返回 x 的绝对值（浮点数形式）。</li>
+<li>gcd(a, b)<br>
+返回 a 和 b 的最大公约数。</li>
+<li>pow(x, y)<br>
+返回 x 的 y 次方（结果为浮点数，与内置 ** 不同）。</li>
+<li>sqrt(x)<br>
+返回 x 的平方根。</li>
+<li>log(x, base=math.e)<br>
+返回 x 的对数（默认自然对数，base 可指定底数）。</li>
+<li>factorial(x)<br>
+返回 x 的阶乘（x 必须为非负整数）。</li>
+</ul>
+<h3>collections</h3>
+<h4>Counter类</h4>
+<p>将对象按照其中元素的出现次数，自动转化为一个类似字典的计数类。与字典大同小异，但是可以进行计算。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">from collections import Counter
+c = Counter(<span class="pl-s"><span class="pl-pds">"</span>hello<span class="pl-pds">"</span></span>)  <span class="pl-c"><span class="pl-c">#</span> Counter({'h':1, 'e':1, 'l':2, 'o':1})</span></pre></div>
+<ul>
+<li>most_common(n=None)<br>
+返回前 n 个最常见元素（默认全部）。</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">c.update(<span class="pl-s"><span class="pl-pds">"</span>world<span class="pl-pds">"</span></span>)  <span class="pl-c"><span class="pl-c">#</span> Counter({'h':1, 'e':1, 'l':3, 'o':2, 'w':1, 'r':1, 'd':1})</span></pre></div>
+<ul>
+<li>update(iterable)<br>
+合并其他计数器或可迭代对象。参数iterable为可迭代对象或 Counter。</li>
+<li>subtract(iterable)<br>
+减去其他计数器的值（允许负值）。参数iterable为可迭代对象或 Counter。</li>
+</ul>
+<h4>deque类</h4>
+<p>双端列表，使用方法和普通列表类似，不同的是其可以在列表两端以 O(1) 的复杂度入队、出队，在单调队列、广度搜索 BFS 等题目中使用较多。</p>
+<ul>
+<li>append(x) / appendleft(x)<br>
+在右端/左端添加元素 x。</li>
+<li>pop() / popleft()<br>
+移除并返回右端/左端元素（队列为空时报错）。</li>
+<li>extend(iterable) / extendleft(iterable)<br>
+在右端/左端批量添加元素（extendleft 会逆序插入）。</li>
+<li>rotate(n=1)<br>
+向右循环移动 n 步（n 为负则向左移动）。</li>
+</ul>
+<h3>heapq</h3>
+<p>堆模块。由于堆的数据结构有着 O(logn) 的优秀的算法复杂度，所以在求最值的时候，使用堆往往更加快捷。最小堆。</p>
+<ul>
+<li>heapify(x)<br>
+将普通列表 x 原地转换为最小堆（时间复杂度 O(n)）。</li>
+<li>heappush(heap, item)<br>
+将 item 插入堆，保持堆结构。</li>
+<li>heappop(heap)<br>
+弹出并返回堆中最小元素（堆大小减 1）。</li>
+<li>nlargest(n, iterable, key=None)<br>
+返回可迭代对象中最大的 n 个元素（无需堆化）。</li>
+<li>nsmallest(n, iterable, key=None)<br>
+返回可迭代对象中最小的 n 个元素。</li>
+</ul>
+<h3>itertools</h3>
+<ul>
+<li>permutations(iterable, r=None)<br>
+生成 iterable 中长度为 r 的排列（顺序敏感）。</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">list(itertools.permutations(<span class="pl-s"><span class="pl-pds">"</span>ABC<span class="pl-pds">"</span></span>, 2))  <span class="pl-c"><span class="pl-c">#</span> [('A','B'), ('A','C'), ('B','A'), ...]</span></pre></div>
+<ul>
+<li>combinations(iterable, r)<br>
+生成 iterable 中长度为 r 的组合（顺序无关）。</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">list(itertools.combinations(<span class="pl-s"><span class="pl-pds">"</span>ABC<span class="pl-pds">"</span></span>, 2))  <span class="pl-c"><span class="pl-c">#</span> [('A','B'), ('A','C'), ('B','C')]</span></pre></div>
+<ul>
+<li>combinations_with_replacement(iterable, r)<br>
+允许元素重复的组合。</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">list(itertools.combinations_with_replacement(<span class="pl-s"><span class="pl-pds">"</span>AB<span class="pl-pds">"</span></span>, 2))  <span class="pl-c"><span class="pl-c">#</span> [('A','A'), ('A','B'), ('B','B')]</span></pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
