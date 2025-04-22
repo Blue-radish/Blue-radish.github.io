@@ -115,10 +115,76 @@ arr = list(map(int, <span class="pl-en">sys.stdin.readline().split</span>())) <s
 <p>使用 print(*list) 解包列表输出空格分隔的结果，换行输出时设置 sep='\n'。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">print(<span class="pl-k">*</span>result, sep = <span class="pl-s"><span class="pl-pds">"</span>\n<span class="pl-pds">"</span></span>)</pre></div>
 <h2>常用函数</h2>
-<h3></h3>
+<h3>print</h3>
+<p>输出内容到控制台。<br>
+参数：*values（多个值）, sep=' '（分隔符）, end='\n'（结束符）, file=sys.stdout（输出流）, flush=False（是否强制刷新）。</p>
+<h3>type</h3>
+<p>返回对象的类型。<br>
+参数：object（要检查的对象）。</p>
+<h3>range</h3>
+<p>生成整数序列。<br>
+参数：start（起始值，默认 0）, stop（结束值）, step=1（步长）。</p>
+<h3>enumerate</h3>
+<p>返回带索引的迭代器。<br>
+参数：iterable（可迭代对象）, start=0（起始索引）。</p>
+<h3>zip</h3>
+<p>将多个可迭代对象组合为元组迭代器。<br>
+参数：*iterables（多个可迭代对象）。</p>
+<h3>ord</h3>
+<p>返回字符的 Unicode 码点。<br>
+参数：char（单个字符）。</p>
+<h3>chr</h3>
+<p>返回 Unicode 码点对应的字符。<br>
+参数：integer（整数码点）。</p>
+<h3>reversed</h3>
+<p>反转序列并返回迭代器。<br>
+参数：seq（可反转的序列，如列表、元组）。</p>
+<h3>sorted</h3>
+<p>返回排序后的新列表。<br>
+参数：iterable（可迭代对象）, key=None（排序规则）, reverse=False（是否降序）。</p>
+<h3>round</h3>
+<p>四舍五入浮点数。<br>
+参数：number（要舍入的数）, ndigits=0（保留小数位数）。</p>
+<h3>map</h3>
+<p>对可迭代对象应用函数。<br>
+参数：func（函数）, iterable（可迭代对象，可传多个）。</p>
 <h2>常用方法</h2>
+<h3>字符串</h3>
+<h4>split(sep=None, maxsplit=-1)</h4>
+<p>按 sep 分割字符串，返回列表。maxsplit 指定最大分割次数。</p>
+<h4>join(iterable)</h4>
+<p>将 iterable 中的元素用当前字符串连接。</p>
+<h4>upper() / lower()</h4>
+<p>返回全大写/全小写字符串（无参数）。</p>
+<h4>strip(chars=None)</h4>
+<p>去除两侧的 chars 字符（默认去空格）。</p>
+<h4>lstrip() / rstrip()</h4>
+<p>仅去除左侧/右侧字符（参数同 strip）。</p>
+<h4>find(sub, start=0, end=None)</h4>
+<p>返回 sub 首次出现的索引，找不到返回 -1。</p>
+<h4>replace(old, new, count=-1)</h4>
+<p>替换 old 为 new，count 指定替换次数（默认全部）。</p>
+<h4>count(sub, start=0, end=None)</h4>
+<p>统计 sub 出现的次数。</p>
+<h4>startswith(prefix, start=0, end=None)</h4>
+<p>检查是否以 prefix 开头（支持元组多匹配）。</p>
+<h4>endswith(suffix, start=0, end=None)</h4>
+<p>检查是否以 suffix 结尾（用法同 startswith）。</p>
 <h3>字典</h3>
-<h4>setdefault()</h4></div>
+<h4>get(key, default=None)</h4>
+<p>返回 key 对应的值，不存在时返回 default（默认 None）。</p>
+<h4>setdefault(key, default=None)</h4>
+<p>若 key 存在返回其值，否则设置 key: default 并返回 default。</p>
+<h4>update(other_dict/iterable, **kwargs)</h4>
+<p>合并字典或键值对（可接受另一个字典、键值对列表，或关键字参数）。</p>
+<h4>pop(key, default)</h4>
+<p>删除 key 并返回其值，若 key 不存在且未提供 default 则报错。</p>
+<h4>keys() / values() / items()</h4>
+<p>返回键、值、键值对的动态视图（无参数）。</p>
+<h4>dict.fromkeys(iterable, value=None)（类方法）</h4>
+<p>用 iterable 的元素作为键，所有值设为 value（默认 None）。</p>
+<h2>常用包</h2>
+<h3>math</h3></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
