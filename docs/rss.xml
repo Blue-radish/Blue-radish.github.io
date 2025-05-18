@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Fri, 02 May 2025 10:47:21 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>人工智能专业英语(期末复习)</title><link>https://Blue-radish.github.io/post/ren-gong-zhi-neng-zhuan-ye-ying-yu-%28-qi-mo-fu-xi-%29.html</link><description>## 高频单词
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Sun, 18 May 2025 09:07:01 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>人工智能专业英语(期末复习)</title><link>https://Blue-radish.github.io/post/ren-gong-zhi-neng-zhuan-ye-ying-yu-%28-qi-mo-fu-xi-%29.html</link><description>## 高频单词
 #### A-C
 | 单词                        | 音标                        | 中文释义         |
 |-----------------------------|-----------------------------|------------------|
@@ -34,7 +34,6 @@
 | Genetic Algorithm        | /dʒəˈnetɪk ˈælɡərɪðəm/    | 遗传算法       |
 | Gradient Boosting        | /ˈɡreɪdiənt ˈboʊstɪŋ/     | 梯度提升         |
 | Gradient Descent         | /ˈɡreɪdiənt dɪˈsɛnt/     | 梯度下降         |
-| Heuristic Search         | /hjuˈrɪstɪk sɜːrtʃ/     | 启发式搜索       |
 | Humanoid Robot           | /hjuːˈmænɔɪd ˈroʊbɑːt/ | 人形机器人     |
 | Hyperparameter           | /ˌhaɪpərˈpærəmɪtər/     | 超参数         |
 | Hyperplane              | /ˈhaɪpərpleɪn/           | 超平面         |
@@ -50,7 +49,6 @@
 | 单词                        | 音标                        | 中文释义         |
 |-----------------------------|-----------------------------|------------------|
 | Machine Translation      | /məˈʃiːn trænsˈleɪʃən/   | 机器翻译       |
-| Markov Decision Process (MDP) | /ˈmɑːrkɔːv dɪˈsɪʒən ˈprɑːses/ | 马尔可夫决策过程 |
 | Natural Language Processing (NLP) | /ˈnætʃrəl ˈlæŋɡwɪdʒ ˈprɑːsesɪŋ/ | 自然语言处理 |
 | Neural Network          | /ˈnʊrəl ˈnɛtwɜːrk/     | 神经网络       |
 | NLP                    | /ɛn ɛl piː/         | 自然语言处理     |
@@ -98,10 +96,10 @@
 ### 原文（げんぶん）
 My name is xxx. I am an undergraduate student at Tokyo University, majoring in Artificial Intelligence. My grades are in the top 15% of my major. During my studies, I have taken important courses such as Computer Networks, Deep Learning, and Machine Learning, which have provided me with a solid technical foundation. I am proficient in using Python, PyTorch, C/C++, and Shell, and I am also experienced in working in a Linux environment.  
 I have participated in several national competitions and won two second prizes and several third prizes. For example, in the iCAN Contest, I developed a vision-based product inspection system, where I was responsible for visual algorithm. In another project, I developed a multimodal fake news detection system using BERT and ResNet.  
-Additionally, I contributed to an SCI paper published in the journal *Electronics*, where I participated in the experiments and the writing process.
+Additionally, I have an SCI paper published in Electronics, which focuses on computer vision.
 
 ### 翻訳文（へんやくもん）
-我叫xxx，目前是东京大学的一名本科生，专业是人工智能。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/ren-gong-zhi-neng-zhuan-ye-ying-yu-%28-qi-mo-fu-xi-%29.html</guid><pubDate>Fri, 02 May 2025 10:29:59 +0000</pubDate></item><item><title>英语作文模板</title><link>https://Blue-radish.github.io/post/ying-yu-zuo-wen-mo-ban.html</link><description>## 现象解释类议论文
+我叫xxx，是东京大学的一名本科生，主修人工智能。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/ren-gong-zhi-neng-zhuan-ye-ying-yu-%28-qi-mo-fu-xi-%29.html</guid><pubDate>Fri, 02 May 2025 10:29:59 +0000</pubDate></item><item><title>英语作文模板</title><link>https://Blue-radish.github.io/post/ying-yu-zuo-wen-mo-ban.html</link><description>## 现象解释类议论文
 ### 模板
 第一段：
 With the rapid development of __________ (填：society, culture, medical service, education, economy), it is of great necessity for __________ (填：students,residents,citizens,youngsters）to __________. it is quite natural for us to ponder over the question of __________ (填：主题词).
