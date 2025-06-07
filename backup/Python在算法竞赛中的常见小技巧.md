@@ -64,7 +64,18 @@ print(*result, sep = "\n")
 四舍五入浮点数。`number` 是要舍入的数，`ndigits` 是保留小数位数，默认为 0。
 - map(func, iterable)
 对可迭代对象应用函数。`func` 是函数，`iterable` 是可迭代对象，可传多个。
+- bin()、oct()、hex()
+分别用于将十进制数转换为二进制、八进制和十六进制。这些函数返回的是字符串形式的结果，并且会包含前缀（0b、0o、0x）。
+```bash
+# 十进制数
+decimal_number = 255
+binary_number = bin(decimal_number)
+print(f"二进制：{binary_number}")  # 输出：0b11111111
 
+octal_number = "377"
+decimal_from_octal = int(octal_number, 8)
+print(f"八进制 {octal_number} 转换为十进制：{decimal_from_octal}")  # 输出：255
+```
 
 ## 常用方法
 ### 字符串
@@ -152,7 +163,7 @@ print(*result, sep = "\n")
 - fabs(x)
 返回 x 的绝对值（浮点数形式）。
 - gcd(a, b)
-返回 a 和 b 的最大公约数。
+返回 a 和 b 的最大公约数。lcm = a * b / gcd(a, b)。
 - pow(x, y)
 返回 x 的 y 次方（结果为浮点数，与内置 ** 不同）。
 - sqrt(x)
