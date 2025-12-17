@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekBSZ.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/125821962?v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## DAY 1
+| 单词          | 音标                  | 中文释义               |
+|---------------|-----------------------|------------------------|
+| progress      | /ˈprəʊɡres/           | 进步，进展             |
+| gress         | /ɡres/                | 行走                   |
+| profit        | /ˈprɒfɪt/             | 利润；得利             |
+| professor     | /prəˈfesə(r)/        | 教授                   |
+| profession    | /prəˈfeʃn/            | 职业                   |
+| professional  | /prəˈfeʃənl/          | 专业的；专业人士       |
+| promise       | /ˈprɒmɪs/             | 承诺；希望             |
+| miss          | /mɪs/                 | 女士；想               |
+| prove         | /pruːv/               | 证明                   |
+| proof         | /pruːf/               | 证明，证据             |
+| precious      | /ˈpreʃəs/             | 珍贵的                 |
+| predict       | /prɪˈdɪkt/            | 预测                   |
+| prevent       | /prɪˈvent/            | 预防；妨碍             |
+| went          | /went/                | go的过去式             |
+| preface       | /ˈprefəs/             | 前言                   |
+| preview       | /ˈpriːvjuː/           | 预览；预习             |
+| percent       | /pəˈsent/             | 百分之                 |
+| person        | /ˈpɜːsn/              | 人                     |
+| perfect       | /ˈpɜːfɪkt/            | 完美的；使完美         |
+| persuade      | /pəˈsweɪd/            | 说服                   |
+| permit        | /pəˈmɪt/ /ˈpɜːmɪt/    | 允许；许可证           |
+| receive       | /rɪˈsiːv/             | 收到                   |
+| rely          | /rɪˈlaɪ/              | 依靠                   |
+| lie           | /laɪ/ /liː/           | 躺                     |
+| repair        | /rɪˈpeə(r)/           | 修理                   |
+| repeat        | /rɪˈpiːt/             | 重复                   |
+| repetition    | /ˌrepəˈtɪʃn/          | 重复                   |
+| repetitive    | /rɪˈpetətɪv/          | 重复的                 |
+| repeatedly    | /rɪˈpiːtɪdli/         | 反复的                 |
+| rescue        | /ˈreskjuː/            | 营救                   |
+
+## DAY 2
+| 单词          | 音标                  | 中文释义                     |
+|---------------|-----------------------|------------------------------|
+| republic      | /rɪˈpʌblɪk/           | 共和国                       |
+| public        | /ˈpʌblɪk/             | 公众；公共的                 |
+| report        | /rɪˈpɔːt/             | 报告                         |
+| reporter      | /rɪˈpɔːtə(r)/         | 记者                         |
+| rest          | /rest/                | 休息；剩余部分；休息；依靠   |
+| increase      | /ɪnˈkriːs/ /ˈɪŋkriːs/ | 上升                         |
+| decrease      | /dɪˈkriːs/ /ˈdiːkriːs/ | （使）下降                   |
+| upgrade       | /ˈʌpɡreɪd/ /ʌpˈɡreɪd/ | （使）升级                   |
+| degrade       | /dɪˈɡreɪd/            | （使）降级；羞辱             |
+| inside        | /ˌɪnˈsaɪd/ /ˈɪnsaɪd/  | 里面的                       |
+| import        | /ˈɪmpɔːt/ /ɪmˈpɔːt/   | 进口                         |
+| port          | /pɔːt/                | 港口                         |
+| input         | /ˈɪnpʊt/              | 输入                         |
+| invite        | /ɪnˈvaɪt/             | 邀请；引发                   |
+| ink           | /ɪŋk/                 | 墨水                         |
+| export        | /ˈekspɔːt/ /ɪkˈspɔːt/  | 出口                         |
+| except        | /ɪkˈsept/             | 除...之外                    |
+| expand        | /ɪkˈspænd/            | 扩张                         |
+| expansion     | /ɪkˈspænʃn/           | 扩张                         |
+| exit          | /ˈeksɪt/ /ɪɡˈzɪt/     | 出口；通道                   |
+| exhibit       | /ɪɡˈzɪbɪt/ /ˈeksɪbɪt/ | 展览                         |
+| exhibition    | /ˌeksɪˈbɪʃn/          | 展览会                       |
+| experience    | /ɪkˈspɪəriəns/        | 经验；体会                   |
+| extreme       | /ɪkˈstriːm/           | 极端的；极端                 |
+| dream         | /driːm/               | 梦；做梦                     |
+| explain       | /ɪkˈspleɪn/           | 解释                         |
+| plan          | /plæn/                | 计划                         |
+| interpersonal | /ˌɪntəˈpɜːsənl/       | 人际的                       |
+| inter         | /ˈɪntə(r)/            | 间                           |
+| interview     | /ˈɪntəvjuː/           | 面试；会谈                   |
+| Internet      | /ˈɪntənet/            | 互联网                       |
+| interface     | /ˈɪntəfeɪs/           | 界面；接口                   |
+| translate     | /trænsˈleɪt/          | 翻译                         |
+| translation   | /trænsˈleɪʃn/         | 翻译；译文                   |
+| transport     | /ˈtrænspɔːt/ /trænsˈpɔːt/ | 运输                       |
+| abnormal      | /æbˈnɔːml/            | 不正常的                     |
+| normal        | /ˈnɔːml/              | 正常的                       |
+| abuse         | /əˈbjuːz/ /ˈəbjuːs/   | 滥用；虐待                   |
+| use           | /juːz/ /juːs/         | 使用                         |
+| agree         | /əˈɡriː/              | 同意                         |
+
+## DAY3
+| 单词          | 音标                  | 中文释义                     |
+|---------------|-----------------------|------------------------------|
+| admire        | /ədˈmaɪə(r)/          | 钦佩；羡慕                   |
+| adapt         | /əˈdæpt/              | 改编；（使）适应             |
+| adjust        | /əˈdʒʌst/             | 使适应                       |
+| advance       | /ədˈvɑːns/ /ˈædvɑːns/  | （使）前进；进展；预付款     |
+| advanced      | /ədˈvɑːnst/           | 先进的                       |
+| advantage     | /ədˈvɑːntɪdʒ/         | 优势                         |
+| attack        | /əˈtæk/               | 攻击；病发作                 |
+| attract       | /əˈtrækt/             | 吸引                         |
+| attractive    | /əˈtræktɪv/           | 有吸引力的                   |
+| accumulate    | /əˈkjuːmjəleɪt/       | （使）积累                   |
+| control       | /kənˈtrəʊl/ /ˈkəntrəʊl/ | 控制                       |
+| cooperate     | /kəʊˈɒpəreɪt/         | 合作                         |
+| cooperative   | /kəʊˈɒpərətɪv/        | 合作的；合作社               |
+| cooperation   | /kəʊˌɒpəˈreɪʃn/       | 合作                         |
+| company       | /ˈkʌmpəni/            | 公司；陪伴                   |
+| accompany     | /əˈkʌmpəni/           | 陪伴；伴奏                   |
+| companion     | /kəmˈpænjən/          | 同伴                         |
+| comfort       | /ˈkʌmfət/ /kəmˈfɜːt/   | 舒适；安慰；使舒适           |
+| comfortable   | /ˈkʌmftəbl/           | 舒适的                       |
+| command       | /kəˈmɑːnd/            | 命令；掌握                   |
+| contribute    | /kənˈtrɪbjuːt/        | 贡献；导致                   |
+| contribution  | /ˌkɒntrɪˈbjuːʃn/      | 贡献                         |
+| tribute       | /ˈtrɪbjuːt/           | 贡品；赞颂                   |
+| distribute    | /dɪˈstrɪbjuːt/        | 分配                         |
+| distributor   | /dɪˈstrɪbjətə(r)/     | 分配者；分销商               |
+| attribute     | /əˈtrɪbjuːt/ /ˈætrɪbjuːt/ | 归功于；特征             |
+| subway        | /ˈsʌbweɪ/             | 地铁                         |
+| way           | /weɪ/                 | 路                           |
+| supreme       | /suːˈpriːm/           | 最高的；至高无上的           |
+| uneasy        | /ʌnˈiːzi/             | 焦虑的                       |
+| unfortunately | /ʌnˈfɔːtʃənətli/      | 不幸的                       |
+| misfortune    | /ˌmɪsˈfɔːtʃuːn/       | 不幸                         |
+| unusual       | /ʌnˈjuːʒuəl/          | 不寻常的                     |
+| usual         | /ˈjuːʒuəl/            | 通常的                       |
+| usually       | /ˈjuːʒuəli/           | 通常，平常                   |
+| unless        | /ənˈles/              | 除非                         |
+| unlikely      | /ʌnˈlaɪkli/           | 未必的                       |
+| likelihood    | /ˈlaɪklihʊd/          | 可能性                       |
+| unlike        | /ˌʌnˈlaɪk/ /ˈʌnlaɪk/   | 和...不同；不像的             |。">
+<meta property="og:title" content="英语单词">
+<meta property="og:description" content="## DAY 1
+| 单词          | 音标                  | 中文释义               |
+|---------------|-----------------------|------------------------|
+| progress      | /ˈprəʊɡres/           | 进步，进展             |
+| gress         | /ɡres/                | 行走                   |
+| profit        | /ˈprɒfɪt/             | 利润；得利             |
+| professor     | /prəˈfesə(r)/        | 教授                   |
+| profession    | /prəˈfeʃn/            | 职业                   |
+| professional  | /prəˈfeʃənl/          | 专业的；专业人士       |
+| promise       | /ˈprɒmɪs/             | 承诺；希望             |
+| miss          | /mɪs/                 | 女士；想               |
+| prove         | /pruːv/               | 证明                   |
+| proof         | /pruːf/               | 证明，证据             |
+| precious      | /ˈpreʃəs/             | 珍贵的                 |
+| predict       | /prɪˈdɪkt/            | 预测                   |
+| prevent       | /prɪˈvent/            | 预防；妨碍             |
+| went          | /went/                | go的过去式             |
+| preface       | /ˈprefəs/             | 前言                   |
+| preview       | /ˈpriːvjuː/           | 预览；预习             |
+| percent       | /pəˈsent/             | 百分之                 |
+| person        | /ˈpɜːsn/              | 人                     |
+| perfect       | /ˈpɜːfɪkt/            | 完美的；使完美         |
+| persuade      | /pəˈsweɪd/            | 说服                   |
+| permit        | /pəˈmɪt/ /ˈpɜːmɪt/    | 允许；许可证           |
+| receive       | /rɪˈsiːv/             | 收到                   |
+| rely          | /rɪˈlaɪ/              | 依靠                   |
+| lie           | /laɪ/ /liː/           | 躺                     |
+| repair        | /rɪˈpeə(r)/           | 修理                   |
+| repeat        | /rɪˈpiːt/             | 重复                   |
+| repetition    | /ˌrepəˈtɪʃn/          | 重复                   |
+| repetitive    | /rɪˈpetətɪv/          | 重复的                 |
+| repeatedly    | /rɪˈpiːtɪdli/         | 反复的                 |
+| rescue        | /ˈreskjuː/            | 营救                   |
+
+## DAY 2
+| 单词          | 音标                  | 中文释义                     |
+|---------------|-----------------------|------------------------------|
+| republic      | /rɪˈpʌblɪk/           | 共和国                       |
+| public        | /ˈpʌblɪk/             | 公众；公共的                 |
+| report        | /rɪˈpɔːt/             | 报告                         |
+| reporter      | /rɪˈpɔːtə(r)/         | 记者                         |
+| rest          | /rest/                | 休息；剩余部分；休息；依靠   |
+| increase      | /ɪnˈkriːs/ /ˈɪŋkriːs/ | 上升                         |
+| decrease      | /dɪˈkriːs/ /ˈdiːkriːs/ | （使）下降                   |
+| upgrade       | /ˈʌpɡreɪd/ /ʌpˈɡreɪd/ | （使）升级                   |
+| degrade       | /dɪˈɡreɪd/            | （使）降级；羞辱             |
+| inside        | /ˌɪnˈsaɪd/ /ˈɪnsaɪd/  | 里面的                       |
+| import        | /ˈɪmpɔːt/ /ɪmˈpɔːt/   | 进口                         |
+| port          | /pɔːt/                | 港口                         |
+| input         | /ˈɪnpʊt/              | 输入                         |
+| invite        | /ɪnˈvaɪt/             | 邀请；引发                   |
+| ink           | /ɪŋk/                 | 墨水                         |
+| export        | /ˈekspɔːt/ /ɪkˈspɔːt/  | 出口                         |
+| except        | /ɪkˈsept/             | 除...之外                    |
+| expand        | /ɪkˈspænd/            | 扩张                         |
+| expansion     | /ɪkˈspænʃn/           | 扩张                         |
+| exit          | /ˈeksɪt/ /ɪɡˈzɪt/     | 出口；通道                   |
+| exhibit       | /ɪɡˈzɪbɪt/ /ˈeksɪbɪt/ | 展览                         |
+| exhibition    | /ˌeksɪˈbɪʃn/          | 展览会                       |
+| experience    | /ɪkˈspɪəriəns/        | 经验；体会                   |
+| extreme       | /ɪkˈstriːm/           | 极端的；极端                 |
+| dream         | /driːm/               | 梦；做梦                     |
+| explain       | /ɪkˈspleɪn/           | 解释                         |
+| plan          | /plæn/                | 计划                         |
+| interpersonal | /ˌɪntəˈpɜːsənl/       | 人际的                       |
+| inter         | /ˈɪntə(r)/            | 间                           |
+| interview     | /ˈɪntəvjuː/           | 面试；会谈                   |
+| Internet      | /ˈɪntənet/            | 互联网                       |
+| interface     | /ˈɪntəfeɪs/           | 界面；接口                   |
+| translate     | /trænsˈleɪt/          | 翻译                         |
+| translation   | /trænsˈleɪʃn/         | 翻译；译文                   |
+| transport     | /ˈtrænspɔːt/ /trænsˈpɔːt/ | 运输                       |
+| abnormal      | /æbˈnɔːml/            | 不正常的                     |
+| normal        | /ˈnɔːml/              | 正常的                       |
+| abuse         | /əˈbjuːz/ /ˈəbjuːs/   | 滥用；虐待                   |
+| use           | /juːz/ /juːs/         | 使用                         |
+| agree         | /əˈɡriː/              | 同意                         |
+
+## DAY3
+| 单词          | 音标                  | 中文释义                     |
+|---------------|-----------------------|------------------------------|
+| admire        | /ədˈmaɪə(r)/          | 钦佩；羡慕                   |
+| adapt         | /əˈdæpt/              | 改编；（使）适应             |
+| adjust        | /əˈdʒʌst/             | 使适应                       |
+| advance       | /ədˈvɑːns/ /ˈædvɑːns/  | （使）前进；进展；预付款     |
+| advanced      | /ədˈvɑːnst/           | 先进的                       |
+| advantage     | /ədˈvɑːntɪdʒ/         | 优势                         |
+| attack        | /əˈtæk/               | 攻击；病发作                 |
+| attract       | /əˈtrækt/             | 吸引                         |
+| attractive    | /əˈtræktɪv/           | 有吸引力的                   |
+| accumulate    | /əˈkjuːmjəleɪt/       | （使）积累                   |
+| control       | /kənˈtrəʊl/ /ˈkəntrəʊl/ | 控制                       |
+| cooperate     | /kəʊˈɒpəreɪt/         | 合作                         |
+| cooperative   | /kəʊˈɒpərətɪv/        | 合作的；合作社               |
+| cooperation   | /kəʊˌɒpəˈreɪʃn/       | 合作                         |
+| company       | /ˈkʌmpəni/            | 公司；陪伴                   |
+| accompany     | /əˈkʌmpəni/           | 陪伴；伴奏                   |
+| companion     | /kəmˈpænjən/          | 同伴                         |
+| comfort       | /ˈkʌmfət/ /kəmˈfɜːt/   | 舒适；安慰；使舒适           |
+| comfortable   | /ˈkʌmftəbl/           | 舒适的                       |
+| command       | /kəˈmɑːnd/            | 命令；掌握                   |
+| contribute    | /kənˈtrɪbjuːt/        | 贡献；导致                   |
+| contribution  | /ˌkɒntrɪˈbjuːʃn/      | 贡献                         |
+| tribute       | /ˈtrɪbjuːt/           | 贡品；赞颂                   |
+| distribute    | /dɪˈstrɪbjuːt/        | 分配                         |
+| distributor   | /dɪˈstrɪbjətə(r)/     | 分配者；分销商               |
+| attribute     | /əˈtrɪbjuːt/ /ˈætrɪbjuːt/ | 归功于；特征             |
+| subway        | /ˈsʌbweɪ/             | 地铁                         |
+| way           | /weɪ/                 | 路                           |
+| supreme       | /suːˈpriːm/           | 最高的；至高无上的           |
+| uneasy        | /ʌnˈiːzi/             | 焦虑的                       |
+| unfortunately | /ʌnˈfɔːtʃənətli/      | 不幸的                       |
+| misfortune    | /ˌmɪsˈfɔːtʃuːn/       | 不幸                         |
+| unusual       | /ʌnˈjuːʒuəl/          | 不寻常的                     |
+| usual         | /ˈjuːʒuəl/            | 通常的                       |
+| usually       | /ˈjuːʒuəli/           | 通常，平常                   |
+| unless        | /ənˈles/              | 除非                         |
+| unlikely      | /ʌnˈlaɪkli/           | 未必的                       |
+| likelihood    | /ˈlaɪklihʊd/          | 可能性                       |
+| unlike        | /ˌʌnˈlaɪk/ /ˈʌnlaɪk/   | 和...不同；不像的             |。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Blue-radish.github.io/post/ying-yu-dan-ci.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/125821962?v=4">
+<title>英语单词</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">英语单词</h1>
+<div class="title-right">
+    <a href="https://Blue-radish.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/Blue-radish/Blue-radish.github.io/issues/13" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>DAY 1</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>单词</th>
+<th>音标</th>
+<th>中文释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>progress</td>
+<td>/ˈprəʊɡres/</td>
+<td>进步，进展</td>
+</tr>
+<tr>
+<td>gress</td>
+<td>/ɡres/</td>
+<td>行走</td>
+</tr>
+<tr>
+<td>profit</td>
+<td>/ˈprɒfɪt/</td>
+<td>利润；得利</td>
+</tr>
+<tr>
+<td>professor</td>
+<td>/prəˈfesə(r)/</td>
+<td>教授</td>
+</tr>
+<tr>
+<td>profession</td>
+<td>/prəˈfeʃn/</td>
+<td>职业</td>
+</tr>
+<tr>
+<td>professional</td>
+<td>/prəˈfeʃənl/</td>
+<td>专业的；专业人士</td>
+</tr>
+<tr>
+<td>promise</td>
+<td>/ˈprɒmɪs/</td>
+<td>承诺；希望</td>
+</tr>
+<tr>
+<td>miss</td>
+<td>/mɪs/</td>
+<td>女士；想</td>
+</tr>
+<tr>
+<td>prove</td>
+<td>/pruːv/</td>
+<td>证明</td>
+</tr>
+<tr>
+<td>proof</td>
+<td>/pruːf/</td>
+<td>证明，证据</td>
+</tr>
+<tr>
+<td>precious</td>
+<td>/ˈpreʃəs/</td>
+<td>珍贵的</td>
+</tr>
+<tr>
+<td>predict</td>
+<td>/prɪˈdɪkt/</td>
+<td>预测</td>
+</tr>
+<tr>
+<td>prevent</td>
+<td>/prɪˈvent/</td>
+<td>预防；妨碍</td>
+</tr>
+<tr>
+<td>went</td>
+<td>/went/</td>
+<td>go的过去式</td>
+</tr>
+<tr>
+<td>preface</td>
+<td>/ˈprefəs/</td>
+<td>前言</td>
+</tr>
+<tr>
+<td>preview</td>
+<td>/ˈpriːvjuː/</td>
+<td>预览；预习</td>
+</tr>
+<tr>
+<td>percent</td>
+<td>/pəˈsent/</td>
+<td>百分之</td>
+</tr>
+<tr>
+<td>person</td>
+<td>/ˈpɜːsn/</td>
+<td>人</td>
+</tr>
+<tr>
+<td>perfect</td>
+<td>/ˈpɜːfɪkt/</td>
+<td>完美的；使完美</td>
+</tr>
+<tr>
+<td>persuade</td>
+<td>/pəˈsweɪd/</td>
+<td>说服</td>
+</tr>
+<tr>
+<td>permit</td>
+<td>/pəˈmɪt/ /ˈpɜːmɪt/</td>
+<td>允许；许可证</td>
+</tr>
+<tr>
+<td>receive</td>
+<td>/rɪˈsiːv/</td>
+<td>收到</td>
+</tr>
+<tr>
+<td>rely</td>
+<td>/rɪˈlaɪ/</td>
+<td>依靠</td>
+</tr>
+<tr>
+<td>lie</td>
+<td>/laɪ/ /liː/</td>
+<td>躺</td>
+</tr>
+<tr>
+<td>repair</td>
+<td>/rɪˈpeə(r)/</td>
+<td>修理</td>
+</tr>
+<tr>
+<td>repeat</td>
+<td>/rɪˈpiːt/</td>
+<td>重复</td>
+</tr>
+<tr>
+<td>repetition</td>
+<td>/ˌrepəˈtɪʃn/</td>
+<td>重复</td>
+</tr>
+<tr>
+<td>repetitive</td>
+<td>/rɪˈpetətɪv/</td>
+<td>重复的</td>
+</tr>
+<tr>
+<td>repeatedly</td>
+<td>/rɪˈpiːtɪdli/</td>
+<td>反复的</td>
+</tr>
+<tr>
+<td>rescue</td>
+<td>/ˈreskjuː/</td>
+<td>营救</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h2>DAY 2</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>单词</th>
+<th>音标</th>
+<th>中文释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>republic</td>
+<td>/rɪˈpʌblɪk/</td>
+<td>共和国</td>
+</tr>
+<tr>
+<td>public</td>
+<td>/ˈpʌblɪk/</td>
+<td>公众；公共的</td>
+</tr>
+<tr>
+<td>report</td>
+<td>/rɪˈpɔːt/</td>
+<td>报告</td>
+</tr>
+<tr>
+<td>reporter</td>
+<td>/rɪˈpɔːtə(r)/</td>
+<td>记者</td>
+</tr>
+<tr>
+<td>rest</td>
+<td>/rest/</td>
+<td>休息；剩余部分；休息；依靠</td>
+</tr>
+<tr>
+<td>increase</td>
+<td>/ɪnˈkriːs/ /ˈɪŋkriːs/</td>
+<td>上升</td>
+</tr>
+<tr>
+<td>decrease</td>
+<td>/dɪˈkriːs/ /ˈdiːkriːs/</td>
+<td>（使）下降</td>
+</tr>
+<tr>
+<td>upgrade</td>
+<td>/ˈʌpɡreɪd/ /ʌpˈɡreɪd/</td>
+<td>（使）升级</td>
+</tr>
+<tr>
+<td>degrade</td>
+<td>/dɪˈɡreɪd/</td>
+<td>（使）降级；羞辱</td>
+</tr>
+<tr>
+<td>inside</td>
+<td>/ˌɪnˈsaɪd/ /ˈɪnsaɪd/</td>
+<td>里面的</td>
+</tr>
+<tr>
+<td>import</td>
+<td>/ˈɪmpɔːt/ /ɪmˈpɔːt/</td>
+<td>进口</td>
+</tr>
+<tr>
+<td>port</td>
+<td>/pɔːt/</td>
+<td>港口</td>
+</tr>
+<tr>
+<td>input</td>
+<td>/ˈɪnpʊt/</td>
+<td>输入</td>
+</tr>
+<tr>
+<td>invite</td>
+<td>/ɪnˈvaɪt/</td>
+<td>邀请；引发</td>
+</tr>
+<tr>
+<td>ink</td>
+<td>/ɪŋk/</td>
+<td>墨水</td>
+</tr>
+<tr>
+<td>export</td>
+<td>/ˈekspɔːt/ /ɪkˈspɔːt/</td>
+<td>出口</td>
+</tr>
+<tr>
+<td>except</td>
+<td>/ɪkˈsept/</td>
+<td>除...之外</td>
+</tr>
+<tr>
+<td>expand</td>
+<td>/ɪkˈspænd/</td>
+<td>扩张</td>
+</tr>
+<tr>
+<td>expansion</td>
+<td>/ɪkˈspænʃn/</td>
+<td>扩张</td>
+</tr>
+<tr>
+<td>exit</td>
+<td>/ˈeksɪt/ /ɪɡˈzɪt/</td>
+<td>出口；通道</td>
+</tr>
+<tr>
+<td>exhibit</td>
+<td>/ɪɡˈzɪbɪt/ /ˈeksɪbɪt/</td>
+<td>展览</td>
+</tr>
+<tr>
+<td>exhibition</td>
+<td>/ˌeksɪˈbɪʃn/</td>
+<td>展览会</td>
+</tr>
+<tr>
+<td>experience</td>
+<td>/ɪkˈspɪəriəns/</td>
+<td>经验；体会</td>
+</tr>
+<tr>
+<td>extreme</td>
+<td>/ɪkˈstriːm/</td>
+<td>极端的；极端</td>
+</tr>
+<tr>
+<td>dream</td>
+<td>/driːm/</td>
+<td>梦；做梦</td>
+</tr>
+<tr>
+<td>explain</td>
+<td>/ɪkˈspleɪn/</td>
+<td>解释</td>
+</tr>
+<tr>
+<td>plan</td>
+<td>/plæn/</td>
+<td>计划</td>
+</tr>
+<tr>
+<td>interpersonal</td>
+<td>/ˌɪntəˈpɜːsənl/</td>
+<td>人际的</td>
+</tr>
+<tr>
+<td>inter</td>
+<td>/ˈɪntə(r)/</td>
+<td>间</td>
+</tr>
+<tr>
+<td>interview</td>
+<td>/ˈɪntəvjuː/</td>
+<td>面试；会谈</td>
+</tr>
+<tr>
+<td>Internet</td>
+<td>/ˈɪntənet/</td>
+<td>互联网</td>
+</tr>
+<tr>
+<td>interface</td>
+<td>/ˈɪntəfeɪs/</td>
+<td>界面；接口</td>
+</tr>
+<tr>
+<td>translate</td>
+<td>/trænsˈleɪt/</td>
+<td>翻译</td>
+</tr>
+<tr>
+<td>translation</td>
+<td>/trænsˈleɪʃn/</td>
+<td>翻译；译文</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>/ˈtrænspɔːt/ /trænsˈpɔːt/</td>
+<td>运输</td>
+</tr>
+<tr>
+<td>abnormal</td>
+<td>/æbˈnɔːml/</td>
+<td>不正常的</td>
+</tr>
+<tr>
+<td>normal</td>
+<td>/ˈnɔːml/</td>
+<td>正常的</td>
+</tr>
+<tr>
+<td>abuse</td>
+<td>/əˈbjuːz/ /ˈəbjuːs/</td>
+<td>滥用；虐待</td>
+</tr>
+<tr>
+<td>use</td>
+<td>/juːz/ /juːs/</td>
+<td>使用</td>
+</tr>
+<tr>
+<td>agree</td>
+<td>/əˈɡriː/</td>
+<td>同意</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h2>DAY3</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>单词</th>
+<th>音标</th>
+<th>中文释义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admire</td>
+<td>/ədˈmaɪə(r)/</td>
+<td>钦佩；羡慕</td>
+</tr>
+<tr>
+<td>adapt</td>
+<td>/əˈdæpt/</td>
+<td>改编；（使）适应</td>
+</tr>
+<tr>
+<td>adjust</td>
+<td>/əˈdʒʌst/</td>
+<td>使适应</td>
+</tr>
+<tr>
+<td>advance</td>
+<td>/ədˈvɑːns/ /ˈædvɑːns/</td>
+<td>（使）前进；进展；预付款</td>
+</tr>
+<tr>
+<td>advanced</td>
+<td>/ədˈvɑːnst/</td>
+<td>先进的</td>
+</tr>
+<tr>
+<td>advantage</td>
+<td>/ədˈvɑːntɪdʒ/</td>
+<td>优势</td>
+</tr>
+<tr>
+<td>attack</td>
+<td>/əˈtæk/</td>
+<td>攻击；病发作</td>
+</tr>
+<tr>
+<td>attract</td>
+<td>/əˈtrækt/</td>
+<td>吸引</td>
+</tr>
+<tr>
+<td>attractive</td>
+<td>/əˈtræktɪv/</td>
+<td>有吸引力的</td>
+</tr>
+<tr>
+<td>accumulate</td>
+<td>/əˈkjuːmjəleɪt/</td>
+<td>（使）积累</td>
+</tr>
+<tr>
+<td>control</td>
+<td>/kənˈtrəʊl/ /ˈkəntrəʊl/</td>
+<td>控制</td>
+</tr>
+<tr>
+<td>cooperate</td>
+<td>/kəʊˈɒpəreɪt/</td>
+<td>合作</td>
+</tr>
+<tr>
+<td>cooperative</td>
+<td>/kəʊˈɒpərətɪv/</td>
+<td>合作的；合作社</td>
+</tr>
+<tr>
+<td>cooperation</td>
+<td>/kəʊˌɒpəˈreɪʃn/</td>
+<td>合作</td>
+</tr>
+<tr>
+<td>company</td>
+<td>/ˈkʌmpəni/</td>
+<td>公司；陪伴</td>
+</tr>
+<tr>
+<td>accompany</td>
+<td>/əˈkʌmpəni/</td>
+<td>陪伴；伴奏</td>
+</tr>
+<tr>
+<td>companion</td>
+<td>/kəmˈpænjən/</td>
+<td>同伴</td>
+</tr>
+<tr>
+<td>comfort</td>
+<td>/ˈkʌmfət/ /kəmˈfɜːt/</td>
+<td>舒适；安慰；使舒适</td>
+</tr>
+<tr>
+<td>comfortable</td>
+<td>/ˈkʌmftəbl/</td>
+<td>舒适的</td>
+</tr>
+<tr>
+<td>command</td>
+<td>/kəˈmɑːnd/</td>
+<td>命令；掌握</td>
+</tr>
+<tr>
+<td>contribute</td>
+<td>/kənˈtrɪbjuːt/</td>
+<td>贡献；导致</td>
+</tr>
+<tr>
+<td>contribution</td>
+<td>/ˌkɒntrɪˈbjuːʃn/</td>
+<td>贡献</td>
+</tr>
+<tr>
+<td>tribute</td>
+<td>/ˈtrɪbjuːt/</td>
+<td>贡品；赞颂</td>
+</tr>
+<tr>
+<td>distribute</td>
+<td>/dɪˈstrɪbjuːt/</td>
+<td>分配</td>
+</tr>
+<tr>
+<td>distributor</td>
+<td>/dɪˈstrɪbjətə(r)/</td>
+<td>分配者；分销商</td>
+</tr>
+<tr>
+<td>attribute</td>
+<td>/əˈtrɪbjuːt/ /ˈætrɪbjuːt/</td>
+<td>归功于；特征</td>
+</tr>
+<tr>
+<td>subway</td>
+<td>/ˈsʌbweɪ/</td>
+<td>地铁</td>
+</tr>
+<tr>
+<td>way</td>
+<td>/weɪ/</td>
+<td>路</td>
+</tr>
+<tr>
+<td>supreme</td>
+<td>/suːˈpriːm/</td>
+<td>最高的；至高无上的</td>
+</tr>
+<tr>
+<td>uneasy</td>
+<td>/ʌnˈiːzi/</td>
+<td>焦虑的</td>
+</tr>
+<tr>
+<td>unfortunately</td>
+<td>/ʌnˈfɔːtʃənətli/</td>
+<td>不幸的</td>
+</tr>
+<tr>
+<td>misfortune</td>
+<td>/ˌmɪsˈfɔːtʃuːn/</td>
+<td>不幸</td>
+</tr>
+<tr>
+<td>unusual</td>
+<td>/ʌnˈjuːʒuəl/</td>
+<td>不寻常的</td>
+</tr>
+<tr>
+<td>usual</td>
+<td>/ˈjuːʒuəl/</td>
+<td>通常的</td>
+</tr>
+<tr>
+<td>usually</td>
+<td>/ˈjuːʒuəli/</td>
+<td>通常，平常</td>
+</tr>
+<tr>
+<td>unless</td>
+<td>/ənˈles/</td>
+<td>除非</td>
+</tr>
+<tr>
+<td>unlikely</td>
+<td>/ʌnˈlaɪkli/</td>
+<td>未必的</td>
+</tr>
+<tr>
+<td>likelihood</td>
+<td>/ˈlaɪklihʊd/</td>
+<td>可能性</td>
+</tr>
+<tr>
+<td>unlike</td>
+<td>/ˌʌnˈlaɪk/ /ˈʌnlaɪk/</td>
+<td>和...不同；不像的</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Blue-radish.github.io">青萝卜菜の博客</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if("01/01/2025"!=""){
+    var startSite=new Date("01/01/2025");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Blue-radish/Blue-radish.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
+
+</html>
