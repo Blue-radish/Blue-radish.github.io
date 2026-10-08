@@ -1,5 +1,822 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Fri, 11 Sep 2026 03:26:37 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>FastTSAD-WebUI 开发计划</title><link>https://Blue-radish.github.io/post/FastTSAD-WebUI%20-kai-fa-ji-hua.html</link><description>## 一、项目背景
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Thu, 08 Oct 2026 15:42:19 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>日语歌</title><link>https://Blue-radish.github.io/post/ri-yu-ge.html</link><description># secret base ～君がくれたもの～（未闻花名 ED）
+
+**演唱：茅野爱衣 / 户松遥 / 早见沙织**
+**作词 / 作曲：町田纪彦**
+
+君(きみ)と夏(なつ)の終(お)わり 将来(しょうらい)の夢(ゆめ)
+kimi to natsu no owari shourai no yume
+与你在夏末约定 将来的梦想
+
+大(おお)きな希望(きぼう) 忘(わす)れない
+ooki na kibou wasurenai
+远大的希望 不要忘记
+
+10年後(じゅうねんご)の8月(はちがつ) また出会(であ)えるのを 信(しん)じて
+juunen go no hachigatsu mata deaeru no wo shinjite
+我相信十年后的八月 我们还能再相遇
+
+最高(さいこう)の思(おも)い出(で)を…
+saikou no omoide wo...
+共创最美好的回忆…
+
+出会(であ)いは ふっとした 瞬間(しゅんかん)
+deai wa futtoshita shunkan
+相识 是在那么不经意的瞬间
+
+帰(かえ)り道(みち)の交差点(こうさてん)で
+kaerimichi no kousaten de
+我在回家途中的十字路口
+
+声(こえ)をかけてくれたね「一緒(いっしょ)に帰(かえ)ろう」
+koe wo kakete kureta ne 'issho ni kaerou'
+听见你的一声「一起回家吧」
+
+僕(ぼく)は 照(て)れくさそうに
+boku wa terekusasou ni
+我当时有点尴尬
+
+カバンで顔(かお)を隠(かく)しながら
+KABAN de kao wo kakushinagara
+还拿书包遮着脸
+
+本当(ほんとう)は とても とても 嬉(うれ)しかったよ
+hontou wa totemo totemo ureshikatta yo
+其实我心里好高兴 真的好高兴
+
+あぁ 花火(はなび)が夜空(よぞら) きれいに咲(さ)いて ちょっとセツナク
+aa hanabi ga yozora kirei ni saite chotto SETSUNAKU
+啊 烟花在夜空中灿烂盛开 几许伤感
+
+あぁ 風(かぜ)が時間(じかん)とともに 流(なが)れる
+aa kaze ga jikan to tomo ni nagareru
+啊 风和时间一起飘过
+
+嬉(うれ)しくって 楽(たの)しくって 冒険(ぼうけん)も いろいろしたね
+ureshikute tanoshikute bouken mo iroiro shita ne
+很高兴 很愉快 曾到处冒险
+
+二人(ふたり)の 秘密(ひみつ)の 基地(きち)の中(なか)
+futari no himitsu no kichi no naka
+就在我们的秘密基地中
+
+君(きみ)と夏(なつ)の終(お)わり 将来(しょうらい)の夢(ゆめ)
+kimi to natsu no owari shourai no yume
+与你在夏末约定 将来的梦想
+
+大(おお)きな希望(きぼう) 忘(わす)れない
+ooki na kibou wasurenai
+远大的希望 不要忘记
+
+10年後(じゅうねんご)の8月(はちがつ) また出会(であ)えるのを 信(しん)じて
+juunen go no hachigatsu mata deaeru no wo shinjite
+我相信十年后的八月 我们还能再相遇
+
+君(きみ)が最後(さいご)まで 心(こころ)から「ありがとう」叫(さけ)んでいたこと
+kimi ga saigo made kokoro kara 'arigatou' sakende ita koto
+你直到最后 都在心里高喊着「谢谢你」
+
+知(し)っていたよ
+shitte ita yo
+我一直都知道
+
+涙(なみだ)をこらえて 笑顔(えがお)でさようなら せつないよね
+namida wo koraete egao de sayounara setsunai yo ne
+含着眼泪强颜欢笑的道别 是多不容易
+
+最高(さいこう)の思(おも)い出(で)を…
+saikou no omoide wo...
+共创最美好的回忆…
+
+あぁ 夏休(なつやす)みも あと少(すこ)しで 終(お)わっちゃうから
+aa natsuyasumi mo ato sukoshi de owacchau kara
+啊 暑假就快要结束了
+
+あぁ 太陽(たいよう)と月(つき) 仲良(なかよ)くして
+aa taiyou to tsuki nakayoku shite
+啊 愿太阳和月亮好好相伴
+
+悲(かな)しくって 寂(さび)しくって 喧嘩(けんか)も いろいろしたね
+kanashikutte sabishikutte kenka mo iroiro shita ne
+也曾伤心寂寞 也曾有过争执
+
+二人(ふたり)の 秘密(ひみつ)の 基地(きち)の中(なか)
+futari no himitsu no kichi no naka
+就在我们的秘密基地中
+
+君(きみ)が最後(さいご)まで 心(こころ)から「ありがとう」叫(さけ)んでいたこと
+kimi ga saigo made kokoro kara 'arigatou' sakende ita koto
+你直到最后 都在心里高喊着「谢谢你」
+
+知(し)っていたよ
+shitte ita yo
+我一直都知道
+
+涙(なみだ)をこらえて 笑顔(えがお)でさようなら せつないよね
+namida wo koraete egao de sayounara setsunai yo ne
+含着眼泪强颜欢笑的道别 是多不容易
+
+最高(さいこう)の思(おも)い出(で)を…
+saikou no omoide wo...
+共创最美好的回忆…
+
+突然(とつぜん)の 転校(てんこう)で どうしようもなく
+totsuzen no tenkou de dou shiyou mo naku
+突如其来的转学 我也无能为力
+
+手紙(てがみ) 書(か)くよ 電話(でんわ)もするよ
+tegami kaku yo denwa mo suru yo
+我一定会给你写信 给你打电话
+
+忘(わす)れないでね 僕(ぼく)のことを
+wasurenaide ne boku no koto wo
+请你不要忘记我
+
+いつまでも 二人(ふたり)の 基地(きち)の中(なか)
+itsu made mo futari no kichi no naka
+无论何时 都在我们的秘密基地中
+
+君(きみ)と夏(なつ)の終(お)わり ずっと話(はな)して
+kimi to natsu no owari zutto hanashite
+与你在夏末 说不完的话
+
+夕日(ゆうひ)を見(み)てから 星(ほし)を眺(なが)め
+yuuhi wo mite kara hoshi wo nagame
+看那夕阳西下 看那繁星满天
+
+君(きみ)の頬(ほほ)を 流(なが)れた涙(なみだ)は
+kimi no hoho wo nagareta namida wa
+你脸颊上流下的泪水
+
+ずっと忘(わす)れない
+zutto wasurenai
+我永远不会忘记
+
+君(きみ)が最後(さいご)まで 大(おお)きく手(て)を振(ふ)ってくれたこと
+kimi ga saigo made ookiku te wo futte kureta koto
+你直到最后 都用力地向我挥手
+
+きっと忘(わす)れない
+kitto wasurenai
+我一定不会忘记
+
+だから こうして 夢(ゆめ)の中(なか)で
+dakara koushite yume no naka de
+所以 就这样 在梦中
+
+ずっと永遠(えいえん)に…
+zutto eien ni...
+永远永远…
+
+君(きみ)と夏(なつ)の終(お)わり 将来(しょうらい)の夢(ゆめ)
+kimi to natsu no owari shourai no yume
+与你在夏末约定 将来的梦想
+
+大(おお)きな希望(きぼう) 忘(わす)れない
+ooki na kibou wasurenai
+远大的希望 不要忘记
+
+10年後(じゅうねんご)の8月(はちがつ) また出会(であ)えるのを 信(しん)じて
+juunen go no hachigatsu mata deaeru no wo shinjite
+我相信十年后的八月 我们还能再相遇
+
+君(きみ)が最後(さいご)まで 心(こころ)から「ありがとう」叫(さけ)んでいたこと
+kimi ga saigo made kokoro kara 'arigatou' sakende ita koto
+你直到最后 都在心里高喊着「谢谢你」
+
+知(し)っていたよ
+shitte ita yo
+我一直都知道
+
+涙(なみだ)をこらえて 笑顔(えがお)でさようなら せつないよね
+namida wo koraete egao de sayounara setsunai yo ne
+含着眼泪强颜欢笑的道别 是多不容易
+
+最高(さいこう)の思(おも)い出(で)を…
+saikou no omoide wo...
+共创最美好的回忆…
+
+最高(さいこう)の思(おも)い出(で)を…
+saikou no omoide wo...
+共创最美好的回忆…
+
+# Pray（杀戮的天使 ED）
+
+**演唱：千菅春香（レイチェル / Rachel）**
+**作词 / 作曲：DECO*27**
+
+冷(つめ)たい記憶(きおく)と 空(から)っぽの世界(せかい)
+tsumetai kioku to karappo no sekai
+冰冷的记忆与空虚的世界
+
+足(た)りない形(かたち)を 縫(ぬ)い合(あ)わせたら
+tarinai katachi wo nuiawasetara
+将残缺的形状缝合在一起
+
+間違(まちが)ってたこと 嫌(きら)ってたこと
+machigatteta koto kiratteta koto
+那些曾做错的事 那些曾厌恶的事
+
+まだ戦(たたか)ってるんだよ
+mada tatakatteru n da yo
+我还在不断战斗着啊
+
+終(お)わりはどこだろう
+owari wa doko darou
+终点究竟在哪里呢
+
+怖(こわ)いくらい青(あお)い月(つき)が 凛(りん)と鳴(な)く頃(ころ)
+kowai kurai aoi tsuki ga rin to naku koro
+当那令人恐惧的苍蓝之月凛然鸣响之时
+
+嘘(うそ)つきは希望(きぼう)と出会(であ)う
+usotsuki wa kibou to deau
+说谎的人将会与希望相遇
+
+離(はな)さないで 私(わたし)を奪(うば)ってよ
+hanasanaide watashi wo ubatte yo
+请不要松开手 将我夺走吧
+
+消(き)えない罪(つみ)に 消(き)えない罰(ばつ)を
+kienai tsumi ni kienai batsu wo
+给无法消逝的罪孽 施以无法消逝的惩罚
+
+約束(やくそく)だから
+yakusoku dakara
+因为这是我们的约定
+
+忘(わす)れないでまだ 息(いき)をしてるから
+wasurenaide mada iki wo shiteru kara
+请不要忘记 我还在呼吸着
+
+ちゃんといつか終(お)わらせてね
+chanto itsuka owarasete ne
+请一定要在未来的某天 将我终结
+
+約束(やくそく)だから
+yakusoku dakara
+因为这是我们的约定
+
+上(うえ)に上(うえ)に堕(お)ちる夢(ゆめ)を
+ue ni ue ni ochiru yume wo
+向着那不断向上坠落的梦境
+
+祈(いの)っていいですか
+inotte ii desu ka
+我可以祈祷吗
+
+失(うしな)ったままの 曇(くも)った心(こころ)
+ushinatta mama no kumotta kokoro
+始终失去着的 阴霾笼罩的心
+
+言(い)いたい言葉(ことば)も 見当(けんとう)たらないかな
+iitai kotoba mo kentou taranai kana
+想说的话 也找不到任何头绪
+
+だけど誓(ちか)いが 痛(いた)みに混(ま)ざっていく
+dakedo chikai ga itami ni mazatte iku
+然而誓言 却渐渐与痛楚交融
+
+今(いま)抗(あらが)っているんだね
+ima aragatte iru n da ne
+你现在正在抗争着呢
+
+私(わたし)はどうしたら
+watashi wa dou shitara
+我该怎么做才好
+
+わかったの 望(のぞ)まれて脈(みゃく)を打(う)つこと
+wakatta no nozomarete myaku wo utsu koto
+我明白了 被期望着 心脏为之跳动
+
+'初(はじ)めて'が絶望(ぜつぼう)を喰(く)らう
+'hajimete' ga zetsubou wo kurau
+“第一次”将绝望吞噬殆尽
+
+止(と)まらないで 私(わたし)が救(すく)うから
+tomaranaide watashi ga sukuu kara
+请不要停下 我会来拯救你的
+
+ありのままを受(う)け止(と)めてね
+arinomama wo uketomete ne
+请接受真实的我吧
+
+お願(ねが)いだから 邪魔(じゃま)しないで
+onegai dakara jama shinaide
+求求你了 不要来妨碍我
+
+ほら元通(もとどお)りにしよう
+hora motodoori ni shiyou
+来吧 让我们恢复原样吧
+
+愛(あい)を込(こ)めて理想(りそう)を做(つく)ろう
+ai wo komete risou wo tsukurou
+倾注爱意 去构建理想吧
+
+お願(ねが)いだから
+onegai dakara
+求求你了
+
+深(ふか)い深(ふか)い夢(ゆめ)の海(うみ)に 溺(おぼ)れるように
+fukai fukai yume no umi ni oboreru youni
+仿佛沉溺在那深邃深邃的梦之海中
+
+鏡(かがみ)の中(なか)には 虚(うつ)ろに浮(う)かぶ青(あお)い月(つき)ふたつ
+kagami no naka ni wa utsuro ni ukabu aoi tsuki futatsu
+镜子之中 虚幻地浮现着两轮苍蓝之月
+
+始(はじ)めよう 歪(ゆが)んだ笑顔(えがお)を切(き)り裂(さ)いて
+hajimeyou yuganda egao wo kirisaite
+开始吧 将那扭曲的笑容撕裂
+
+ねえ 私(わたし)が判(わか)ったら 誰(だれ)も泣(な)いてくれないのかな
+nee watashi ga wakattara dare mo naite kurenai no kana
+呐 如果我不在了 会有谁为我哭泣吗
+
+終(お)わっちゃうのかな
+owacchau no kana
+一切就会结束吗
+
+ねえただ 消(き)えてしまえたら
+nee tada kiete shimaetara
+呐 如果只是就这样消失的话
+
+明日(あす)は楽(らく)になれるのかな
+asu wa raku ni nareru no kana
+明天就会变得轻松吗
+
+その手(て)でどうか
+sono te de douka
+请用那双手
+
+離(はな)さないで 私(わたし)を奪(うば)ってよ
+hanasanaide watashi wo ubatte yo
+请不要松开手 将我夺走吧
+
+消(き)えない罪(つみ)に 消(き)えない罰(ばつ)を
+kienai tsumi ni kienai batsu wo
+给无法消逝的罪孽 施以无法消逝的惩罚
+
+約束(やくそく)だから
+yakusoku dakara
+因为这是我们的约定
+
+忘(わす)れないでまだ 息(いき)をしてるから
+wasurenaide mada iki wo shiteru kara
+请不要忘记 我还在呼吸着
+
+ちゃんといつか終(お)わらせてね
+chanto itsuka owarasete ne
+请一定要在未来的某天 将我终结
+
+約束(やくそく)だから
+yakusoku dakara
+因为这是我们的约定
+
+上(うえ)に上(うえ)に堕(お)ちる夢(ゆめ)を
+ue ni ue ni ochiru yume wo
+向着那不断向上坠落的梦境
+
+祈(いの)っていいですか
+inotte ii desu ka
+我可以祈祷吗
+
+深(ふか)い深(ふか)い夢(ゆめ)の海(うみ)に 溺(おぼ)れるように
+fukai fukai yume no umi ni oboreru youni
+仿佛沉溺在那深邃深邃的梦之海中
+
+# グランドエスケープ（天气之子 插曲）
+
+**演唱：三浦透子 / RADWIMPS**
+**作词 / 作曲：野田洋次郎**
+
+空(そら)飛(と)ぶ羽根(はね)と引(ひ)き換(か)えに
+sora tobu hane to hikikae ni
+没有选择飞翔的翅膀
+
+繋(つな)ぎ合(あ)う手(て)を選(えら)んだ僕(ぼく)ら
+tsunagiau te wo eranda bokura
+而是选择十指相扣的我们
+
+それでも空(そら)に魅(み)せられて
+sore demo sora ni miserarete
+却还是向往天空
+
+夢(ゆめ)を重(かさ)ねるのは罪(つみ)か
+yume wo kasaneru no wa tsumi ka
+反复做着同样的梦这有错吗
+
+夏(なつ)は秋(あき)の背中(せなか)を見(み)て
+natsu wa aki no senaka wo mite
+夏天望着秋天的背影
+
+その顔(かお)を思(おも)い浮(う)かべる
+sono kao wo omoiukaberu
+心中浮现出了那面庞
+
+憧(あこが)れなのか、恋(こい)なのか
+akogare na no ka, koi na no ka
+我是在期待吗，这是爱情吗
+
+叶(かな)わぬと知(し)っていながら
+kanawanu to shitte inagara
+明明知道无法实现
+
+通(とお)り雨(あめ)が通(とお)り雨(あめ)と
+tooriame ga tooriame to
+阵雨对阵阵雨
+
+木漏(こも)れ日(び)たちが木漏(こも)れ日(び)と
+komorebitachi ga komorebi to
+树影对树影
+
+名乗(なの)るずっとずっとずっと前(まえ)から
+nanoru zutto zutto zutto mae kara
+从很久很久很久以前就如此自称
+
+あなたはあなたでいたんだろう？
+anata wa anata de ita n darou?
+你一直就是你自己吧？
+
+重力(じゅうりょく)が眠(ねむ)りにつく
+juuryoku ga nemuri ni tsuku
+当大地渐渐失去了重力
+
+1000年(せんねん)に一度(いちど)の今日(きょう)
+sennen ni ichido no kyou
+在千年一遇的今天
+
+太陽(たいよう)の死角(しかく)に立(た)ち
+taiyou no shikaku ni tachi
+站在太阳无法企及的边缘
+
+僕(ぼく)らこの星(ほし)を出(で)よう
+bokura kono hoshi wo deyou
+我们离开这颗星球吧
+
+彼(かれ)が眼(め)を覚(さ)ました時(とき)
+kare ga me wo samashita toki
+在他睁开眼的那一瞬间
+
+連(つ)れ戻(もど)せない場所(ばしょ)へ
+tsuremodosenai basho e
+向着那无法返回的地方
+
+「せーの」で大地(だいち)を蹴(け)って
+'seeno' de daichi wo kette
+齐声喊着「1、2…」脚蹬大地
+
+ここではない星(ほし)へ
+koko de wa nai hoshi e
+向着其他行星前进
+
+行(い)こう
+ikou
+出发吧！
+
+もう少(すこ)しで運命(うんめい)の向(む)こう
+mou sukoshi de unmei no mukou
+只差一步就是命运的方向
+
+もう少(すこ)しで文明(ぶんめい)の向(む)こう
+mou sukoshi de bunmei no mukou
+只差一步就是文明的方向
+
+もう少(すこ)しで運命(うんめい)の向(む)こう
+mou sukoshi de unmei no mukou
+只差一步就是命运的方向
+
+もう少(すこ)しで
+mou sukoshi de
+只差一步…
+
+夢(ゆめ)に僕(ぼく)らで帆(ほ)を張(は)って
+yume ni bokura de ho wo hatte
+为了那个梦我们扬帆起航
+
+来(き)たるべき日(ひ)のために夜(よる)を越(こ)え
+kitarubeki hi no tame ni yoru wo koe
+为了理应到来的那天跨越无尽黑夜
+
+いざ期待(きたい)だけ満(まん)タンで
+iza kitai dake MANTAN de
+满怀期待
+
+あとはどうにかなるさと肩(かた)を組(く)んだ
+ato wa dou ni ka naru sa to kata wo kunda
+相信一切都会顺利而并肩同行
+
+怖(こわ)くないと言(い)ったら嘘(うそ)になる
+kowakunai to ittara uso ni naru
+说不害怕那是骗人的
+
+それでも行(い)かなきゃならないんだよ
+sore demo ikanakya naranai n da yo
+但即便如此也必须前行
+
+僕(ぼく)が僕(ぼく)であるために
+boku ga boku de aru tame ni
+为了让我成为我自己
+
+君(きみ)が君(きみ)でいるために
+kimi ga kimi de iru tame ni
+为了让你成为你自己
+
+今(いま)　僕(ぼく)らの恋(こい)が言(い)う　声(こえ)が言(う)
+ima bokura no koi ga iu koe ga iu
+此刻 我们的爱情在诉说 声音在呼唤
+
+「行(い)け」と言(い)う
+'ike' to iu
+说着「去吧」
+
+重力(じゅうりょく)が眠(ねむ)りにつく
+juuryoku ga nemuri ni tsuku
+当大地渐渐失去了重力
+
+1000年(せんねん)に一度(いちど)の今日(きょう)
+sennen ni ichido no kyou
+在千年一遇的今天
+
+太陽(たいよう)の死角(しかく)に立(た)ち
+taiyou no shikaku ni tachi
+站在太阳无法企及的边缘
+
+僕(ぼく)らこの星(ほし)を出(で)よう
+bokura kono hoshi wo deyou
+我们离开这颗星球吧
+
+彼(かれ)が眼(め)を覚(さ)ました時(とき)
+kare ga me wo samashita toki
+在他睁开眼的那一瞬间
+
+連(つ)れ戻(もど)せない場所(ばしょ)へ
+tsuremodosenai basho e
+向着那无法返回的地方
+
+「せーの」で大地(だいち)を蹴(け)って
+'seeno' de daichi wo kette
+齐声喊着「1、2…」脚蹬大地
+
+ここではない星(ほし)へ
+koko de wa nai hoshi e
+向着其他行星前进
+
+行(い)こう
+ikou
+出发吧！
+
+# 愛にできることはまだあるかい（天气之子 主题曲）
+
+**演唱：RADWIMPS**
+**作词 / 作曲：野田洋次郎**
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+何(なに)も持(も)たずに 生(う)まれ堕(お)ちた僕(ぼく)
+nani mo motazu ni umareochita boku
+一无所有诞生的我
+
+永遠(とわ)の隙間(すきま)で のたうち回(まわ)ってる
+towa no sukima de notauchimawatteru
+在永远的缝隙中痛苦挣扎
+
+諦(あきら)めた者(もの)と 賢(かしこ)い者(もの)だけが
+akirameta mono to kashikoi mono dake ga
+只有放弃的人 和聪明的人
+
+勝者(しょうしゃ)の時代(じだい)に 何処(どこ)で息(いき)を吸(す)う
+shousha no jidai ni doko de iki wo suu
+在这胜者的时代 要在何处呼吸
+
+支配者(しはいしゃ)も神(かみ)も 何処(どこ)か他人顔(たにんがお)
+shihaisha mo kami mo dokoka taningao
+支配者和神明 都摆出一副事不关己的表情
+
+だけど本当(ほんとう)は 分(わ)かっているはず
+dakedo hontou wa wakatte iru hazu
+但其实 心里应该都明白
+
+勇気(ゆうき)や希望(きぼう)や 絆(きずな)とかの魔法(まほう)
+yuuki ya kibou ya kizuna toka no mahou
+勇气和希望 还有羁绊之类的魔法
+
+使(つか)い道(みち)もなく オトナは眼(め)を背(そむ)ける
+tsukaimichi mo naku OTONA wa me wo somukeru
+因无处可用 大人们都别过眼去
+
+それでもあの日(ひ)の 君(きみ)が今(いま)もまだ
+sore demo ano hi no kimi ga ima mo mada
+可那一天的你 至今依然
+
+僕(ぼく)の全正義(ぜんせいぎ)の ど真(ま)ん中(なか)にいる
+boku no zenseigi no domannaka ni iru
+在我全部正义的正中央
+
+世界(せかい)が背中(せなか)を 向(む)けてもまだなお
+sekai ga senaka wo mukete mo mada nao
+哪怕世界转过身去 依然
+
+立(た)ち向(む)かう君(きみ)が 今(いま)もここにいる
+tachimukau kimi ga ima mo koko ni iru
+勇敢面对的你 现在也在这里
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+僕(ぼく)にできることはまだあるかい
+boku ni dekiru koto wa mada aru kai
+还有什么是能做到的吗
+
+君(きみ)がくれた勇気(ゆうき)だから
+kimi ga kureta yuuki dakara
+因为那是你给我的勇气
+
+君(きみ)のために使(つか)いたいんだ
+kimi no tame ni tsukaitain da
+所以我想为你而使用
+
+君(きみ)と分(わ)け合(あ)った愛(あい)だから
+kimi to wakeatta ai dakara
+因为那是与你分享的爱
+
+君(きみ)とじゃなきゃ意味(いみ)がないんだ
+kimi to ja nakya imi ga nai n da
+如果不是你 就没有意义
+
+運命(さだめ)とはつまり サイコロの出(で)た目(め)
+sadame to wa tsumari SAIKORO no deta me
+所谓命运 说到底不过是骰子掷出的点数
+
+はたまた神(かみ)の 気(き)まぐれなボタン
+hata mata kami no kimagure na BOTAN
+又或是神明心血来潮的按钮
+
+選(えら)び選(えら)ばれ 巡(めぐ)り巡(めぐ)り
+erabi erabare meguri meguri
+被选择又选择 循环往复
+
+僕(ぼく)は君(きみ)を 選(えら)んだんだ
+boku wa kimi wo eranda n da
+而我选择了你
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+僕(ぼく)にできることはまだあるかい
+boku ni dekiru koto wa mada aru kai
+还有什么是能做到的吗
+
+君(きみ)がくれた勇気(ゆうき)だから
+kimi ga kureta yuuki dakara
+因为那是你给我的勇气
+
+君(きみ)のために使(つか)いたいんだ
+kimi no tame ni tsukaitain da
+所以我想为你而使用
+
+君(きみ)と分(わ)け合(あ)った愛(あい)だから
+kimi to wakeatta ai dakara
+因为那是与你分享的爱
+
+君(きみ)とじゃなきゃ意味(いみ)がないんだ
+kimi to ja nakya imi ga nai n da
+如果不是你 就没有意义
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+僕(ぼく)にできることはまだあるかい
+boku ni dekiru koto wa mada aru kai
+还有什么是能做到的吗
+
+雨(あめ)が降(ふ)り続(つづ)けて 傘(かさ)をなくした
+ame ga furitsuzukete kasa wo nakushita
+大雨持续不停 我丢失了伞
+
+君(きみ)の全(すべ)てを 濡(ぬ)らしてでも
+kimi no subete wo nurashite demo
+哪怕将你的一切都淋湿
+
+守(まも)りたいんだ
+mamoritain da
+我也想守护你
+
+もう少(すこ)しだけ もう少(すこ)しだけ
+mou sukoshi dake mou sukoshi dake
+再一会儿就好 再一会儿就好
+
+このままでいさせて
+kono mama de isasete
+让我就这样待着
+
+震(ふる)える君(きみ)の 手(て)を握(にぎ)って
+furueru kimi no te wo nigitte
+握紧你颤抖的手
+
+僕(ぼく)は僕(ぼく)の 覚悟(かくご)を決(き)めた
+boku wa boku no kakugo wo kimeta
+我下定了我的决心
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+僕(ぼく)にできることはまだあるかい
+boku ni dekiru koto wa mada aru kai
+还有什么是能做到的吗
+
+君(きみ)がくれた勇気(ゆうき)だから
+kimi ga kureta yuuki dakara
+因为那是你给我的勇气
+
+君(きみ)のために使(つか)いたいんだ
+kimi no tame ni tsukaitain da
+所以我想为你而使用
+
+君(きみ)と分(わ)け合(あ)った愛(あい)だから
+kimi to wakeatta ai dakara
+因为那是与你分享的爱
+
+君(きみ)とじゃなきゃ意味(いみ)がないんだ
+kimi to ja nakya imi ga nai n da
+如果不是你 就没有意义
+
+愛(あい)にできることはまだあるかい
+ai ni dekiru koto wa mada aru kai
+还有什么是爱能做到的吗
+
+僕(ぼく)にできることはまだあるかい
+boku ni dekiru koto wa mada aru kai
+还有什么是能做到的吗
+
+愛(あい)にできることはまだあるよ
+ai ni dekiru koto wa mada aru yo
+爱能做到的事 还有很多
+
+# Only my Railgun（某科学的超电磁炮 OP1）
+
+**演唱：fripSide**
+**作词：八木沼悟志 / yuki-ka**
+**作曲 / 编曲：八木沼悟志**
+
+放(はな)て！心(こころ)に刻(きざ)んだ夢(ゆめ)を
+hanate! kokoro ni kizanda yume wo
+释放吧！将那铭刻于心的梦想
+
+未来(みらい)さえ置(お)き去(ざ)りにして
+mirai sae okizari ni shite
+就连未来也抛诸脑后
+
+限界(げんかい)など 知(し)らない 意味(いみ)無(な)い！
+genkai nado shiranai imi nai!
+极限什么的 我不知道 毫无意义！
+
+この能力(ちから)が光(ひかり)散(ち)らす
+kono chikara ga hikari chirasu
+这份力量让光芒四散
+
+その先(さき)に 遥(はる)かな想(おも)いを
+sono saki ni haruka na omoi wo
+在那前方 有着遥远的思念
+
+歩(ある)いてきた この道(みち)を
+aruite kita kono michi wo
+一路走来的这条道路
+
+振(ふ)り返(かえ)ることしか 出来(でき)ないなら…
+furikaeru koto shika dekinai nara...
+如果只能不断回首的话…
+
+今(いま)ここで 全(すべ)てを壊(こわ)せる
+ima koko de subete wo kowaseru
+此刻 就在这里 将一切破坏殆尽
+
+暗闇(くらやみ)に落(お)ちる 街(まち)並(な)み
+kurayami ni ochiru machinami
+坠入黑暗的街道
+
+人(ひと)は何処(どこ)まで 立(た)ち向(む)かえるの？
+hito wa doko made tachimukaeru no?
+人们究竟能抗争到何方？
+
+この痛(いた)みから 誰(だれ)かを
+kono itami kara dareka wo
+从这份痛楚之中
+
+きっと守(まも)れるよ
+kitto mamoreru yo
+一定能够守护某人
+
+Looking! The blitz loop this planet to search way.
+Only my RAILGUN can shoot it. 今(いま)すぐ
+Only my RAILGUN can shoot it. ima sugu
+唯有我的超电磁炮能将其击穿。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/ri-yu-ge.html</guid><pubDate>Thu, 08 Oct 2026 15:41:20 +0000</pubDate></item><item><title>FastTSAD-WebUI 开发计划</title><link>https://Blue-radish.github.io/post/FastTSAD-WebUI%20-kai-fa-ji-hua.html</link><description>## 一、项目背景
 
 [FastTSAD](https://github.com/lunarlsggg/FastTSAD) 是一个时序异常检测基准框架，内置多种算法、统一数据管线与评估指标（Affiliation / VUS / R-AUC），但目前只有命令行接口，使用门槛较高。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/FastTSAD-WebUI%20-kai-fa-ji-hua.html</guid><pubDate>Fri, 11 Sep 2026 03:24:57 +0000</pubDate></item><item><title>《牛来》采访计划</title><link>https://Blue-radish.github.io/post/%E3%80%8A-niu-lai-%E3%80%8B-cai-fang-ji-hua.html</link><description># 《牛来》观众采访执行计划
 
