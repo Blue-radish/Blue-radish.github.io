@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Mon, 12 Oct 2026 02:56:15 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>日语歌</title><link>https://Blue-radish.github.io/post/ri-yu-ge.html</link><description># secret base ～君がくれたもの～（未闻花名 ED）
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>青萝卜菜の博客</title><link>https://Blue-radish.github.io</link><description>密涅瓦的猫头鹰只在黄昏才展开翅膀</description><copyright>青萝卜菜の博客</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/125821962?v=4</url><title>avatar</title><link>https://Blue-radish.github.io</link></image><lastBuildDate>Sun, 25 Oct 2026 14:34:02 +0000</lastBuildDate><managingEditor>青萝卜菜の博客</managingEditor><ttl>60</ttl><webMaster>青萝卜菜の博客</webMaster><item><title>日语歌</title><link>https://Blue-radish.github.io/post/ri-yu-ge.html</link><description># secret base ～君がくれたもの～（未闻花名 ED）
 
 **演唱：ZONE / 茅野爱衣等**
 **作词：町田紀彦 / 作曲：町田紀彦 / 编曲：とくP**
@@ -1725,8 +1725,12 @@ Artificial intelligence techniques are increasingly showing up in smartphone app
 
 不会真的有人到tb买激活码吧？
 
-## 方法一：
+## 方法一(推荐)：
 
-KMS (Key Management Service) 激活是一种批量许可激活方式，主要用于企业或组织，而不是个人用户。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/Windows-ji-huo-fang-fa.html</guid><pubDate>Sun, 19 Jan 2025 15:55:39 +0000</pubDate></item><item><title>用Python启动一个HTTP服务器</title><link>https://Blue-radish.github.io/post/yong-Python-qi-dong-yi-ge-HTTP-fu-wu-qi.html</link><description>## 引言
+进入PowerShell管理员终端(不是cmd)，输入以下命令：
+```bash
+irm https://get.activated.win | iex
+```
+命令输完后按提示操作。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/Windows-ji-huo-fang-fa.html</guid><pubDate>Sun, 19 Jan 2025 15:55:39 +0000</pubDate></item><item><title>用Python启动一个HTTP服务器</title><link>https://Blue-radish.github.io/post/yong-Python-qi-dong-yi-ge-HTTP-fu-wu-qi.html</link><description>## 引言
 
 可以用在局域网下小组成员间快速传递文件。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/yong-Python-qi-dong-yi-ge-HTTP-fu-wu-qi.html</guid><pubDate>Sat, 18 Jan 2025 03:53:59 +0000</pubDate></item><item><title>Ciallo World!</title><link>https://Blue-radish.github.io/post/Ciallo%20World%21.html</link><description>Ciallo World!。</description><guid isPermaLink="true">https://Blue-radish.github.io/post/Ciallo%20World%21.html</guid><pubDate>Sat, 18 Jan 2025 01:18:47 +0000</pubDate></item><item><title>关于</title><link>https://Blue-radish.github.io/about.html</link><description>我，毋畏遗忘。</description><guid isPermaLink="true">https://Blue-radish.github.io/about.html</guid><pubDate>Sat, 28 Jun 2025 16:58:25 +0000</pubDate></item></channel></rss>
