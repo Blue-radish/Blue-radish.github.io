@@ -7,7 +7,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.0.1';
+  var VERSION = 'radish-1.0.2';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
@@ -124,7 +124,9 @@
     });
   });
 
-  probe('dns', function (env, ctx) { return ctx.json('https://edns.ip-api.com/json', 2000).then(function (j) { return j || M('unsupported'); }); });
+  probe('dns', function (env, ctx) {
+    return ctx.json('https://edns.ip-api.com/json', 3500).then(function (j) { return (j && j.dns) ? j : M('unsupported'); });
+  });
 
   // ============ exit · 出口 ============
   function exitTrace(host, field) {
@@ -141,7 +143,22 @@
   probe('ex_gpt', exitTrace('chatgpt.com'));
   probe('ex_claude', exitTrace('claude.ai'));
   probe('ex_cf', exitTrace('www.cloudflare.com'));
-  probe('stack', exitTrace('radar.cloudflare.com', 'http'));
+  // trace 主机兜底：只要有一个能读到 http/tls 就算成功（radar 那条不一定带 http=）
+  probe('stack', function (env, ctx) {
+    var hosts = ['www.cloudflare.com', 'radar.cloudflare.com', 'cloudflare.com'];
+    var i = 0;
+    function next() {
+      if (i >= hosts.length) return Promise.resolve(M('unsupported'));
+      var host = hosts[i++];
+      return ctx.text('https://' + host + '/cdn-cgi/trace', 2500).then(function (t2) {
+        if (!t2) return next();
+        var kv = ctx.parseTrace(t2);
+        if (!kv.http && !kv.tls) return next();
+        return { loc: kv.loc || null, colo: kv.colo || null, http: kv.http || null, tls: kv.tls || null };
+      });
+    }
+    return next();
+  });
   probe('ex_intl', function (env, ctx) {
     return ctx.json('https://api.ip.sb/geoip', 2500).then(function (j) {
       if (!j) return M('unsupported');
@@ -149,11 +166,19 @@
     });
   });
   probe('ex_cn', function (env, ctx) {
-    return ctx.text('https://myip.ipip.net/json', 2500).then(function (t) {
+    // 现在的返回是 {"ret":"ok","data":{"ip":"…","location":["中国","陕西","西安","","电信"]}}
+    // 老格式是 {data:{country,province,city,isp}}，两种都要认
+    return ctx.text('https://myip.ipip.net/json', 3500).then(function (t) {
       if (!t) return M('unsupported');
       var j = null; try { j = JSON.parse(t); } catch (e) { return M('unsupported'); }
       var d = (j && (j.data || j)) || {};
-      var o = { country: d.country || null, province: d.province || null, city: d.city || null, isp: d.isp || null };
+      var loc = Array.isArray(d.location) ? d.location : [];
+      var o = {
+        country: d.country || loc[0] || null,
+        province: d.province || loc[1] || null,
+        city: d.city || loc[2] || null,
+        isp: d.isp || loc[4] || null
+      };
       if (!o.country && !o.province && !o.city && !o.isp) return M('unsupported');
       return o;
     });
@@ -590,22 +615,41 @@
     }, M('unsupported'));
   });
   probe('hz', function (env) {
+    var doc = env.document || {};
     return new Promise(function (resolve) {
       var raf = env.requestAnimationFrame;
       if (!raf) { resolve(M('unsupported')); return; }
-      var times = [], done = false;
-      var t = setTimeout(function () { done = true; finish(); }, 1200);
-      function finish() {
-        if (!times.length) { resolve(M('unsupported')); return; }
-        var deltas = [];
-        for (var i = 1; i < times.length; i++) { var d = times[i] - times[i - 1]; if (d > 0) deltas.push(d); }
-        if (!deltas.length) { resolve(M('unsupported')); return; }
-        deltas.sort(function (a, b) { return a - b; });
-        var med = deltas[Math.floor(deltas.length / 2)];
-        resolve(num(1000 / med, 0));
+      var settled = false;
+      var guard = setTimeout(function () { done(M('unsupported')); }, 4500);
+      function done(v) { if (settled) return; settled = true; clearTimeout(guard); resolve(v); }
+      // 后台标签页 rAF 会被暂停，等页面可见再测
+      if (doc.visibilityState === 'hidden') {
+        if (!env.addEventListener) { done(M('unsupported')); return; }
+        env.addEventListener('visibilitychange', function () {
+          if (doc.visibilityState !== 'hidden') measure();
+        }, { once: true });
+        return;
       }
-      function step(ts) { times.push(ts); if (times.length >= 30 || done) { done = true; clearTimeout(t); finish(); return; } raf(step); }
-      raf(step);
+      measure();
+      function measure() {
+        var times = [];
+        var stop = setTimeout(finish, 1200);
+        function finish() {
+          clearTimeout(stop);
+          if (times.length < 3) { done(M('unsupported')); return; }
+          var deltas = [];
+          for (var i = 1; i < times.length; i++) { var d = times[i] - times[i - 1]; if (d > 0) deltas.push(d); }
+          if (!deltas.length) { done(M('unsupported')); return; }
+          deltas.sort(function (a, b) { return a - b; });
+          done(num(1000 / deltas[Math.floor(deltas.length / 2)], 0));
+        }
+        function step(ts) {
+          times.push(ts || 0);
+          if (times.length >= 30) { finish(); return; }
+          raf.call(env, step);
+        }
+        raf.call(env, step);
+      }
     });
   });
   probe('screens', function (env) {
@@ -615,7 +659,13 @@
     }, M('unsupported'));
   });
   probe('win', function (env) {
-    return safe(function () { return { iw: env.innerWidth || 0, ih: env.innerHeight || 0, ow: env.outerWidth || 0, oh: env.outerHeight || 0 }; }, M('unsupported'));
+    return safe(function () {
+      var o = { iw: env.innerWidth || 0, ih: env.innerHeight || 0 };
+      var ow = env.outerWidth || 0, oh = env.outerHeight || 0;
+      // 只在合理时给外框尺寸，否则宁可不发（最小化 / 无边框窗口会给出 160×28 这种垃圾值）
+      if (ow > 0 && ow >= o.iw && oh >= o.ih) { o.ow = ow; o.oh = oh; }
+      return o;
+    }, M('unsupported'));
   });
   probe('scrollbar', function (env) {
     return safe(function () {
@@ -760,11 +810,14 @@
   });
   probe('rtccodecs', function (env) {
     return safe(function () {
-      var RTC = env.RTCPeerConnection;
-      if (!RTC || !RTC.getCapabilities) return M('unsupported');
-      var a = safe(function () { return RTC.getCapabilities('audio').codecs.map(function (c) { return c.mimeType; }); }, []);
-      var v = safe(function () { return RTC.getCapabilities('video').codecs.map(function (c) { return c.mimeType; }); }, []);
-      return { audio: a.slice(0, 20), video: v.slice(0, 20) };
+      // 注意：静态 getCapabilities 挂在 RTCRtpSender / RTCRtpReceiver 上，RTCPeerConnection 没有
+      var S = env.RTCRtpSender, R = env.RTCRtpReceiver;
+      if (!(S && S.getCapabilities) && !(R && R.getCapabilities)) return M('unsupported');
+      var get = function (kind) { return (S && S.getCapabilities) ? S.getCapabilities(kind) : R.getCapabilities(kind); };
+      var a = safe(function () { return get('audio').codecs.map(function (c) { return c.mimeType; }); }, []);
+      var v = safe(function () { return get('video').codecs.map(function (c) { return c.mimeType; }); }, []);
+      if (!a.length && !v.length) return M('unsupported');
+      return { audio: a.slice(0, 12), video: v.slice(0, 16) };
     }, M('unsupported'));
   });
   probe('recmime', function (env) {
@@ -915,7 +968,6 @@
       if (w.external && w.external.toString && /Sequentum|Selenium/.test(String(w.external)))
         out.push('external');
       if (n.plugins && n.plugins.length === 0 && /Chrome/.test(n.userAgent || '')) out.push('plugins-empty');
-      if (w.chrome && w.chrome.runtime === undefined && /Chrome/.test(n.userAgent || '')) out.push('chrome-no-runtime');
       return out;
     }, M('unsupported'));
   });
@@ -1188,6 +1240,11 @@
       var s = JSON.stringify(envelope);
       return typeof Buffer !== 'undefined' ? Buffer.byteLength(s, 'utf8') : new TextEncoder().encode(s).length;
     };
+    var HARD = { fonts: 300, voices: 32, icu: 24 };
+    for (var hid in HARD) {
+      var hv = envelope.cli[hid];
+      if (Array.isArray(hv) && hv.length > HARD[hid]) { was[hid] = hv.length; envelope.cli[hid] = hv.slice(0, HARD[hid]); }
+    }
     for (var L = 0; L < TRIM_LEVELS.length && bytes() > limit; L++) {
       var cap = TRIM_LEVELS[L];
       for (var i = 0; i < TRIM_ORDER.length; i++) {
