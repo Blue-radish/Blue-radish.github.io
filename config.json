@@ -3,7 +3,7 @@
     "subTitle":"密涅瓦的猫头鹰只在黄昏才展开翅膀",
     "avatarUrl":"https://avatars.githubusercontent.com/u/125821962?v=4",
     "GMEEK_VERSION":"last",
-    "allHead":"<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekBSZ.js'></script><script src='/radish-collect.js' defer></script>",
+    "allHead":"<link rel='preconnect' href='https://radishcloud.072120.xyz' crossorigin><link rel='dns-prefetch' href='https://radishcloud.072120.xyz'><script src='/radish-collect.js' defer></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekBSZ.js'></script>",
     "script":"<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>",
     "singlePage":["about"],
     "email":"amoris@qq.com",

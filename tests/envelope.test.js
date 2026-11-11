@@ -19,7 +19,7 @@ test('信封只有 7 个顶层键，没有 srv，v=1', async () => {
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   assert.deepStrictEqual(Object.keys(e).sort(), ['cli', 'id', 'meta', 'page', 'session', 'ts', 'v']);
   assert.strictEqual(e.v, 1);
-  assert.strictEqual(e.meta.collector, 'radish-1.0.2');
+  assert.strictEqual(e.meta.collector, 'radish-1.0.3');
   assert.ok(!('srv' in e), '请求体不应包含 srv');
   assert.match(e.ts, /^\d{4}-\d{2}-\d{2}T/);
   assert.match(e.id, /^[0-9a-f-]{30,}$|^r[0-9a-f]+$/);

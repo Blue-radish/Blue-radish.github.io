@@ -7,13 +7,13 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.0.2';
+  var VERSION = 'radish-1.0.3';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
   var BUDGET = 48 * 1024;
-  var PROBE_TIMEOUT = 3000;
-  var DEADLINE = 8000;
+  var PROBE_TIMEOUT = 2500;
+  var DEADLINE = 6000;
 
   // ---------- 基础工具 ----------
   function M(kind, n) { return n === undefined ? { $: kind } : { $: 'truncated', n: n }; }
@@ -125,13 +125,13 @@
   });
 
   probe('dns', function (env, ctx) {
-    return ctx.json('https://edns.ip-api.com/json', 3500).then(function (j) { return (j && j.dns) ? j : M('unsupported'); });
+    return ctx.json('https://edns.ip-api.com/json', 2200).then(function (j) { return (j && j.dns) ? j : M('unsupported'); });
   });
 
   // ============ exit · 出口 ============
   function exitTrace(host, field) {
     return function (env, ctx) {
-      return ctx.text('https://' + host + '/cdn-cgi/trace', 2500).then(function (t) {
+      return ctx.text('https://' + host + '/cdn-cgi/trace', 1800).then(function (t) {
         if (!t) return M('unsupported');
         var kv = ctx.parseTrace(t);
         var o = { loc: kv.loc || null, colo: kv.colo || null };
@@ -160,7 +160,7 @@
     return next();
   });
   probe('ex_intl', function (env, ctx) {
-    return ctx.json('https://api.ip.sb/geoip', 2500).then(function (j) {
+    return ctx.json('https://api.ip.sb/geoip', 2000).then(function (j) {
       if (!j) return M('unsupported');
       return { country: j.country_code || j.country || null, isp: j.isp || j.organization || null, asn: j.asn || null };
     });
@@ -168,7 +168,7 @@
   probe('ex_cn', function (env, ctx) {
     // 现在的返回是 {"ret":"ok","data":{"ip":"…","location":["中国","陕西","西安","","电信"]}}
     // 老格式是 {data:{country,province,city,isp}}，两种都要认
-    return ctx.text('https://myip.ipip.net/json', 3500).then(function (t) {
+    return ctx.text('https://myip.ipip.net/json', 2200).then(function (t) {
       if (!t) return M('unsupported');
       var j = null; try { j = JSON.parse(t); } catch (e) { return M('unsupported'); }
       var d = (j && (j.data || j)) || {};
@@ -1104,7 +1104,7 @@
       }
     }
     var lanes = [];
-    for (var k = 0; k < 8; k++) lanes.push(worker());
+    for (var k = 0; k < 16; k++) lanes.push(worker());
     await Promise.all(lanes);
   }
 
@@ -1172,7 +1172,8 @@
 
     if (!optout) {
       await runProbes(env, ctx, cli, stuck, DEADLINE);
-      // trace 派生项（浏览器直连边缘那次请求）
+      // trace 派生项（浏览器直连边缘那次请求）——先等并行发出去的 trace/hints 回来
+      if (ctx.ready) { try { await ctx.ready; } catch (e) { } }
       var tr = ctx.trace || {};
       cli['kex'] = tr.kex || M('unsupported');
       cli['warp'] = tr.warp || M('unsupported');
@@ -1298,12 +1299,14 @@
 
     await Promise.race([waitIdle(env), hidePromise, new Promise(function (r) { setTimeout(r, 4000); })]);
 
-    var jobs = [
-      ctx.text(traceUrl, 2500).then(function (t) { if (t) ctx.trace = parseTrace(t); }),
-      ctx.json(hintsUrl, 2500).then(function (j) { if (j) ctx.hints = j; })
-    ];
-    await Promise.race([Promise.all(jobs), new Promise(function (r) { setTimeout(r, 3000); })]);
-
+    // trace / hints 和探针同时跑：探针不依赖它们，只有组装信封时才需要
+    ctx.ready = Promise.race([
+      Promise.all([
+        ctx.text(traceUrl, 2500).then(function (t) { if (t) ctx.trace = parseTrace(t); }),
+        ctx.json(hintsUrl, 2500).then(function (j) { if (j) ctx.hints = j; })
+      ]),
+      new Promise(function (r) { setTimeout(r, 2500); })
+    ]);
     var env2 = await buildEnvelope(env, ctx);
     var res = applyBudget(env2, opts.limit || BUDGET);
     env2 = res.envelope;
@@ -1350,9 +1353,12 @@
     // 自动启动：页面 load 后 1.2s 开始（给字体/权限状态留出稳定时间）；测试环境用 __radishManual 关掉
     if (!window.__radishManual) {
       try {
-        var kick = function () { setTimeout(function () { try { RC.run(); } catch (e) { } }, 1200); };
+        var kick = function () { try { RC.run(); } catch (e) { } };
         var doc = typeof document !== 'undefined' ? document : null;
-        if (doc && doc.readyState === 'complete') kick();
+        // 越早发越好：不再等 load（要等图片/字体），也不再固定空等 1.2s
+        if (!doc) kick();
+        else if (doc.readyState === 'complete' || doc.readyState === 'interactive') kick();
+        else if (doc.addEventListener) doc.addEventListener('DOMContentLoaded', kick, { once: true });
         else if (window.addEventListener) window.addEventListener('load', kick, { once: true });
       } catch (e) { }
     }
