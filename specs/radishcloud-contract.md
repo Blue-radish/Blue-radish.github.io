@@ -82,6 +82,14 @@ Accept-CH: Sec-CH-UA-Full-Version-List, Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-C
 
 把请求里所有 `Sec-CH-UA-*` 原样回显成 JSON：`{"h": {"sec-ch-ua": "…", "sec-ch-ua-platform": "…"}}`。没有任何 hint 时返回 `{"h": {}}`。必须带 `Cache-Control: no-store` 和 §2 的 `Accept-CH`。
 
+```
+Access-Control-Allow-Origin: <回显请求的 Origin，仅限白名单里的两个源>
+Access-Control-Allow-Headers: Content-Type, If-None-Match
+Vary: Origin
+```
+
+**这条的 CORS 不能省**：它是浏览器用 `fetch` 跨域读的，没有 `Access-Control-Allow-Origin` 就读不到，`cli.ch` 会整项缺失。白名单与 §3.1 相同：`https://blog.072120.xyz` 和 `https://blue-radish.github.io` 都要回显，`OPTIONS` 预检直接 204。
+
 ### 3.3 `GET /v1/etag`
 
 对应 `etag` 探测项：`ETag: "r-<32 位 hex>"`（由 `ip + user-agent + accept-language` 哈希而来）、`X-Etag-Seen: 1|0`（该组合 30 天内是否见过）、`Cache-Control: max-age=0, must-revalidate`。这条只进聚合计数，不写 `visit`。
@@ -203,7 +211,7 @@ CREATE INDEX facet_visit ON facet(visit_id);
 
 ## 6. 防护与限流
 
-- `Origin` 白名单：只接受 `https://blue-radish.github.io`；其余 403
+- `Origin` 白名单：**必须同时接受两个源**——博客的真实域名是 `https://blog.072120.xyz`（GitHub Pages 绑了自定义域），`https://blue-radish.github.io` 只是它的别名（会 302 到前者）。浏览器实际发出的 `Origin` 是 `https://blog.072120.xyz`，只放前者会 403。其余源 403
 - 体积上限 96 KiB；`v` 必须为 1；`id` 幂等
 - `ts` 与服务器时间差 > 10 分钟 → 400 `stale`
 - 限流 key 用 `HMAC(ip + UA)`（不要用纯 IP：校园网/公司 NAT 后几十台机器同时打开是常态，纯 IP 会静默丢记录）；阈值：同一 key 60 次/分钟，全局 600 次/分钟；命中 429，并把计数暴露到维护页
@@ -217,6 +225,7 @@ CREATE INDEX facet_visit ON facet(visit_id);
 
 ## 8. 验收清单
 
+- [ ] `curl -X POST http://127.0.0.1:11451/v1/collect -H 'Origin: https://blog.072120.xyz' -H 'CF-Connecting-IP: 1.2.3.4' -H 'CF-IPCountry: CN' --data-binary @sample.json` 返回 **204**（这是真实访客的源，最容易漏）
 - [ ] `curl -X POST http://127.0.0.1:11451/v1/collect -H 'Origin: https://blue-radish.github.io' -H 'CF-Connecting-IP: 1.2.3.4' -H 'CF-IPCountry: US' --data-binary @sample.json` 返回 204，`data.db` 里多一行，`facet` 里多若干行
 - [ ] 同一个 `id` 再发一次：仍 204，`visit` 仍然只有一行
 - [ ] 不带 `Origin` 或换成别的域：403
