@@ -7,7 +7,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.0.3';
+  var VERSION = 'radish-1.0.4';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
@@ -1266,19 +1266,13 @@
   function endpointOf(opts) { return (opts && opts.endpoint) || ENDPOINT; }
 
   function waitIdle(env) {
+    // 只让一小会儿给首屏资源，绝不等 load 事件（那要等图片/字体，慢链路上能差好几秒）
     return new Promise(function (resolve) {
-      var w = env;
-      var done = false;
+      var w = env, done = false;
       function go() { if (done) return; done = true; resolve(); }
       try {
-        if (w.document && w.document.readyState === 'complete') {
-          if (w.requestIdleCallback) w.requestIdleCallback(go, { timeout: 2000 }); else setTimeout(go, 1500);
-        } else if (w.addEventListener) {
-          w.addEventListener('load', function () {
-            if (w.requestIdleCallback) w.requestIdleCallback(go, { timeout: 2000 }); else setTimeout(go, 800);
-          }, { once: true });
-          setTimeout(go, 4000);
-        } else setTimeout(go, 0);
+        if (w.requestIdleCallback) { w.requestIdleCallback(go, { timeout: 300 }); setTimeout(go, 400); }
+        else setTimeout(go, 300);
       } catch (e) { go(); }
     });
   }
