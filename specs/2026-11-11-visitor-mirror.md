@@ -69,7 +69,7 @@
 
 ---
 
-## 5. 逐句示例（用真实记录，2016-11-11 那条 Edge + RTX 2080 Ti）
+## 5. 逐句示例（用真实记录，2026-11-11 那条 Edge + RTX 2080 Ti）
 
 输入摘要：`srv.loc = US/California/Los Angeles`、`srv.asn = 40676 Psychz Networks`、`srv.ptr = unassigned.psychz.net`、`cli.cpu=20`、`cli.mem=32`、`webgl.unmaskedRenderer = ANGLE (NVIDIA, NVIDIA GeForce RTX 2080 Ti (0x00001E04) Direct3D11 vs_5_0 ps_5_0, D3D11)`、`browser=Edge 157`、`langs=[zh-CN,ru,ru-RU]`、`tz=Asia/Hong_Kong`、`clock.off=8`、`screen=2560×1440 dpr 1.1`、`screens.n=2`、`touch.points=10 hover=true`、`voices=250 条`、`fonts=31 种`。
 
@@ -108,6 +108,56 @@
 | `srv.loc` 只有国家 | 说「从 X 连过来」，不提省份城市 |
 | `fpid` 为空（老版本采集端） | 省略唯一性那句 |
 | 字段整块缺失 | 对应句子整句删掉，不要留空句、不要写「未知」 |
+
+---
+
+## 7.5 代理判定，以及「连接端系统」永久不可见（2026-11-12 定案）
+
+### 7.5.1 这个站看不到访客的 TCP 握手，是架构决定的
+
+访客的 TCP/TLS 在两个地方就终止了，两个地方都不属于我们：
+
+```
+访客 ──TCP/TLS──> Fastly（GitHub Pages 承载博客）   ← 不提供任何服务端数据，连 IP 都没有
+访客 ──TCP/TLS──> Cloudflare 边缘 ──隧道──> 本机     ← 只给 HTTP 头，不给 SYN
+```
+
+所以要拿 p0f 那套（初始 TTL、TCP options 顺序、MSS、window scale）必须有一台**自己接住访客 TCP 连接**的机器：公网 IP + 开放端口 + 不套橙云。现状是那台 Windows Server 没有公网入口（装 cloudflared 就是为了绕开这一点），也没有额外 VPS，所以：
+
+> **`tcpfp` / `ja4` / `h2fp` / `quicfp` / `tlsfp` 这 5 项是架构性不可见，不是待办、不是 bug、不会"以后补上"。**
+
+除非将来出现「公网直连入口」这个前提变了，否则不要为这 5 项写任何代码或承诺。
+
+第三方公共探针（`tls.peet.ws`、`tls.browserleaks.com`）技术上能返回 TTL/MSS/JA3/JA4，但都不给本域 `Access-Control-Allow-Origin`，浏览器读不到；而且等于把访客 IP 交给第三方，与「自己后台看统计」的定位冲突。**已排除，不要再评估。**
+
+### 7.5.2 文案里这句必须写实
+
+当画像需要提「连接端系统」时，固定用这个说法（不要留空、不要写"未知"）：
+
+> 连接你的是哪台机器、什么系统，我看不到——TCP 握手在你到 Cloudflare 那一段就结束了，只有 Cloudflare 知道我连的是 Windows 还是 Linux。我能确认的只有：你这个出口是机房线路。
+
+### 7.5.3 代理/机房判定用加权分数（没有 SYN 也能判强弱）
+
+| 信号 | 取值 | 权重 |
+|---|---|---|
+| 出口 ASN 命中机房关键字表（§3 `net_kind`） | 是 | +40 |
+| `srv.ptr` 含 hosting / server / vps / unassigned / cloud / colo | 是 | +20 |
+| 时区国家 / 语言 与 `srv.loc.country` 不一致 | 每个 | +15 |
+| `ex_cf` / `ex_gpt` / `ex_claude` / `stack` 的 `colo` 不完全一致 | 是 | +10 |
+| `webrtc.mdns = true` 且 `lan.ips` 为空（拿不到内网） | 是 | +5 |
+| `auto` 非空 / `webdriver=true` / UA 含 Headless | 是 | +30（同时走 §7 的自动化提示行） |
+| UA 与 `srv.ch` / `agent.kind` 完全一致 | 是 | −15 |
+| 时区与出口国一致 且 `conn.rtt` 正常 | 是 | −10 |
+
+结论分档（写进文案的措辞）：
+
+| 分数 | 措辞 |
+|---|---|
+| ≥ 60 | 「你这个出口几乎肯定是机房或代理线路」 |
+| 30–59 | 「看起来像挂了代理或走了中转」 |
+| < 30 | 「看不出明显的代理痕迹」 |
+
+分数与明细都要存进 `parts`（`{key:'proxy', score, hits:[...]}`），方便以后调权重，也方便你自己在后台核对。
 
 ---
 
@@ -153,3 +203,6 @@
 - [ ] 构造 `srv.loc` 只有国家的记录 → 不出现省市
 - [ ] 同一条记录连调两次，输出字节完全相同
 - [ ] 折叠态字数 ≤160，无「未知」「N/A」「null」「undefined」字样
+- [ ] 机房 IP + 时区不一致的记录 → `parts` 里有 `proxy`，score ≥ 60，措辞是「几乎肯定是机房或代理线路」
+- [ ] 家宽 IP + 时区语言都对得上的记录 → score < 30，措辞是「看不出明显的代理痕迹」
+- [ ] 任何记录都不出现「连接端系统：Linux」这类推断（该信息本架构不可见，只能用 §7.5.2 的固定说法）

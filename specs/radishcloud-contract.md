@@ -248,6 +248,8 @@ CREATE INDEX facet_visit ON facet(visit_id);
 
 id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 
+> **架构性不可见（2026-11-12 定案）**：`tcpfp` `ja4` `h2fp` `quicfp` `tlsfp` 这 5 项永远不会有数据。它们需要一台自己接住访客 TCP/TLS 握手的服务器（公网 IP、开放端口、不套橙云）。本项目的访客连接分别终止在 Fastly（GitHub Pages）和 Cloudflare 边缘，两者都不会把这些信息交给源站；现状也没有公网直连入口。这是网络位置问题，不是代码问题，后台不要显示成「待补」，画像不要写成「未知」——用 `specs/2026-11-11-visitor-mirror.md` §7.5.2 的固定说法。
+
 采集端实发 **105 个键**（`C` + `C*` 全部，加 `edge`、`ch`、`proto` 三项——它们由客户端从 `/cdn-cgi/trace` 与 `/v1/hints` 读回，源站若从请求头也能拿到同一信息，以源站为准）。`E` 组的 `ip` `geo` `coords` `tzip` `h_*` 不会出现在 `cli` 里，`O` 组的 `isp` `ptr` `etag` 由源站自己算。`X` 组 5 项的 `k` 永远没有数据（原 `proto` 已由客户端读到）。
 
 **高基数项提示**：`fpid` `hwid` `canvas` `audio` `mathfp` `fontfp` `domrect` `svgrect` `textm` `glimg` `ip` `ptr` `etag` `ex_*` 的取值几乎每访问一个值，在分布页里会变成一堆计数为 1 的卡片。建议后台支持「隐藏维度」或把这类项折叠到一个「指纹/单值」分区；`fpid`/`hwid` 更适合当筛选与去重口径（`distinct fpid` 已用于总览）。
