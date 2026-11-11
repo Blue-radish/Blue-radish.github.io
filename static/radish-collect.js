@@ -7,7 +7,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.0.0';
+  var VERSION = 'radish-1.0.1';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
@@ -151,9 +151,11 @@
   probe('ex_cn', function (env, ctx) {
     return ctx.text('https://myip.ipip.net/json', 2500).then(function (t) {
       if (!t) return M('unsupported');
-      var j = null; try { j = JSON.parse(t); } catch (e) { return { raw: t.slice(0, 80) }; }
+      var j = null; try { j = JSON.parse(t); } catch (e) { return M('unsupported'); }
       var d = (j && (j.data || j)) || {};
-      return { country: d.country || null, province: d.province || null, city: d.city || null, isp: d.isp || null };
+      var o = { country: d.country || null, province: d.province || null, city: d.city || null, isp: d.isp || null };
+      if (!o.country && !o.province && !o.city && !o.isp) return M('unsupported');
+      return o;
     });
   });
 
@@ -449,7 +451,6 @@
         } catch (e) { out.push(name + ':err'); }
       }
       check('Function.prototype.toString', f);
-      if (env.navigator) { check('navigator.hardwareConcurrency', Object.getOwnPropertyDescriptor(env.navigator, 'hardwareConcurrency') ? function () { } : function () { }); }
       try { if (!('languages' in env.navigator) || !Object.getOwnPropertyDescriptor(Object.getPrototypeOf(env.navigator) || {}, 'languages')) out.push('languages-missing'); } catch (e) { }
       try { if (env.Notification && !Object.getOwnPropertyDescriptor(env.Notification, 'permission')) out.push('notification-descriptor'); } catch (e) { out.push('notification-err'); }
       try {
@@ -850,7 +851,8 @@
   probe('dnt', function (env) {
     return safe(function () {
       var n = env.navigator;
-      var dnt = n.doNotTrack === undefined ? null : String(n.doNotTrack);
+      var raw = n.doNotTrack;
+      var dnt = (raw === undefined || raw === null || raw === '') ? null : String(raw);
       return { dnt: dnt, gpc: n.globalPrivacyControl === true };
     }, M('unsupported'));
   });
@@ -1027,6 +1029,33 @@
     return ctx;
   }
 
+  // 并发池（8 路）+ 全局死线：到点就收工，没跑完的记 timeout 并记进 meta.stuck
+  async function runProbes(env, ctx, cli, stuck, budgetMs) {
+    var deadline = Date.now() + (budgetMs || DEADLINE);
+    var next = 0;
+    async function worker() {
+      while (true) {
+        var i = next++;
+        if (i >= PROBES.length) return;
+        var p = PROBES[i];
+        var left = deadline - Date.now();
+        if (left <= 0) { cli[p.id] = M('timeout'); stuck.push(p.id); continue; }
+        var v = await withTimeout(
+          Promise.resolve().then(function () { return p.run(env, ctx); }).catch(function () { return { __error: true }; }),
+          Math.min(PROBE_TIMEOUT, Math.max(200, left)),
+          p.id
+        );
+        if (v && v.__timeout) { cli[p.id] = M('timeout'); stuck.push(p.id); }
+        else if (v && v.__error) { cli[p.id] = M('error'); }
+        else if (v === undefined || v === null) { cli[p.id] = M('unsupported'); }
+        else cli[p.id] = v;
+      }
+    }
+    var lanes = [];
+    for (var k = 0; k < 8; k++) lanes.push(worker());
+    await Promise.all(lanes);
+  }
+
   // ---------- 信封 ----------
   function uuid(env) {
     try { if (env.crypto && env.crypto.randomUUID) return env.crypto.randomUUID(); } catch (e) { }
@@ -1090,18 +1119,7 @@
     var optout = optedOut(env);
 
     if (!optout) {
-      for (var i = 0; i < PROBES.length; i++) {
-        var p = PROBES[i];
-        var v;
-        try {
-          v = p.run(env, ctx);
-          v = await withTimeout(v, PROBE_TIMEOUT, p.id);
-        } catch (e) { v = { __error: true }; }
-        if (v && v.__timeout) { cli[p.id] = M('timeout'); stuck.push(p.id); }
-        else if (v && v.__error) { cli[p.id] = M('error'); }
-        else if (v === undefined || v === null) { cli[p.id] = M('unsupported'); }
-        else cli[p.id] = v;
-      }
+      await runProbes(env, ctx, cli, stuck, DEADLINE);
       // trace 派生项（浏览器直连边缘那次请求）
       var tr = ctx.trace || {};
       cli['kex'] = tr.kex || M('unsupported');

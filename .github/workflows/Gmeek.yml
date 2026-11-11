@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   issues:
     types: [opened, edited]
+  # push 到 main 就重新构建。Gmeek 自己用 GITHUB_TOKEN 提交，不会再次触发工作流，不会死循环。
+  push:
+    branches: [main]
   schedule:
     - cron: "0 16 * * *"
     
