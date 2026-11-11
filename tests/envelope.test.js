@@ -69,6 +69,19 @@ test('超预算时按优先级截断长尾数组，且字节数达标', async ()
   assert.deepStrictEqual(plain(out.envelope.meta.truncated.map(d => d.n)), [900, 900]);
 });
 
+test('数据极端大时逐级压缩，绝不超 48 KiB', async () => {
+  const RC = loadCollector(fakeEnv());
+  const e = await RC.buildEnvelope(undefined, collectorCtx());
+  e.cli.fonts = Array.from({ length: 400 }, (_, i) => 'Long Font Family ' + i + ' ' + 'x'.repeat(120));
+  e.cli.voices = Array.from({ length: 400 }, (_, i) => 'Voice ' + i + ' ' + 'y'.repeat(120));
+  const out = RC.applyBudget(e, 48 * 1024);
+  const bytes = Buffer.byteLength(JSON.stringify(out.envelope), 'utf8');
+  assert.ok(bytes <= 48 * 1024, 'bytes=' + bytes);
+  assert.ok(out.envelope.cli.fonts.length < 300, '应压到 300 以下，实际 ' + out.envelope.cli.fonts.length);
+  assert.ok(out.envelope.cli.fonts.length >= 9, '不应压到 9 以下');
+  assert.deepStrictEqual(plain(out.envelope.meta.truncated.map(d => d.n)), [400, 400]);
+});
+
 test('DNT/GPC 开启时 cli 为空且 optout=true', async () => {
   const RC = loadCollector(fakeEnv({ dnt: '1' }));
   const e = await RC.buildEnvelope(undefined, collectorCtx());

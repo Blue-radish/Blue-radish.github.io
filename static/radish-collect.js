@@ -1134,6 +1134,7 @@
       meta: {
         dur_ms: Date.now() - t0,
         stuck: stuck,
+        truncated: [],
         privacy: { dnt: String(nav.doNotTrack) === '1', gpc: nav.globalPrivacyControl === true, optout: optout },
         collector: VERSION,
         ua: safe(function () { return nav.userAgent; }, '')
@@ -1158,30 +1159,28 @@
     return out.join('|');
   }
 
-  // 只裁数组型长尾项；被裁的项目记在 meta.truncated 里（保持数组形态，服务端 facet 展开规则不受影响）
-  var TRIM_ORDER = [['fonts', 300], ['voices', 300], ['icu', 24]];
+  // 只裁数组型长尾项；逐级压缩直到塞进预算，被裁的项目记在 meta.truncated 里
+  var TRIM_ORDER = ['fonts', 'voices', 'icu'];
+  var TRIM_LEVELS = [300, 150, 75, 37, 18, 9];
 
   function applyBudget(envelope, limit) {
     limit = limit || BUDGET;
-    var dropped = [];
+    var was = {}, dropped = [];
     var bytes = function () {
       var s = JSON.stringify(envelope);
       return typeof Buffer !== 'undefined' ? Buffer.byteLength(s, 'utf8') : new TextEncoder().encode(s).length;
     };
-    var guard = 0;
-    while (bytes() > limit && guard++ < 40) {
-      var changed = false;
+    for (var L = 0; L < TRIM_LEVELS.length && bytes() > limit; L++) {
+      var cap = TRIM_LEVELS[L];
       for (var i = 0; i < TRIM_ORDER.length; i++) {
         if (bytes() <= limit) break;
-        var id = TRIM_ORDER[i][0], cap = TRIM_ORDER[i][1], v = envelope.cli[id];
+        var id = TRIM_ORDER[i], v = envelope.cli[id];
         if (!Array.isArray(v) || v.length <= cap) continue;
-        var full = v.length;
+        was[id] = was[id] || v.length;
         envelope.cli[id] = v.slice(0, cap);
-        dropped.push({ id: id, n: full });
-        changed = true;
       }
-      if (!changed) break;
     }
+    for (var k in was) dropped.push({ id: k, n: was[k] });
     envelope.meta = envelope.meta || {};
     envelope.meta.truncated = dropped;
     return { envelope: envelope, dropped: dropped, bytes: bytes() };
