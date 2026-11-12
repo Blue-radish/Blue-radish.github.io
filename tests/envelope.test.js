@@ -19,7 +19,7 @@ test('信封只有 7 个顶层键，没有 srv，v=1', async () => {
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   assert.deepStrictEqual(Object.keys(e).sort(), ['cli', 'id', 'meta', 'page', 'session', 'ts', 'v']);
   assert.strictEqual(e.v, 1);
-  assert.strictEqual(e.meta.collector, 'radish-1.0.4');
+  assert.strictEqual(e.meta.collector, 'radish-1.1.0');
   assert.ok(!('srv' in e), '请求体不应包含 srv');
   assert.match(e.ts, /^\d{4}-\d{2}-\d{2}T/);
   assert.match(e.id, /^[0-9a-f-]{30,}$|^r[0-9a-f]+$/);
@@ -130,4 +130,51 @@ test('trace 派生的 kex/warp/edge/proto 与 hints 派生的 ch', async () => {
   assert.deepStrictEqual(plain(e2.cli.kex), { $: 'unsupported' });
   assert.deepStrictEqual(plain(e2.cli.proto), { $: 'unsupported' });
   assert.ok(!('ch' in e2.cli), '没有 hints 时 ch 不出现，由源站标记');
+});
+
+test('G10：40 个 20000 字符的 voice 也不能撑破 48 KiB', async () => {
+  const RC = loadCollector(fakeEnv());
+  const big = Array.from({ length: 40 }, (_, i) => 'V' + i + '-' + 'x'.repeat(20000));
+  const stub = { v: 1, id: 'a', ts: 'b', session: 'c', page: {}, cli: { voices: big, fonts: [] }, meta: {} };
+  const r = RC.applyBudget(stub, 49152);
+  const body = JSON.stringify(r.envelope);
+  assert.ok(Buffer.byteLength(body, 'utf8') <= 49152, '实际 ' + Buffer.byteLength(body, 'utf8') + ' B');
+  assert.ok(r.ok, '应该报告预算已满足');
+  assert.ok(r.dropped.some(d => d.id === 'voices'), '裁剪要记账');
+});
+
+test('G06：ICE 解析取 candidate.address，不抓 foundation', async () => {
+  const env = fakeEnv();
+  class PC {
+    constructor() { this.onicecandidate = null; }
+    createDataChannel() { }
+    createOffer() {
+      setTimeout(() => {
+        this.onicecandidate({ candidate: { candidate: 'candidate:123456 1 udp 2113937151 192.168.1.8 54321 typ host', address: '192.168.1.8', type: 'host' } });
+        this.onicecandidate({ candidate: null });
+      }, 5);
+      return Promise.resolve({});
+    }
+    setLocalDescription() { return Promise.resolve(); }
+    close() { this.closed = true; }
+  }
+  env.RTCPeerConnection = PC;
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  assert.deepStrictEqual(plain(e.cli.lan.ips), ['192.168.1.8']);
+  assert.strictEqual(e.cli.lan.mdns_only, undefined);
+});
+
+test('G07：trace 晚到时 clock.skew_h 也要算出来', async () => {
+  const env = fakeEnv();
+  const RC = loadCollector(env);
+  let n = 0;
+  env.fetch = (u) => new Promise(r => setTimeout(() => {
+    n++;
+    const ts = (Date.now() / 1000) + 7200;   // 服务器比本地快 2 小时
+    r({ ok: true, status: 200, text: () => Promise.resolve('ts=' + ts + '\nhttp=HTTP/2\ntls=TLSv1.3\ncolo=LAX\n'), json: () => Promise.resolve({ h: {} }) });
+  }, 120));
+  await RC.run(env, { endpoint: 'http://x/c', trace: 'http://t/t', hints: 'http://h/h' });
+  const body = JSON.parse(await env.__sent[0].blob.text());
+  assert.ok(Math.abs(body.cli.clock.skew_s + 7200) < 5, '实际 ' + body.cli.clock.skew_s);
+  assert.ok(Math.abs(body.cli.clock.skew_h + 2) < 0.05, '实际 ' + body.cli.clock.skew_h);
 });

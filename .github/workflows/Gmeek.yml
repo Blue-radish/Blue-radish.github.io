@@ -15,7 +15,12 @@ jobs:
     name: Generate blog
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
-    permissions: write-all
+    # 只给实际用到的权限（原来是 write-all）
+    permissions:
+      contents: write
+      issues: write
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +41,11 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Clone source code
         run: |
           GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
@@ -43,6 +53,7 @@ jobs:
           cd /opt/Gmeek/
           lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+          echo "Gmeek 生成器版本: $(git describe --tags --always) $(git rev-parse HEAD)"
 
       - name: Install dependencies
         run: |
@@ -57,7 +68,21 @@ jobs:
           cp -a /opt/Gmeek/docs ${{ github.workspace }} 
           cp -a /opt/Gmeek/backup ${{ github.workspace }} 
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
-          
+
+      # 模板由上游生成，修复必须落在生成之后；匹配不上就失败，避免漏洞悄悄回来
+      - name: Patch generated html
+        run: node tools/patch-generated.js
+
+      # 待发布的 artifact 必须与源一致，并且测试直接跑在这份产物上
+      - name: Verify artifact
+        run: |
+          cmp static/radish-collect.js docs/radish-collect.js || (echo "::error::docs/radish-collect.js 与 static 不一致"; exit 1)
+          echo "collector: $(grep -o "radish-[0-9.]*" docs/radish-collect.js | head -1)"
+          sha256sum static/radish-collect.js docs/radish-collect.js
+
+      - name: Test the artifact
+        run: node --test tests/*.test.js
+
       - name: update html
         run: |
           git config --local user.email "$(jq -r ".email" config.json)"

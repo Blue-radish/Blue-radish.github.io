@@ -7,7 +7,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.0.4';
+  var VERSION = 'radish-1.1.0';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
@@ -19,8 +19,33 @@
   function M(kind, n) { return n === undefined ? { $: kind } : { $: 'truncated', n: n }; }
   function isMissing(v) { return v && typeof v === 'object' && !Array.isArray(v) && typeof v.$ === 'string'; }
   function safe(fn, fallback) { try { var r = fn(); return r === undefined ? fallback : r; } catch (e) { return fallback; } }
-  function has(o, k) { return o && typeof o[k] !== 'undefined' && o[k] !== null; }
   function num(v, d) { v = +v; return isFinite(v) ? Math.round(v * Math.pow(10, d || 0)) / Math.pow(10, d || 0) : null; }
+
+  var STR_CAP = 300;   // 仅当整体超预算时才启用的单字符串上限
+  function capStrings(v, cap, was, id) {
+    if (typeof v === 'string') {
+      if (v.length > cap) { was[id] = was[id] || v.length; return v.slice(0, cap); }
+      return v;
+    }
+    if (Array.isArray(v)) { var arr = []; for (var i = 0; i < v.length; i++) arr.push(capStrings(v[i], cap, was, id)); return arr; }
+    if (v && typeof v === 'object' && typeof v.$ !== 'string') { var o = {}; for (var k in v) o[k] = capStrings(v[k], cap, was, id); return o; }
+    return v;
+  }
+
+  var OWN_KEYS = ['radish.sid', 'radish.sent'];
+  function foreignKeys(s) {
+    if (!s) return null;
+    var mine = 0;
+    for (var i = 0; i < OWN_KEYS.length; i++) { try { if (s.getItem(OWN_KEYS[i]) !== null) mine++; } catch (e) { } }
+    try {
+      if (typeof s.key === 'function') {
+        var n = 0;
+        for (var j = 0; j < s.length; j++) { var k = s.key(j); if (k && OWN_KEYS.indexOf(k) < 0) n++; }
+        return n;
+      }
+    } catch (e) { return null; }
+    return Math.max(0, (s.length || 0) - mine);
+  }
 
   function sha(str) {
     try {
@@ -74,12 +99,10 @@
   function probe(id, fn) { if (MAP[id]) return; MAP[id] = true; PROBES.push({ id: id, run: fn }); }
 
   // ============ net · 客户端可读部分 ============
-  probe('clock', function (env, ctx) {
-    var local = Date.now() / 1000;
-    var off = -new Date().getTimezoneOffset() / 60;
-    var skew = null;
-    if (ctx.trace && ctx.trace.ts) skew = num((parseFloat(ctx.trace.ts) - local) / 3600, 1);
-    return { off: num(off, 2), skew_h: skew };
+  probe('clock', function (env) {
+    // 只报本地读数。skew 依赖 trace，统一在 derive() 里算——探针与 trace 并发时
+    // 这里读 ctx.trace 一定是空的（旧实现因此永远 skew_h=null）。
+    return { off: num(-new Date().getTimezoneOffset() / 60, 2), offset_min: new Date().getTimezoneOffset(), __t: Date.now() / 1000 };
   });
 
   // 一次 ICE 收集，供 webrtc / lan / v6mac 共用
@@ -89,20 +112,30 @@
     icePromise = new Promise(function (resolve) {
       var RTC = safe(function () { return env.RTCPeerConnection || env.webkitRTCPeerConnection; }, null);
       if (!RTC) { resolve(M('unsupported')); return; }
-      var addrs = [], done = false;
-      function finish() { if (done) return; done = true; resolve(addrs); }
+      var addrs = [], done = false, pc = null, timer = null;
+      function finish() { if (done) return; done = true; clearTimeout(timer); try { if (pc && pc.close) pc.close(); } catch (e) { } resolve(addrs); }
+      // 地址取 RTCIceCandidate.address；老实现按 candidate 语法取第 5 段。
+      // 旧代码用 /([0-9a-fA-F.:]{3,})\s/ 抓到的是 foundation（"123456"），不是地址。
+      function addrOf(cand) {
+        var a = null;
+        if (cand && typeof cand.address === 'string' && cand.address) a = cand.address;
+        if (!a && cand && typeof cand.candidate === 'string') {
+          var parts = cand.candidate.split(/\s+/);
+          if (parts.length >= 8 && /^candidate:/.test(parts[0])) a = parts[4];
+        }
+        if (!a) return null;
+        return /\.local$/i.test(a) ? 'mdns.local' : a;
+      }
       try {
-        var pc = new RTC({ iceServers: [], iceCandidatePoolSize: 0 });
-        var timer = setTimeout(function () { finish(); }, 2000);
+        pc = new RTC({ iceServers: [], iceCandidatePoolSize: 0 });
+        timer = setTimeout(function () { finish(); }, 2000);
         pc.onicecandidate = function (e) {
-          if (!e || !e.candidate) { clearTimeout(timer); finish(); return; }
-          var c = e.candidate.candidate || '';
-          var m = c.match(/([0-9a-fA-F.:]{3,})\s/);
-          if (m) addrs.push(m[1]);
-          if (/\.local/.test(c)) addrs.push('mdns.local');
+          if (!e || !e.candidate) { finish(); return; }
+          var a = addrOf(e.candidate);
+          if (a && addrs.indexOf(a) < 0) addrs.push(a);
         };
         pc.createDataChannel('r');
-        pc.createOffer().then(function (o) { return pc.setLocalDescription(o); }).catch(function () { clearTimeout(timer); finish(); });
+        pc.createOffer().then(function (o) { return pc.setLocalDescription(o); }).catch(function () { finish(); });
       } catch (e) { resolve(M('error')); }
     });
     return icePromise;
@@ -111,9 +144,13 @@
   probe('lan', function (env) {
     return ice(env).then(function (a) {
       if (isMissing(a)) return a;
-      var ips = a.filter(function (x) { return x !== 'mdns.local' && /^\d+\.\d+\.\d+\.\d+$/.test(x); });
-      if (!ips.length) return { ips: [], mdns_only: true };
-      return { ips: ips.slice(0, 8) };
+      var mdns = a.indexOf('mdns.local') >= 0;
+      var ips = a.filter(function (x) { return /^\d+\.\d+\.\d+\.\d+$/.test(x); });
+      var v6 = a.filter(function (x) { return x !== 'mdns.local' && x.indexOf(':') >= 0; });
+      if (!ips.length) {
+        return { ips: [], v6: v6.slice(0, 4), mdns: mdns, mdns_only: mdns, reason: mdns ? 'mdns_only' : (v6.length ? 'v6_only' : 'no_candidate') };
+      }
+      return { ips: ips.slice(0, 8), v6: v6.slice(0, 4), mdns: mdns };
     });
   });
   probe('v6mac', function (env) {
@@ -125,14 +162,14 @@
   });
 
   probe('dns', function (env, ctx) {
-    return ctx.json('https://edns.ip-api.com/json', 2200).then(function (j) { return (j && j.dns) ? j : M('unsupported'); });
+    return ctx.json('https://edns.ip-api.com/json', 2200, M('unreadable')).then(function (j) { return (j && j.dns) ? j : M('unreadable'); });
   });
 
   // ============ exit · 出口 ============
   function exitTrace(host, field) {
     return function (env, ctx) {
-      return ctx.text('https://' + host + '/cdn-cgi/trace', 1800).then(function (t) {
-        if (!t) return M('unsupported');
+      return ctx.text('https://' + host + '/cdn-cgi/trace', 1800, M('unreadable')).then(function (t) {
+        if (!t) return M('unreadable');
         var kv = ctx.parseTrace(t);
         var o = { loc: kv.loc || null, colo: kv.colo || null };
         if (field && kv[field]) o[field] = kv[field];
@@ -143,33 +180,31 @@
   probe('ex_gpt', exitTrace('chatgpt.com'));
   probe('ex_claude', exitTrace('claude.ai'));
   probe('ex_cf', exitTrace('www.cloudflare.com'));
-  // trace 主机兜底：只要有一个能读到 http/tls 就算成功（radar 那条不一定带 http=）
+  // stack：契约承诺的是 IPv4 / IPv6 双栈，所以分别打 v4-only 与 v6-only 目标
+  // （旧实现打的是普通 hostname 的 trace，测出来的是 HTTP/TLS，跟 stack 的名字无关）
   probe('stack', function (env, ctx) {
-    var hosts = ['www.cloudflare.com', 'radar.cloudflare.com', 'cloudflare.com'];
-    var i = 0;
-    function next() {
-      if (i >= hosts.length) return Promise.resolve(M('unsupported'));
-      var host = hosts[i++];
-      return ctx.text('https://' + host + '/cdn-cgi/trace', 2500).then(function (t2) {
-        if (!t2) return next();
-        var kv = ctx.parseTrace(t2);
-        if (!kv.http && !kv.tls) return next();
-        return { loc: kv.loc || null, colo: kv.colo || null, http: kv.http || null, tls: kv.tls || null };
+    function one(url) {
+      return ctx.json(url, 2000, M('unreadable')).then(function (j) {
+        if (!j || isMissing(j)) return { ok: false, state: 'unreadable' };
+        return j.ip ? { ok: true, ip: j.ip } : { ok: false, state: 'no_ip' };
       });
     }
-    return next();
+    return Promise.all([one('https://api4.ipify.org?format=json'), one('https://api6.ipify.org?format=json')]).then(function (r) {
+      var dual = !!(r[0].ok && r[1].ok);
+      return { v4: r[0], v6: r[1], dual };
+    });
   });
   probe('ex_intl', function (env, ctx) {
-    return ctx.json('https://api.ip.sb/geoip', 2000).then(function (j) {
-      if (!j) return M('unsupported');
+    return ctx.json('https://api.ip.sb/geoip', 2000, M('unreadable')).then(function (j) {
+      if (!j) return M('unreadable');
       return { country: j.country_code || j.country || null, isp: j.isp || j.organization || null, asn: j.asn || null };
     });
   });
   probe('ex_cn', function (env, ctx) {
     // 现在的返回是 {"ret":"ok","data":{"ip":"…","location":["中国","陕西","西安","","电信"]}}
     // 老格式是 {data:{country,province,city,isp}}，两种都要认
-    return ctx.text('https://myip.ipip.net/json', 2200).then(function (t) {
-      if (!t) return M('unsupported');
+    return ctx.text('https://myip.ipip.net/json', 2200, M('unreadable')).then(function (t) {
+      if (!t) return M('unreadable');
       var j = null; try { j = JSON.parse(t); } catch (e) { return M('unsupported'); }
       var d = (j && (j.data || j)) || {};
       var loc = Array.isArray(d.location) ? d.location : [];
@@ -188,8 +223,20 @@
   probe('langs', function (env) { return safe(function () { return (env.navigator.languages || [env.navigator.language]).slice(0, 12); }, M('unsupported')); });
   probe('locale', function (env) { return safe(function () { return Intl.DateTimeFormat().resolvedOptions().locale; }, M('unsupported')); });
   probe('tz', function (env) { return safe(function () { return Intl.DateTimeFormat().resolvedOptions().timeZone; }, M('unsupported')); });
-  probe('hour', function () { return safe(function () { return new Date().getHours(); }, null); });
-  probe('week', function (env) { return safe(function () { return new Intl.DateTimeFormat(undefined, { weekday: 'long' }).format(new Date()); }, M('unsupported')); });
+  probe('hour', function () {
+    return safe(function () {
+      var o = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+      return { cycle: o.hourCycle || null, h12: o.hour12 === undefined ? null : !!o.hour12 };
+    }, M('unsupported'));
+  });
+  probe('week', function (env) {
+    return safe(function () {
+      var L = new Intl.Locale(env.navigator.language || 'en');
+      var wi = L.weekInfo || (L.getWeekInfo ? L.getWeekInfo() : null);
+      if (!wi) return M('unsupported');
+      return { firstDay: wi.firstDay, weekend: wi.weekend || null, minDays: wi.minimalDays || null };
+    }, M('unsupported'));
+  });
   probe('fmt', function (env) {
     return safe(function () {
       var d = new Date(2024, 0, 2, 15, 4, 5);
@@ -459,11 +506,24 @@
     }, M('unsupported'));
   });
   probe('engver', function (env) {
-    return safe(function () {
+    function fromUa() {
       var ua = env.navigator.userAgent || '';
-      var m = ua.match(/(?:Chrome|Chromium|Firefox|Edg|OPR|Version)\/(\d+)/);
-      return m ? m[1] : 'unknown';
-    }, M('unsupported'));
+      var m = ua.match(/(?:Chrome|Chromium|Firefox|Edg|OPR|Version)\/(\d+(?:\.\d+)*)/);
+      return m ? m[1] : M('unsupported');
+    }
+    try {
+      var uad = uaData(env);
+      if (uad && uad.getHighEntropyValues) {
+        return uad.getHighEntropyValues(['fullVersionList']).then(function (v) {
+          var list = v && v.fullVersionList || [];
+          for (var i = 0; i < list.length; i++) {
+            if (/Chromium|Google Chrome|Microsoft Edge|Firefox/.test(list[i].brand)) return list[i].version;
+          }
+          return fromUa();
+        }).catch(fromUa);
+      }
+    } catch (e) { }
+    return safe(fromUa, M('unsupported'));
   });
   probe('lies', function (env) {
     return safe(function () {
@@ -655,7 +715,9 @@
   probe('screens', function (env) {
     return safe(function () {
       var s = env.screen;
-      return { n: s.isExtended ? 2 : 1, ext: !!s.isExtended };
+      // isExtended 只能说明「不止一块」，数不出具体几个（旧代码硬写 2，三屏会被说成双屏）
+      if (s.isExtended) return { n: null, ext: true, basis: 'isExtended' };
+      return { n: 1, ext: false, basis: 'isExtended' };
     }, M('unsupported'));
   });
   probe('win', function (env) {
@@ -700,12 +762,24 @@
     });
   });
   probe('gpulim', function (env) {
-    return safe(function () {
+    function fromGl() {
       var i = glInfo(env);
       if (!i) return M('unsupported');
       var gl = i.gl;
-      return { maxTexDim: gl.getParameter(gl.MAX_TEXTURE_SIZE), features: (gl.getSupportedExtensions() || []).slice(0, 40) };
-    }, M('unsupported'));
+      return { src: 'webgl', maxTexDim: gl.getParameter(gl.MAX_TEXTURE_SIZE), features: (gl.getSupportedExtensions() || []).slice(0, 40) };
+    }
+    try {
+      var gpu = env.navigator && env.navigator.gpu;
+      if (gpu && gpu.requestAdapter) {
+        return gpu.requestAdapter().then(function (ad) {
+          if (!ad) return fromGl();
+          var L = ad.limits || {}, feats = [];
+          try { ad.features.forEach(function (f) { feats.push(String(f)); }); } catch (e) { }
+          return { src: 'webgpu', maxTexDim: L.maxTextureDimension2D || null, features: feats.slice(0, 40) };
+        }).catch(function () { return safe(fromGl, M('unsupported')); });
+      }
+    } catch (e) { }
+    return safe(fromGl, M('unsupported'));
   });
   probe('glx', function (env) {
     return safe(function () {
@@ -739,9 +813,19 @@
       } catch (e) { resolve(M('unsupported')); }
     });
   });
-  probe('geoloc', function () { return M('denied'); });
-  probe('sensors', function () { return M('denied'); });
-  probe('gamepad', function (env) { return safe(function () { return env.navigator.getGamepads ? M('denied') : M('unsupported'); }, M('unsupported')); });
+  // 这三项当前不主动请求权限，所以是「没跑」而不是「被拒绝」
+  probe('geoloc', function () { return M('not_run'); });
+  probe('sensors', function () { return M('not_run'); });
+  probe('gamepad', function (env) {
+    return safe(function () {
+      var f = env.navigator.getGamepads;
+      if (!f) return M('unsupported');
+      var list = f.call(env.navigator) || [];
+      var n = 0;
+      for (var i = 0; i < list.length; i++) if (list[i]) n++;
+      return { connected: n };
+    }, M('unsupported'));
+  });
   probe('conn', function (env) {
     return safe(function () {
       var c = env.navigator.connection || env.navigator.mozConnection || env.navigator.webkitConnection;
@@ -749,22 +833,32 @@
       return { eff: c.effectiveType || null, rtt: c.rtt === undefined ? null : c.rtt, down: c.downlink === undefined ? null : c.downlink, save: !!c.saveData };
     }, M('unsupported'));
   });
+  // media：媒体输入输出设备（契约原意就是 enumerateDevices 的摄像头/麦克风）
   probe('media', function (env) {
-    return safe(function () {
-      var n = env.navigator;
-      return { audio: n.hardwareConcurrency && env.MediaSource ? 1 : 0, video: env.HTMLMediaElement ? 1 : 0 };
-    }, M('unsupported'));
-  });
-  probe('audiohw', function (env) {
     return new Promise(function (resolve) {
       try {
-        var md = env.navigator.mediaDevices;
+        var md = env.navigator && env.navigator.mediaDevices;
         if (!md || !md.enumerateDevices) { resolve(M('unsupported')); return; }
         md.enumerateDevices().then(function (d) {
-          resolve({ total: d.length, audio: d.filter(function (x) { return x.kind === 'audioinput' || x.kind === 'audiooutput'; }).length, video: d.filter(function (x) { return x.kind === 'videoinput'; }).length });
-        }).catch(function () { resolve(M('unsupported')); });
+          d = d || [];
+          resolve({
+            total: d.length,
+            audio: d.filter(function (x) { return x.kind === 'audioinput' || x.kind === 'audiooutput'; }).length,
+            video: d.filter(function (x) { return x.kind === 'videoinput'; }).length
+          });
+        }).catch(function () { resolve(M('unreadable')); });
       } catch (e) { resolve(M('unsupported')); }
     });
+  });
+  // audiohw：音频硬件的实际采样率与延迟（契约原意是 AudioContext.sampleRate）
+  probe('audiohw', function (env) {
+    return safe(function () {
+      var A = env.AudioContext || env.webkitAudioContext || (env.window && env.window.AudioContext);
+      if (!A) return M('unsupported');
+      var a = new A(), out = { rate: a.sampleRate || null, base: a.baseLatency === undefined ? null : a.baseLatency };
+      try { if (a.close) a.close(); } catch (e) { }
+      return out;
+    }, M('unsupported'));
   });
   probe('bio', function (env) {
     return new Promise(function (resolve) {
@@ -775,7 +869,17 @@
       } catch (e) { resolve(M('unsupported')); }
     });
   });
-  probe('bt', function (env) { return safe(function () { return !!(env.navigator.bluetooth); }, M('unsupported')); });
+  probe('bt', function (env) {
+    return new Promise(function (resolve) {
+      try {
+        var b = env.navigator && env.navigator.bluetooth;
+        if (!b) { resolve(M('unsupported')); return; }
+        if (!b.getAvailability) { resolve({ api: true, available: null }); return; }
+        b.getAvailability().then(function (v) { resolve({ api: true, available: !!v }); })
+          .catch(function () { resolve({ api: true, available: null }); });
+      } catch (e) { resolve(M('unsupported')); }
+    });
+  });
   probe('xr', function (env) {
     return new Promise(function (resolve) {
       try {
@@ -1025,8 +1129,8 @@
       } catch (e) { resolve(M('error')); }
     });
   });
-  probe('trackers', function () { return M('denied'); });
-  probe('extwar', function () { return M('denied'); });
+  probe('trackers', function () { return M('not_run'); });
+  probe('extwar', function () { return M('not_run'); });
   probe('ext', function (env) {
     return safe(function () {
       var w = env, out = [];
@@ -1044,7 +1148,11 @@
     return safe(function () {
       var out = {};
       try { out.localStorage = !!env.localStorage && env.localStorage.length > 0; } catch (e) { out.localStorage = 'blocked'; }
-      try { out.sessionStorage = !!env.sessionStorage && env.sessionStorage.length > 0; } catch (e) { out.sessionStorage = 'blocked'; }
+      try {
+        var fk = foreignKeys(env.sessionStorage);
+        out.sessionStorage = fk === null ? null : fk > 0;
+        out.sessionKeys = fk;
+      } catch (e) { out.sessionStorage = 'blocked'; }
       try { out.name = !!(env.name && String(env.name).length); } catch (e) { out.name = null; }
       try { out.caches = !!env.caches; } catch (e) { out.caches = null; }
       try {
@@ -1068,21 +1176,27 @@
   function makeCtx(env) {
     var ctx = { trace: {}, hints: {} };
     ctx.parseTrace = parseTrace;
-    ctx.text = function (url, ms) {
+    ctx.text = function (url, ms, miss) {
       try {
         return fetch(url, { mode: 'cors', credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(ms || 2500) })
-          .then(function (r) { return r.ok ? r.text() : null; }).catch(function () { return null; });
-      } catch (e) { return Promise.resolve(null); }
+          .then(function (r) { return r.ok ? r.text() : null; })
+          .catch(function () { return null; })
+          .then(function (v) { return v === null && miss ? miss : v; });
+      } catch (e) { return Promise.resolve(miss || null); }
     };
-    ctx.json = function (url, ms) {
-      return ctx.text(url, ms).then(function (t) { if (!t) return null; try { return JSON.parse(t); } catch (e) { return null; } });
+    ctx.json = function (url, ms, miss) {
+      return ctx.text(url, ms, miss).then(function (t) {
+        if (!t) return miss || null;
+        try { return JSON.parse(t); } catch (e) { return miss || null; }
+      });
     };
     ctx.trace = {};
     return ctx;
   }
 
   // 并发池（8 路）+ 全局死线：到点就收工，没跑完的记 timeout 并记进 meta.stuck
-  async function runProbes(env, ctx, cli, stuck, budgetMs) {
+  async function runProbes(env, ctx, state, budgetMs) {
+    var cli = state.cli, stuck = state.stuck;
     var deadline = Date.now() + (budgetMs || DEADLINE);
     var next = 0;
     async function worker() {
@@ -1163,35 +1277,42 @@
     });
   }
 
-  async function buildEnvelope(env, ctx) {
-    env = env || (typeof globalThis !== 'undefined' ? globalThis : this);
-    ctx = ctx || makeCtx(env);
-    var t0 = Date.now();
-    var cli = {}, stuck = [];
-    var optout = optedOut(env);
-
-    if (!optout) {
-      await runProbes(env, ctx, cli, stuck, DEADLINE);
-      // trace 派生项（浏览器直连边缘那次请求）——先等并行发出去的 trace/hints 回来
-      if (ctx.ready) { try { await ctx.ready; } catch (e) { } }
-      var tr = ctx.trace || {};
-      cli['kex'] = tr.kex || M('unsupported');
-      cli['warp'] = tr.warp || M('unsupported');
-      cli['proto'] = (tr.http || tr.tls) ? { http: tr.http || null, tls: tr.tls || null } : M('unsupported');
-      cli['edge'] = tr.colo || M('unsupported');
-      // Accept-CH 回显
-      var h = ctx.hints && ctx.hints.h ? ctx.hints.h : null;
-      if (h && Object.keys(h).length) {
-        var chv = [];
-        for (var k in h) chv.push(k + '=' + h[k]);
-        cli['ch'] = chv.slice(0, 8);
-      }
+  // trace 派生项 + 时钟偏移：必须在 ctx.ready 之后算（G07）
+  function derive(env, ctx, cli, stuck) {
+    var tr = ctx.trace || {};
+    cli['kex'] = tr.kex || M('unsupported');
+    cli['warp'] = tr.warp || M('unsupported');
+    cli['proto'] = (tr.http || tr.tls) ? { http: tr.http || null, tls: tr.tls || null } : M('unsupported');
+    cli['edge'] = tr.colo || M('unsupported');
+    var h = ctx.hints && ctx.hints.h ? ctx.hints.h : null;
+    if (h && Object.keys(h).length) {
+      var chv = [];
+      for (var k in h) chv.push(k + '=' + h[k]);
+      cli['ch'] = chv.slice(0, 8);
     }
+    var clk = cli['clock'];
+    if (clk && typeof clk === 'object' && typeof clk.$ !== 'string') {
+      var ts = tr.ts ? parseFloat(tr.ts) : NaN;
+      if (clk.__t && isFinite(ts)) {
+        var skewS = num(clk.__t - ts, 2);
+        clk.skew_s = skewS;
+        clk.skew_h = num(skewS / 3600, 3);
+      } else { clk.skew_s = null; clk.skew_h = null; }
+      delete clk.__t;
+    }
+  }
 
+  function idOf(env) {
+    if (!env.__radishId) env.__radishId = uuid(env);
+    return env.__radishId;   // 失败重试沿用同一个 id，后端按 id 幂等
+  }
+
+  // 纯同步组装（pagehide 要在事件处理函数内就发出去）
+  function buildPlain(env, ctx, cli, stuck, partial) {
     var nav = env.navigator || {};
     return {
       v: 1,
-      id: uuid(env),
+      id: idOf(env),
       ts: new Date().toISOString(),
       session: getSession(env),
       page: {
@@ -1203,14 +1324,34 @@
       },
       cli: cli,
       meta: {
-        dur_ms: Date.now() - t0,
+        dur_ms: Date.now() - (env.__radishT0 || Date.now()),
         stuck: stuck,
         truncated: [],
-        privacy: { dnt: String(nav.doNotTrack) === '1', gpc: nav.globalPrivacyControl === true, optout: optout },
+        partial: !!partial,
+        privacy: { dnt: String(nav.doNotTrack) === '1', gpc: nav.globalPrivacyControl === true, optout: optedOut(env) },
         collector: VERSION,
         ua: safe(function () { return nav.userAgent; }, '')
       }
     };
+  }
+
+  async function buildEnvelope(env, ctx, pre) {
+    env = env || (typeof globalThis !== 'undefined' ? globalThis : this);
+    ctx = ctx || makeCtx(env);
+    var state = stateOf(env);
+    if (!(pre && pre.prebuilt)) {
+      state.cli = {};
+      state.stuck = [];
+      if (!optedOut(env)) {
+        await runProbes(env, ctx, state, DEADLINE);
+        if (ctx.ready) { try { await ctx.ready; } catch (e) { } }
+        derive(env, ctx, state.cli, state.stuck);
+      } else {
+        // 隐私分支：不跑探针，只保留服务端可见的基础访问字段
+        state.cli = {};
+      }
+    }
+    return buildPlain(env, ctx, state.cli, state.stuck, !!(pre && pre.prebuilt));
   }
 
   // ---------- 归一化与预算 ----------
@@ -1256,10 +1397,30 @@
         envelope.cli[id] = v.slice(0, cap);
       }
     }
+    // 仍然超预算：单个字符串本身太长（例如 40 × 20000 字符的语音名）
+    if (bytes() > limit) {
+      for (var sid in envelope.cli) envelope.cli[sid] = capStrings(envelope.cli[sid], STR_CAP, was, sid);
+    }
+    var ok = true, degraded = null;
+    if (bytes() > limit) {
+      // 只留诊断必需项，其余整体丢弃并记账（不静默）
+      var KEEP = { clock: 1, screen: 1, gpu: 1, hwid: 1, fpid: 1, tz: 1, langs: 1, agent: 1, wgl: 1, webgl: 1 };
+      var kept = {}, all = 0;
+      for (var kid in envelope.cli) {
+        all++;
+        if (KEEP[kid]) kept[kid] = envelope.cli[kid];
+        else was[kid] = was[kid] || 1;
+      }
+      envelope.cli = kept;
+      degraded = { level: 'whitelist', dropped: all - Object.keys(kept).length };
+      if (bytes() > limit) { envelope.cli = {}; degraded = { level: 'empty', dropped: all }; }
+      ok = bytes() <= limit;
+    }
     for (var k in was) dropped.push({ id: k, n: was[k] });
     envelope.meta = envelope.meta || {};
     envelope.meta.truncated = dropped;
-    return { envelope: envelope, dropped: dropped, bytes: bytes() };
+    if (degraded) envelope.meta.degraded = degraded;
+    return { envelope: envelope, dropped: dropped, bytes: bytes(), ok: ok };
   }
 
   // ---------- 发送 ----------
@@ -1277,52 +1438,95 @@
     });
   }
 
-  async function run(env, opts) {
+  // 发送一次；返回是否已排队（sendBeacon 的 true 只代表排队，不代表落库）
+  function sendNow(env, url, body) {
+    try {
+      if (env.navigator && typeof env.navigator.sendBeacon === 'function') {
+        if (env.navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }))) return Promise.resolve(true);
+      }
+    } catch (e) { }
+    try {
+      return fetch(url, { method: 'POST', body: body, keepalive: true, mode: 'no-cors', credentials: 'omit', headers: { 'content-type': 'text/plain' } })
+        .then(function () { return true; }, function () { return false; });
+    } catch (e) { return Promise.resolve(false); }
+  }
+
+  function stateOf(env) {
+    if (!env.__radishSt) env.__radishSt = { cli: {}, stuck: [], sent: false, partial: false };
+    return env.__radishSt;
+  }
+
+  var INFLIGHT = null;   // 单次运行：并发调用复用同一次（G05）
+
+  function run(env, opts) {
+    if (alreadySent(env)) return Promise.resolve('already');
+    if (INFLIGHT) return INFLIGHT;
+    INFLIGHT = runInner(env, opts).then(function (r) {
+      if (r !== 'sent' && r !== 'already') INFLIGHT = null;   // 失败可重试（G04）
+      return r;
+    }, function (e) { INFLIGHT = null; throw e; });
+    return INFLIGHT;
+  }
+
+  async function runInner(env, opts) {
     env = env || (typeof globalThis !== 'undefined' ? globalThis : this);
     opts = opts || {};
     if (alreadySent(env)) return 'already';
-    var traceUrl = opts.trace || TRACE_URL, hintsUrl = opts.hints || HINTS_URL;
+    env.__radishT0 = Date.now();
+    var limit = opts.limit || BUDGET;
+    var url = endpointOf(opts);
     var ctx = makeCtx(env);
+    var state = stateOf(env);
+    var sentBody = null;
 
-    // pagehide 时立刻继续（用户 1 秒内关页也要发出去）
-    var hideResolve;
-    var hidePromise = new Promise(function (r) { hideResolve = r; });
+    function flush(partial) {
+      var env2 = partial ? buildPlain(env, ctx, state.cli, state.stuck, true) : null;
+      return env2;
+    }
+    function beacon(obj) {
+      var res = applyBudget(obj, limit);
+      var body;
+      try { body = JSON.stringify(res.envelope); } catch (e) { return Promise.resolve(false); }
+      if (sentBody === body) return Promise.resolve(true);
+      sentBody = body;
+      return sendNow(env, url, body);
+    }
+
+    // 离页：在事件处理函数里同步组装并排队，不等探针（G03）
+    var hideSent = false;
+    function onHide() {
+      if (hideSent || state.sent) return;
+      hideSent = true;
+      var obj;
+      try { obj = flush(true); } catch (e) { return; }
+      beacon(obj).then(function (ok) {
+        if (ok) { state.sent = true; state.partial = true; markSent(env); }
+        else { hideSent = false; state.partial = true; }
+      });
+    }
     try {
-      if (env.addEventListener) env.addEventListener('pagehide', function () { hideResolve(); }, { once: true });
+      if (env.addEventListener) env.addEventListener('pagehide', onHide, { once: true });
     } catch (e) { }
 
-    await Promise.race([waitIdle(env), hidePromise, new Promise(function (r) { setTimeout(r, 4000); })]);
+    await Promise.race([waitIdle(env), new Promise(function (r) { setTimeout(r, 1500); })]);
 
-    // trace / hints 和探针同时跑：探针不依赖它们，只有组装信封时才需要
-    ctx.ready = Promise.race([
-      Promise.all([
-        ctx.text(traceUrl, 2500).then(function (t) { if (t) ctx.trace = parseTrace(t); }),
-        ctx.json(hintsUrl, 2500).then(function (j) { if (j) ctx.hints = j; })
-      ]),
-      new Promise(function (r) { setTimeout(r, 2500); })
-    ]);
-    var env2 = await buildEnvelope(env, ctx);
-    var res = applyBudget(env2, opts.limit || BUDGET);
-    env2 = res.envelope;
-    env2.meta.dur_ms = Math.max(0, env2.meta.dur_ms);
-    var body;
-    try { body = JSON.stringify(env2); } catch (e) { return 'serialize_failed'; }
-
-    var url = endpointOf(opts);
-    var sent = false;
-    try {
-      if (env.navigator && typeof env.navigator.sendBeacon === 'function') {
-        sent = env.navigator.sendBeacon(url, new Blob([body], { type: 'text/plain' }));
-      }
-    } catch (e) { sent = false; }
-    if (!sent) {
-      try {
-        await fetch(url, { method: 'POST', body: body, keepalive: true, mode: 'no-cors', credentials: 'omit', headers: { 'content-type': 'text/plain' } });
-        sent = true;
-      } catch (e) { sent = false; }
+    // 隐私分支：不发任何诊断网络请求（G15）
+    if (!optedOut(env)) {
+      ctx.ready = Promise.race([
+        Promise.all([
+          ctx.text(opts.trace || TRACE_URL, 2500).then(function (t) { if (t) ctx.trace = parseTrace(t); }),
+          ctx.json(opts.hints || HINTS_URL, 2500).then(function (j) { if (j) ctx.hints = j; })
+        ]),
+        new Promise(function (r) { setTimeout(r, 2500); })
+      ]);
     }
-    markSent(env);
-    return sent ? 'sent' : 'failed';
+
+    var env2 = await buildEnvelope(env, ctx);
+    if (state.sent) return 'sent';            // pagehide 已经发过
+    var ok = await beacon(env2);
+    if (ok) { markSent(env); return 'sent'; }
+    state.partial = true;
+    return 'failed';                          // 不写 sent 标记，允许重试
   }
 
   var RC = {

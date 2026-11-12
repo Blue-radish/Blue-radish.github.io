@@ -419,3 +419,57 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 
 合计 124 项：E 12 · O 4 · C* 9 · X 6 · C 93
 
+
+
+---
+
+## 附录 C · 采集端 1.1.0 的语义变更（2026-11-12，联合审查后）
+
+1.1.0 修掉了「字段名承诺 A、实际测到 B」的一批问题。**老记录仍是老语义**，后台按
+`meta.collector` 版本分支解释；新规则不要再套到 1.0.x 的历史数据上。
+
+### C.1 状态枚举扩充
+
+原来的 `ok / unsupported / denied / timeout / error` 混用了「没跑」「读不到」「拒绝」。
+现在新增两个，后台按此展示：
+
+| 标记 | 含义 | 典型来源 |
+|---|---|---|
+| `not_run` | 这项检测本轮没有运行（当前不主动请求权限） | `geoloc` `sensors` `trackers` `extwar` |
+| `unreadable` | 请求发出去了但结果读不到（CORS / 网络 / HTTP 非 2xx） | `dns` `ex_*` `stack` |
+
+**1.0.x 历史数据里的 `denied` 要解释成「旧采集器没有运行这一项」，不能当成用户拒绝。**
+
+### C.2 形状变更（1.1.0 起）
+
+| id | 1.0.x（旧） | 1.1.0（新） |
+|---|---|---|
+| `hour` | 当前小时 0–23 | `{cycle:'h12'|'h23'|…, h12:bool}`（时制） |
+| `week` | 星期几的中文文本 | `{firstDay:1-7, weekend:[…], minDays}` |
+| `engver` | UA 主版本 | 优先 `fullVersionList` 的真实版本，回落 UA |
+| `gpulim` | `{maxTexDim, features}` | `{src:'webgpu'|'webgl', maxTexDim, features}` |
+| `media` | CPU/MediaSource 存在性（无效） | `{total, audio, video}` = enumerateDevices |
+| `audiohw` | 设备数量 | `{rate:48000, base:0.01}` = AudioContext |
+| `stack` | 第三方 trace 的 loc/colo/http/tls | `{v4:{ok,ip}, v6:{ok,state}, dual}` |
+| `screens` | `n` 恒为 1 或 2 | `n` 可为 `null`（只知道"不止一块"，数不出来） |
+| `bt` | `true` = 有 API | `{api:bool, available:bool|null}` |
+| `gamepad` | `denied` | `{connected:N}` |
+| `lan` | `{ips, mdns_only}` | 增加 `v6`、`mdns`、`reason`（`no_candidate`/`mdns_only`/`v6_only`）；`mdns_only` 只在真的有 mDNS 候选时为 true |
+| `clock` | `{off, skew_h}` | `{off, offset_min, skew_s, skew_h}`，`skew_s` 是秒，精度比小时高 3600 倍 |
+| `traces` | `sessionStorage` 含采集器自己的 key | 已排除 `radish.*`，另给 `sessionKeys` 计数 |
+| `agent` | 名字像"操作方式"，实测是 UA 与 Client Hints 一致性 | 语义改为「UA 与 CH 是否自相矛盾」，**不是**输入设备方式 |
+
+### C.3 信封
+
+- `id`：一次采集运行一个，**发送失败后重试沿用同一个 id**，服务端可继续按 id 幂等。
+- `meta.partial = true`：用户在采集完成前离开页面（pagehide），这是"已经采到的部分"，
+  其余字段缺失是正常的，不要当成采集器坏掉。
+- `meta.degraded = {level:'whitelist'|'empty', dropped:N}`：体积超限时的降级等级。
+- `meta.truncated = [{id, n}]`：被裁剪的字段与原长度（`n` 是**真实数量**，
+  例如 `{id:'voices', n:250}` 表示真实 250 条、只发了前 32 条）。
+- 客户端硬预算 48 KiB，UTF-8 字节数；仍塞不下就降级，绝不发超预算的 body。
+
+### C.4 已知未兑现的承诺
+
+`/v1/etag` 在当前客户端里**没有被调用**。要么两端一起做出真实的缓存实验，要么从
+文档里去掉这个承诺——现状是文档写了、代码没做，属于契约漂移。
