@@ -57,8 +57,8 @@ Accept-CH: Sec-CH-UA-Full-Version-List, Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-C
   "ts": "2026-11-10T23:20:31.412+08:00",
   "session": "b3d1f0c2e5",
   "page": { "path": "/post/TSAD.html", "title": "TSAD", "lang": "zh-CN", "ref": "https://www.google.com/", "nav": "navigate" },
-  "cli": { "langs": ["zh-CN","zh"], "tz": "Asia/Shanghai", "screen": { "w": 2560, "h": 1440, "aw": 2560, "ah": 1400, "dpr": 1.25, "depth": 24 }, "fonts": ["Arial"], "fpid": "sha256:71ab…" },
-  "meta": { "dur_ms": 812, "stuck": ["webgpu"], "privacy": { "dnt": false, "gpc": false, "optout": false }, "collector": "radish-1.0.0" }
+  "cli": { "langs": ["zh-CN","zh"], "tz": "Asia/Shanghai", "screen": { "w": 2560, "h": 1440, "aw": 2560, "ah": 1400, "dpr": 1.25, "depth": 24 }, "battery": { "level": 0.61, "charging": false, "chargingTime": 5400 }, "wasm": { "supported": true }, "fonts": ["Arial"], "fpid": "sha256:71ab…" },
+  "meta": { "dur_ms": 812, "stuck": ["webgpu"], "privacy": { "dnt": false, "gpc": false, "optout": false }, "collector": "radish-1.2.0" }
 }
 ```
 
@@ -244,19 +244,19 @@ CREATE INDEX facet_visit ON facet(visit_id);
 - 不主动请求浏览器权限（定位、传感器）——采集端根本不会发这些
 - 不加 Cloudflare Worker（v1 不引入额外组件）
 
-## 附录 A：124 个探测项 id（`facet.k` 的取值空间）
+## 附录 A：127 个探测项 id（`facet.k` 的取值空间）
 
 id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 
-> **架构性不可见（2026-11-12 定案）**：`tcpfp` `ja4` `h2fp` `quicfp` `tlsfp` 这 5 项永远不会有数据。它们需要一台自己接住访客 TCP/TLS 握手的服务器（公网 IP、开放端口、不套橙云）。本项目的访客连接分别终止在 Fastly（GitHub Pages）和 Cloudflare 边缘，两者都不会把这些信息交给源站；现状也没有公网直连入口。这是网络位置问题，不是代码问题，后台不要显示成「待补」，画像不要写成「未知」——用 `specs/2026-11-11-visitor-mirror.md` §7.5.2 的固定说法。
+> **探针未接入（采集器 1.2.0）**：`tcpfp` `ja4` `h2fp` `quicfp` `tlsfp` 这 5 项由外部探针服务提供，采集器只预留接口，生产 `PROBE_URL = ''`，**不会有生产数据**。要拿到它们，需要一台自己接住访客 TCP/TLS 握手的服务器（公网 IP、开放端口、不套橙云）。本项目的访客连接分别终止在 Fastly（GitHub Pages）和 Cloudflare 边缘，两者都不会把这些信息交给源站；现状也没有公网直连入口。这是网络位置问题，不是代码问题。后台统一显示「探针未接入」，不要显示成「待补」，画像不要写成「未知」，更不能伪造 JA4（固定说法见 `specs/2026-11-11-visitor-mirror.md` §7.5.2）。
 
-采集端实发 **105 个键**（`C` + `C*` 全部，加 `edge`、`ch`、`proto` 三项——它们由客户端从 `/cdn-cgi/trace` 与 `/v1/hints` 读回，源站若从请求头也能拿到同一信息，以源站为准）。`E` 组的 `ip` `geo` `coords` `tzip` `h_*` 不会出现在 `cli` 里，`O` 组的 `isp` `ptr` `etag` 由源站自己算。`X` 组 5 项的 `k` 永远没有数据（原 `proto` 已由客户端读到）。
+采集端默认实发 **106 个键**（`C` 与 `C*` 全部，另加 `edge`、`ch` 两项——`edge`／`proto` 由客户端从 `/cdn-cgi/trace` 读回，`ch` 从 `/v1/hints` 读回；源站若从请求头也能拿到同一信息，以源站为准）。配置探针服务后另加 5 个 `P` 项。`E` 组的 `ip` `geo` `coords` `tzip` `h_*` 不会出现在 `cli` 里；`O` 组的 `isp` `ptr` `etag` `vm` `tor` 由源站自己算；`X` 组当前没有保留项。
 
 **高基数项提示**：`fpid` `hwid` `canvas` `audio` `mathfp` `fontfp` `domrect` `svgrect` `textm` `glimg` `ip` `ptr` `etag` `ex_*` 的取值几乎每访问一个值，在分布页里会变成一堆计数为 1 的卡片。建议后台支持「隐藏维度」或把这类项折叠到一个「指纹/单值」分区；`fpid`/`hwid` 更适合当筛选与去重口径（`distinct fpid` 已用于总览）。
 
-`ch` 是数组（最多 8 个 `sec-ch-ua-*=值` 字符串），`meta.truncated` 记录被裁剪掉的长尾项（`[{id,n}]`，`n` 是裁剪前长度）。组名与组内顺序构成后台「分布」页的分栏。提供方列里：`C` 客户端探测（在 `cli` 里）、`C*` 客户端但依赖跨域读（可能缺失）、`E` Cloudflare 请求头（你从头部还原）、`O` 源站自算、`X` v1 采集端不会发送（这些 `k` 永远没有数据，后台仍要展示该名字并标「未采集」）。
+`ch` 是数组（最多 8 个 `sec-ch-ua-*=值` 字符串），`meta.truncated` 记录被裁剪掉的长尾项（`[{id,n}]`，`n` 是裁剪前长度）。组名与组内顺序构成后台「分布」页的分栏。提供方列里：`C` 客户端探测（在 `cli` 里）、`C*` 客户端但依赖跨域读（可能缺失）、`E` Cloudflare 请求头（你从头部还原）、`O` 源站自算、`P` 外部探针服务（1.2.0 预留，`PROBE_URL` 为空时不发请求）、`X` 保留位（当前没有 `X` 项）。
 
-### net · 服务器看到的（20 项）
+### net · 服务器看到的（21 项）
 
 | id | 探测项 | 机制/来源 | 提供方 |
 |---|---|---|---|
@@ -271,15 +271,16 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 | `proto` | HTTP 和 TLS | `/cdn-cgi/trace` 的 `http` + `tls`（浏览器直连边缘那次请求） | C* |
 | `kex` | 密钥交换 | /cdn-cgi/trace · kex, sni | C* |
 | `warp` | Cloudflare WARP | /cdn-cgi/trace · warp | C* |
-| `tlsfp` | TLS 指纹 | TLS ClientHello | X |
-| `tcpfp` | TCP/IP 指纹 | probe.1ms.dog · TCP SYN | X |
-| `ja4` | TLS 指纹（JA4） | probe.1ms.dog · JA4 | X |
-| `h2fp` | HTTP/2 指纹 | probe.1ms.dog · HTTP/2 SETTINGS | X |
-| `quicfp` | QUIC 指纹（HTTP/3） | probe.1ms.dog · HTTP/3 · QUIC JA4 | X |
-| `clock` | 你的时钟 | Date.now() | C |
+| `tlsfp` | TLS 指纹 | 探针服务 · TLS ClientHello（`tls.ja3n` 优先，回落 `ja3`） | P |
+| `tcpfp` | TCP/IP 指纹 | 探针服务 · TCP SYN | P |
+| `ja4` | TLS 指纹（JA4） | 探针服务 · JA4 | P |
+| `h2fp` | HTTP/2 指纹 | 探针服务 · HTTP/2 SETTINGS | P |
+| `quicfp` | QUIC 指纹（HTTP/3） | 探针服务 · HTTP/3 · QUIC JA4 | P |
+| `clock` | 时钟 | Date.now() | C |
 | `webrtc` | WebRTC 地址 | RTCPeerConnection · STUN | C |
 | `lan` | 局域网地址 | WebRTC host candidate | C |
 | `v6mac` | IPv6 泄露网卡 MAC | IPv6 EUI-64 (ff:fe) | C |
+| `tor` | Tor 出口 | Tor bulk exit list（源站缓存，不传访客 IP） | O |
 
 ### exit · 出口（6 项）
 
@@ -319,7 +320,7 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 | `kbd` | 键盘布局 | navigator.keyboard | C |
 | `voices` | 朗读语音 | speechSynthesis | C |
 
-### fp · 指纹（23 项）
+### fp · 指纹（24 项）
 
 | id | 探测项 | 机制/来源 | 提供方 |
 |---|---|---|---|
@@ -346,8 +347,9 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 | `etag` | 缓存编号（ETag） | HTTP cache · ETag / If-None-Match | O |
 | `rand` | 防指纹 | canvas × 2 | C |
 | `shield` | 防护是谁 | navigator.brave · noise · lies | C |
+| `wasm` | WebAssembly | `WebAssembly.validate` → `{supported}` | C |
 
-### dev · 设备（34 项）
+### dev · 设备（35 项）
 
 | id | 探测项 | 机制/来源 | 提供方 |
 |---|---|---|---|
@@ -385,6 +387,7 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 | `hwdec` | 视频硬件解码 | mediaCapabilities.decodingInfo | C |
 | `drm` | DRM | requestMediaKeySystemAccess | C |
 | `storage` | 存储配额 | storage.estimate | C |
+| `vm` | 虚拟机 | GPU renderer 推断 hypervisor（源站） | O |
 
 ### brw · 浏览器设置（24 项）
 
@@ -415,9 +418,9 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 | `traces` | 存储留痕 | localStorage · IndexedDB · Cache · window.name | C |
 | `fonts` | 已装字体 | canvas measureText | C |
 
-提供方图例：`C` 客户端探测 · `C*` 客户端探测但依赖跨域读（可能缺失） · `E` 从请求头还原 · `O` 源站自算 · `X` v1 不会发送（后台仍要展示该名字并标「未采集」）
+提供方图例：`C` 客户端探测 · `C*` 客户端探测但依赖跨域读（可能缺失） · `E` 从请求头还原 · `O` 源站自算 · `P` 外部探针服务（1.2.0 预留，`PROBE_URL` 为空时不发请求） · `X` 保留位（当前没有 `X` 项）
 
-合计 124 项：E 12 · O 4 · C* 9 · X 6 · C 93
+合计 127 项：E 12 · O 6 · C* 10 · P 5 · X 0 · C 94
 
 
 
@@ -473,3 +476,59 @@ id 就是采集端发来的 `cli` 的键，**不得改名、不得加前缀**。
 
 `/v1/etag` 在当前客户端里**没有被调用**。要么两端一起做出真实的缓存实验，要么从
 文档里去掉这个承诺——现状是文档写了、代码没做，属于契约漂移。
+
+---
+
+## 附录 D · 采集端 1.2.0（2026-11-12）
+
+1.2.0 **只增不改**：1.1.0 的形状与语义全部保留，老记录继续按 `meta.collector` 分支解释。
+默认 `VERSION = 'radish-1.2.0'`，`meta.collector = 'radish-1.2.0'`。
+
+### D.1 新增 `wasm`（fp 组）
+
+```json
+"wasm": { "supported": true }
+```
+
+`supported = !!(WebAssembly && WebAssembly.validate)`。浏览器没有 WebAssembly 时是
+`{supported:false}`，不是缺失标记——「浏览器明确不支持」和「这一项没跑」是两件事。
+后台按对象展开 `wasm.supported`。
+
+### D.2 `battery` 增加 `chargingTime`
+
+从 1.2.0 起，**支持 Battery API（`navigator.getBattery`）时** `battery` 为 `{level, charging, chargingTime}`：
+
+| 读数 | 写入 |
+|---|---|
+| 有限且 `>= 0` 的数字 | 原值（秒） |
+| `Infinity`（正在充电）/ `NaN` / 负数 / 缺失 | `null`，**属性仍然存在** |
+
+没有 `navigator.getBattery`、或读取失败时，`battery` 仍按缺失标记规则写 `{"$":"unsupported"}`（见 §4.1 与附录 C.1），不能伪装成三字段对象。
+
+`chargingTime === 0` 且 `level === 1` 且 `charging === true` 表示「接着电源、没有电池」，
+台式机很常见；**不能写成「电量 100%」**。老记录没有 `chargingTime` 时按缺失处理，
+不要当成 0。
+
+### D.3 可选探针（P 组）
+
+- 采集器常量 `PROBE_URL = ''`。**生产必须保持空字符串**；为空时不注册任何探针请求，
+  `cli` 里不会出现 `tcpfp` `ja4` `tlsfp` `h2fp` `quicfp`。
+- 只有显式配置了 `PROBE_URL` 才请求 `PROBE_URL + '/fp'`（去掉尾部 `/`），5 项共用一次请求。
+- 超时 1200ms；请求失败或读不到结果时，这 5 项写 `{"$":"unreachable"}`（不是 `unsupported`），
+  不抛错、不阻塞 beacon。
+- 映射：
+
+  | 采集字段 | 来源 |
+  |---|---|
+  | `tcpfp` | `fp.tcp` |
+  | `ja4` | `fp.tls.ja4` |
+  | `tlsfp` | `fp.tls.ja3n \|\| fp.tls.ja3` |
+  | `h2fp` | `fp.http2` |
+  | `quicfp` | `fp.tls.ja4`，**仅当 `fp.proto` 表示 HTTP/3（`h3` / `http/3` / `quic*`）** |
+
+  服务端返回里没有对应字段时该键不出现（不是 `unsupported`），后台按「探针未接入」展示。
+
+### D.4 版本与产物
+
+`static/radish-collect.js` 与 `docs/radish-collect.js` 必须逐字节一致；服务端用
+`meta.collector === 'radish-1.2.0'` 判断新形状。

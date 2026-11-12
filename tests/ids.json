@@ -44,7 +44,7 @@
    {
     "id": "proto",
     "mech": "request.cf.tlsVersion",
-    "prov": "X"
+    "prov": "C*"
    },
    {
     "id": "kex",
@@ -59,27 +59,27 @@
    {
     "id": "tlsfp",
     "mech": "TLS ClientHello",
-    "prov": "X"
+    "prov": "P"
    },
    {
     "id": "tcpfp",
     "mech": "probe.1ms.dog · TCP SYN",
-    "prov": "X"
+    "prov": "P"
    },
    {
     "id": "ja4",
     "mech": "probe.1ms.dog · JA4",
-    "prov": "X"
+    "prov": "P"
    },
    {
     "id": "h2fp",
     "mech": "probe.1ms.dog · HTTP/2 SETTINGS",
-    "prov": "X"
+    "prov": "P"
    },
    {
     "id": "quicfp",
     "mech": "probe.1ms.dog · HTTP/3 · QUIC JA4",
-    "prov": "X"
+    "prov": "P"
    },
    {
     "id": "clock",
@@ -100,6 +100,11 @@
     "id": "v6mac",
     "mech": "IPv6 EUI-64 (ff:fe)",
     "prov": "C"
+   },
+   {
+    "id": "tor",
+    "mech": "Tor bulk exit list（源站缓存，不传访客 IP）",
+    "prov": "O"
    }
   ],
   "exit": [
@@ -338,6 +343,11 @@
     "id": "shield",
     "mech": "navigator.brave · noise · lies",
     "prov": "C"
+   },
+   {
+    "id": "wasm",
+    "mech": "WebAssembly.validate",
+    "prov": "C"
    }
   ],
   "dev": [
@@ -510,6 +520,11 @@
     "id": "storage",
     "mech": "storage.estimate",
     "prov": "C"
+   },
+   {
+    "id": "vm",
+    "mech": "GPU renderer 推断 hypervisor（源站）",
+    "prov": "O"
    }
   ],
   "brw": [
@@ -656,6 +671,7 @@
   "webrtc",
   "lan",
   "v6mac",
+  "tor",
   "ex_cn",
   "ex_intl",
   "ex_gpt",
@@ -702,6 +718,7 @@
   "etag",
   "rand",
   "shield",
+  "wasm",
   "os",
   "browser",
   "arch",
@@ -736,6 +753,7 @@
   "hwdec",
   "drm",
   "storage",
+  "vm",
   "scheme",
   "motion",
   "gamut",

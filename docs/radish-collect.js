@@ -1,5 +1,5 @@
 /*!
- * radish-collect 1.0.0 — 博客访客信息采集
+ * radish-collect 1.2.0 — 博客访客信息采集
  * 契约：specs/radishcloud-contract.md   设计：specs/2026-11-10-radish-visitor-insights-design.md
  * 不读 Cookie / 不写 localStorage / 不改 DOM / 不上报异常；每会话最多发一次。
  */
@@ -7,12 +7,15 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-1.1.0';
+  var VERSION = 'radish-1.2.0';
   var ENDPOINT = 'https://radishcloud.072120.xyz/v1/collect';
   var TRACE_URL = 'https://radishcloud.072120.xyz/cdn-cgi/trace';
   var HINTS_URL = 'https://radishcloud.072120.xyz/v1/hints';
+  // 生产保持空字符串：不配置外部探针服务时，下面 5 个探针项根本不发请求
+  var PROBE_URL = '';
   var BUDGET = 48 * 1024;
   var PROBE_TIMEOUT = 2500;
+  var PROBE_FETCH_TIMEOUT = 1200;   // 探针服务自身的超时，比整体死线短
   var DEADLINE = 6000;
 
   // ---------- 基础工具 ----------
@@ -97,6 +100,9 @@
   // ---------- 探针注册 ----------
   var PROBES = [], MAP = {};
   function probe(id, fn) { if (MAP[id]) return; MAP[id] = true; PROBES.push({ id: id, run: fn }); }
+  // 探针主动「不参与本轮」：没配置探针服务、或服务返回里没有这一项时用它，
+  // 让 runProbes 跳过这个键，而不是写成 unsupported（那会把「没跑」说成「不支持」）
+  var SKIP = { __radishSkip: true };
 
   // ============ net · 客户端可读部分 ============
   probe('clock', function (env) {
@@ -159,6 +165,48 @@
       var v6 = a.filter(function (x) { return x.indexOf(':') > 0; });
       return { v6: v6.length > 0, eui64: v6.some(function (x) { return /ff:fe/i.test(x); }) };
     });
+  });
+
+  // ============ probe · 可选探针服务（PROBE_URL 为空时不发任何请求） ============
+  function probeUrlOf(ctx) { return (ctx && ctx.probeUrl) || PROBE_URL; }
+  function probeH3(fp) {
+    return /^(h3|http\/3|quic)/.test(String(fp.proto || '').toLowerCase());
+  }
+  // 5 项共用一次 /fp 请求；结果挂在 ctx 上，不同 ctx（不同轮次）互不串味
+  function probeFp(ctx) {
+    var base = probeUrlOf(ctx);
+    if (!base) return null;
+    if (ctx.__radishProbe) return ctx.__radishProbe;
+    var url = String(base).replace(/\/+$/, '') + '/fp';
+    var p;
+    try {
+      p = ctx.json(url, PROBE_FETCH_TIMEOUT, M('unreachable'));
+    } catch (e) { p = Promise.resolve(M('unreachable')); }
+    // 失败统一成 unreachable：说明「配置了探针但读不到」，不是「浏览器不支持」
+    ctx.__radishProbe = Promise.resolve(p).then(function (fp) {
+      return (fp && !isMissing(fp)) ? fp : M('unreachable');
+    }, function () { return M('unreachable'); });
+    return ctx.__radishProbe;
+  }
+  function probeField(id, pick) {
+    probe(id, function (env, ctx) {
+      var p = probeFp(ctx);
+      if (!p) return SKIP;
+      return p.then(function (fp) {
+        if (isMissing(fp)) return fp;
+        var v = safe(function () { return pick(fp); }, undefined);
+        return v === undefined || v === null ? SKIP : v;
+      });
+    });
+  }
+  probeField('tcpfp', function (fp) { return fp.tcp; });
+  probeField('ja4', function (fp) { return fp.tls && fp.tls.ja4; });
+  probeField('tlsfp', function (fp) { return fp.tls && (fp.tls.ja3n || fp.tls.ja3); });
+  probeField('h2fp', function (fp) { return fp.http2; });
+  probeField('quicfp', function (fp) {
+    // QUIC 只在 HTTP/3 连接上才有意义，HTTP/2 访问不能伪造一份 QUIC 指纹
+    if (!probeH3(fp)) return null;
+    return fp.tls && fp.tls.ja4;
   });
 
   probe('dns', function (env, ctx) {
@@ -583,6 +631,11 @@
       return { brave: brave, noise: noise };
     }, M('unsupported'));
   });
+  probe('wasm', function (env) {
+    return safe(function () {
+      return { supported: !!(env.WebAssembly && env.WebAssembly.validate) };
+    }, M('unsupported'));
+  });
   probe('fpid', function (env) {
     return hash(tmplStr(env)).then(function (h) { return h; });
   });
@@ -809,7 +862,14 @@
       try {
         var n = env.navigator;
         if (!n.getBattery) { resolve(M('unsupported')); return; }
-        n.getBattery().then(function (b) { resolve({ level: num(b.level, 2), charging: !!b.charging }); }).catch(function () { resolve(M('unsupported')); });
+        n.getBattery().then(function (b) {
+          // chargingTime 只接受有限的非负数；Infinity（正在充电）/ NaN / 负数 / 缺失都记 null，
+          // 但属性必须保留——后台要能区分「没有电池」和「老版本没采」
+          var ct = (b.chargingTime === null || b.chargingTime === undefined || b.chargingTime === '')
+            ? null : +b.chargingTime;
+          if (!(isFinite(ct) && ct >= 0)) ct = null;
+          resolve({ level: num(b.level, 2), charging: !!b.charging, chargingTime: ct });
+        }).catch(function () { resolve(M('unsupported')); });
       } catch (e) { resolve(M('unsupported')); }
     });
   });
@@ -1211,6 +1271,7 @@
           Math.min(PROBE_TIMEOUT, Math.max(200, left)),
           p.id
         );
+        if (v === SKIP) continue;   // 这一项本轮不参与，别写成 unsupported
         if (v && v.__timeout) { cli[p.id] = M('timeout'); stuck.push(p.id); }
         else if (v && v.__error) { cli[p.id] = M('error'); }
         else if (v === undefined || v === null) { cli[p.id] = M('unsupported'); }
@@ -1534,6 +1595,7 @@
     ENDPOINT: ENDPOINT,
     TRACE_URL: TRACE_URL,
     HINTS_URL: HINTS_URL,
+    PROBE_URL: PROBE_URL,
     BUDGET: BUDGET,
     normalize: normalize,
     applyBudget: applyBudget,

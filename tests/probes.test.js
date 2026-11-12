@@ -112,3 +112,117 @@ test('网络读不到标 unreadable，不是 unsupported', async () => {
   assert.deepStrictEqual(plain(e.cli.ex_cf), { $: 'unreadable' });
   assert.deepStrictEqual(plain(e.cli.dns), { $: 'unreadable' });
 });
+
+test('wasm and chargingTime are collected', async () => {
+  const env = fakeEnv();
+  env.WebAssembly = { validate: () => true };
+  env.navigator.getBattery = () => Promise.resolve({
+    level: 0.61, charging: false, chargingTime: 5400
+  });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  assert.deepStrictEqual(plain(e.cli.wasm), { supported: true });
+  assert.strictEqual(e.cli.battery.chargingTime, 5400);
+});
+
+test('wasm 没有 API 时仍是 {supported:false}，不是缺失标记', async () => {
+  const env = fakeEnv();
+  env.WebAssembly = undefined;
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  assert.deepStrictEqual(plain(e.cli.wasm), { supported: false });
+});
+
+test('chargingTime 只接受有限非负数，其余一律 null 且属性保留', async () => {
+  for (const raw of [Infinity, -Infinity, NaN, -1, undefined, null, 'abc']) {
+    const env = fakeEnv();
+    env.navigator.getBattery = () => Promise.resolve({ level: 0.5, charging: true, chargingTime: raw });
+    const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+    assert.deepStrictEqual(Object.keys(e.cli.battery).sort(), ['charging', 'chargingTime', 'level']);
+    assert.strictEqual(e.cli.battery.chargingTime, null, 'chargingTime=' + String(raw));
+  }
+  for (const raw of [0, 5400, 1.5]) {
+    const env = fakeEnv();
+    env.navigator.getBattery = () => Promise.resolve({ level: 0.5, charging: true, chargingTime: raw });
+    const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+    assert.strictEqual(e.cli.battery.chargingTime, raw);
+  }
+});
+
+test('probe is skipped when PROBE_URL is empty', async () => {
+  const ctx = collectorCtx({ probeUrl: '' });
+  const e = await loadCollector(fakeEnv()).buildEnvelope(undefined, ctx);
+  assert.strictEqual(e.cli.tcpfp, undefined);
+  assert.strictEqual(collectorCtx().probeUrl, '');
+});
+
+test('生产常量 PROBE_URL 保持空字符串', () => {
+  const RC = loadCollector(fakeEnv());
+  assert.strictEqual(RC.PROBE_URL, '');
+});
+
+test('probe maps /fp fields when configured', async () => {
+  let fpCalls = 0;
+  const ctx = collectorCtx({
+    probeUrl: 'https://probe.test',
+    json: (url) => {
+      if (String(url).endsWith('/fp')) fpCalls++;
+      return Promise.resolve(String(url).endsWith('/fp')
+        ? { tcp: { os: 'windows', mtu: 1500 }, tls: { ja4: 't13d...' }, http2: { fp: 'm,a,s,p' } }
+        : { family: 4 });
+    }
+  });
+  const e = await loadCollector(fakeEnv()).buildEnvelope(undefined, ctx);
+  assert.strictEqual(e.cli.tcpfp.os, 'windows');
+  assert.strictEqual(e.cli.ja4, 't13d...');
+  assert.strictEqual(e.cli.h2fp.fp, 'm,a,s,p');
+  assert.strictEqual(fpCalls, 1, '5 个探针项共用一次 /fp 请求');
+});
+
+test('tlsfp 回落 ja3，quicfp 只在 HTTP/3 时出现', async () => {
+  const h2 = collectorCtx({
+    probeUrl: 'https://probe.test',
+    json: () => Promise.resolve({ tls: { ja3n: 'ja3n-x', ja4: 'ja4-x' }, proto: 'h2' })
+  });
+  const e = await loadCollector(fakeEnv()).buildEnvelope(undefined, h2);
+  assert.strictEqual(e.cli.tlsfp, 'ja3n-x');
+  assert.strictEqual(e.cli.quicfp, undefined);
+
+  const h3 = collectorCtx({
+    probeUrl: 'https://probe.test',
+    json: () => Promise.resolve({ tls: { ja3: 'ja3-y', ja4: 'ja4-y' }, proto: 'h3' })
+  });
+  const e3 = await loadCollector(fakeEnv()).buildEnvelope(undefined, h3);
+  assert.strictEqual(e3.cli.tlsfp, 'ja3-y');
+  assert.strictEqual(e3.cli.quicfp, 'ja4-y');
+});
+
+test('探针失败标 unreachable，不抛错也不阻塞信封', async () => {
+  const ctx = collectorCtx({
+    probeUrl: 'https://probe.test',
+    json: () => Promise.reject(new Error('offline'))
+  });
+  const e = await loadCollector(fakeEnv()).buildEnvelope(undefined, ctx);
+  assert.deepStrictEqual(plain(e.cli.tcpfp), { $: 'unreachable' });
+  assert.deepStrictEqual(plain(e.cli.quicfp), { $: 'unreachable' });
+  assert.strictEqual(typeof e.meta.collector, 'string');
+});
+
+test('探针字段照常参与预算，不会撑破 48 KiB', async () => {
+  const ctx = collectorCtx({
+    probeUrl: 'https://probe.test',
+    json: () => Promise.resolve({
+      tcp: { os: 'windows', mtu: 1500 },
+      tls: { ja4: 't13d...', ja3n: 'ja3n...' },
+      http2: { fp: 'm,a,s,p' },
+      proto: 'h3'
+    })
+  });
+  const RC = loadCollector(fakeEnv());
+  const e = await RC.buildEnvelope(undefined, ctx);
+  assert.strictEqual(e.cli.tcpfp.os, 'windows');
+  e.cli.fonts = Array.from({ length: 900 }, (_, i) => 'Font' + i + 'x'.repeat(40));
+  e.cli.voices = Array.from({ length: 900 }, (_, i) => 'Voice' + i + 'y'.repeat(40));
+  const out = RC.applyBudget(e, 48 * 1024);
+  const bytes = Buffer.byteLength(JSON.stringify(out.envelope), 'utf8');
+  assert.ok(bytes <= 48 * 1024, 'bytes=' + bytes);
+  assert.strictEqual(out.envelope.cli.tcpfp.os, 'windows');
+});

@@ -396,7 +396,7 @@ ingress:
 | `ja4` | TLS 指纹（JA4） | probe.1ms.dog · JA4 | X |
 | `h2fp` | HTTP/2 指纹 | probe.1ms.dog · HTTP/2 SETTINGS | X |
 | `quicfp` | QUIC 指纹（HTTP/3） | probe.1ms.dog · HTTP/3 · QUIC JA4 | X |
-| `clock` | 你的时钟 | Date.now() | C |
+| `clock` | 时钟 | Date.now() | C |
 | `webrtc` | WebRTC 地址 | RTCPeerConnection · STUN | C |
 | `lan` | 局域网地址 | WebRTC host candidate | C |
 | `v6mac` | IPv6 泄露网卡 MAC | IPv6 EUI-64 (ff:fe) | C |

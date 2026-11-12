@@ -4,7 +4,8 @@ const assert = require('node:assert');
 const { loadCollector, fakeEnv, collectorCtx, plain } = require('./harness');
 const IDS = require('./ids.json');
 
-const CLIENT_FILLED_EXTRA = ['edge', 'ch', 'proto']; // edge 来自 trace 的 colo、ch 来自 hints、proto 来自 trace 的 http/tls
+// proto 已是 C*（来自 trace），因此由上面的分组循环带出；只剩两个跨组键要补。
+const CLIENT_FILLED_EXTRA = ['edge', 'ch']; // edge 来自 trace 的 colo、ch 来自 hints
 
 function expectedClientIds() {
   const out = [];
@@ -19,22 +20,23 @@ test('信封只有 7 个顶层键，没有 srv，v=1', async () => {
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   assert.deepStrictEqual(Object.keys(e).sort(), ['cli', 'id', 'meta', 'page', 'session', 'ts', 'v']);
   assert.strictEqual(e.v, 1);
-  assert.strictEqual(e.meta.collector, 'radish-1.1.0');
+  assert.strictEqual(e.meta.collector, 'radish-1.2.0');
   assert.ok(!('srv' in e), '请求体不应包含 srv');
   assert.match(e.ts, /^\d{4}-\d{2}-\d{2}T/);
   assert.match(e.id, /^[0-9a-f-]{30,}$|^r[0-9a-f]+$/);
 });
 
-test('cli 覆盖全部客户端项（105 个），且没有不认识的多余键', async () => {
+test('cli 覆盖全部客户端项（106 个），清单共 127 项，且没有不认识的多余键', async () => {
   const RC = loadCollector(fakeEnv());
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   const expected = expectedClientIds();
   const lack = expected.filter(id => !(id in e.cli));
   const unknown = Object.keys(e.cli).filter(id => !IDS.all.includes(id));
   assert.deepStrictEqual(lack, [], '缺少的探测项');
-  assert.deepStrictEqual(unknown, [], '不在 124 项清单里的键');
-  assert.strictEqual(new Set(expected).size, 105);
-  assert.strictEqual(Object.keys(e.cli).length, 105);
+  assert.deepStrictEqual(unknown, [], '不在 127 项清单里的键');
+  assert.strictEqual(IDS.all.length, 127, 'id 清单总数');
+  assert.strictEqual(new Set(expected).size, 106);
+  assert.strictEqual(Object.keys(e.cli).length, 106);
 });
 
 test('没有任何一项是 undefined 或裸 null（一律用缺失标记）', async () => {
@@ -104,7 +106,7 @@ test('canvas 抛 SecurityError 时只标记该项，其余项照常', async () =
   }
   assert.strictEqual(typeof e.cli.tz, 'string');
   assert.strictEqual(typeof e.cli.cpu, 'number');
-  assert.strictEqual(Object.keys(e.cli).length, 105);
+  assert.strictEqual(Object.keys(e.cli).length, 106);
 });
 
 test('不支持的 API 标 unsupported 而不是抛错', async () => {

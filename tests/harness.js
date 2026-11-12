@@ -151,6 +151,8 @@ function collectorCtx(over) {
   return Object.assign({
     trace: trace,
     hints: { h: { 'sec-ch-ua': '"Chromium";v="141"', 'sec-ch-ua-platform': '"Windows"' } },
+    // 生产 PROBE_URL 是空字符串；测试用 collectorCtx({ probeUrl }) 覆盖这一项
+    probeUrl: '',
     parseTrace(t) {
       const out = {};
       String(t).split('\n').forEach(l => {
