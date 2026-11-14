@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   issues:
     types: [opened, edited]
+  # push 到 main 就重新构建。Gmeek 自己用 GITHUB_TOKEN 提交，不会再次触发工作流，不会死循环。
+  push:
+    branches: [main]
   schedule:
     - cron: "0 16 * * *"
     
@@ -12,7 +15,16 @@ jobs:
     name: Generate blog
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
-    permissions: write-all
+    # 生成与提交必须串行，否则多个 issue/push 事件会并发改同一份产物（BLOG-03）
+    concurrency:
+      group: "gmeek-build"
+      cancel-in-progress: false
+    # 只给实际用到的权限（原来是 write-all）
+    permissions:
+      contents: write
+      issues: write
+      pages: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +45,11 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Clone source code
         run: |
           GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
@@ -40,6 +57,7 @@ jobs:
           cd /opt/Gmeek/
           lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
           if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+          echo "Gmeek 生成器版本: $(git describe --tags --always) $(git rev-parse HEAD)"
 
       - name: Install dependencies
         run: |
@@ -54,14 +72,27 @@ jobs:
           cp -a /opt/Gmeek/docs ${{ github.workspace }} 
           cp -a /opt/Gmeek/backup ${{ github.workspace }} 
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
-          
+
+      # 模板由上游生成，修复必须落在生成之后；匹配不上就失败，避免漏洞悄悄回来
+      - name: Patch generated html
+        run: node tools/patch-generated.js
+
+      # 产物一致性 + 模板补丁 + 关键读数 + 行为测试，全部在 tools/check-artifact.js 里
+      - name: Check artifact
+        run: node tools/check-artifact.js
+
       - name: update html
         run: |
           git config --local user.email "$(jq -r ".email" config.json)"
           git config --local user.name "${{ github.repository_owner }}"
           git add .
           git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
-          git push || echo "nothing to push"
+          # 只有"确实没改动"才允许跳过；推送失败必须让构建失败，不能吞掉权限/并发冲突
+          if git diff --quiet origin/${{ github.ref_name }} -- .; then
+            echo "no changes to push"
+          else
+            git push || (echo "::error::推送生成产物失败（权限或并发冲突）"; exit 1)
+          fi
           sleep 3
           
       - name: Upload artifact

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
-    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekBSZ.js'></script>
+    <script src='/radish-collect.js?v=2.0.0' defer></script><script src='https://blog.meekdai.com/Gmeek/plugins/GmeekBSZ.js'></script>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/125821962?v=4"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
@@ -141,9 +141,13 @@ request.onload=function(){
     jsonData=JSON.parse(request.response);
     console.log(jsonData);
     showList(labelsCount);
-    setClassDisplay(decodeURI(window.location.hash.slice(1)));
+    setClassDisplay(radishDecode(window.location.hash.slice(1)));
 }
 
+function radishEsc(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]; }); }
+function radishSafeColor(c){ return /^#[0-9a-fA-F]{3,8}$/.test(String(c||'')) ? String(c) : null; }
+function radishSafeHref(u){ var s=String(u||''); return /^(https?:\/\/|\/|\.{0,2}\/|[\w.-]+\.html)/i.test(s) ? s : '#'; }
+function radishDecode(h){ try { return decodeURI(h); } catch (e) { return h; } }
 function showList(labelsCount){
     let SideNav=document.getElementsByClassName("SideNav")[0];
     SideNav.classList.add("border");
@@ -165,13 +169,13 @@ function showList(labelsCount){
         tagList.push(label);
         let showLabels = document.createElement("button");
         showLabels.setAttribute("class", "Label");
-        showLabels.setAttribute("style", "background-color:" + jsonData['labelColorDict'][label]+";padding:4px;");
-        showLabels.innerHTML="&nbsp;&nbsp;"+label+" ";
-        showLabels.setAttribute("onclick", "javascript:updateShowTag('" + label + "');");
+        showLabels.setAttribute("style", "background-color:" + (radishSafeColor(jsonData['labelColorDict'][label]) || "transparent") + ";padding:4px;");
+        showLabels.innerHTML="&nbsp;&nbsp;"+radishEsc(label)+" ";
+        showLabels.setAttribute("data-label", label); showLabels.addEventListener("click", function () { updateShowTag(label); });
 
         let LabelNum=document.createElement("span");
         LabelNum.setAttribute("class","Counter");
-        LabelNum.innerHTML=labelsCount[label];
+        LabelNum.textContent=labelsCount[label];
         showLabels.appendChild(LabelNum);
         taglabel.appendChild(showLabels);
     }
@@ -179,10 +183,10 @@ function showList(labelsCount){
     for(i in jsonData){
         if(i!='labelColorDict'){
             let div=document.createElement("div");
-            div.setAttribute("class","lists "+jsonData[i]['labels'].join(" "));
+            div.setAttribute("class","lists"); div.setAttribute("data-labels","|"+jsonData[i]['labels'].join("|")+"|");
             let item=document.createElement("a");
             item.setAttribute("class","SideNav-item d-flex flex-items-center flex-justify-between");
-            item.setAttribute("href",jsonData[i]['postUrl']);
+            item.setAttribute("href", radishSafeHref(jsonData[i]['postUrl']));
 
             let center=document.createElement("div");
             center.setAttribute("class","d-flex flex-items-center");
@@ -197,7 +201,7 @@ function showList(labelsCount){
 
             let title=document.createElement("span");
             title.setAttribute("class","listTitle");
-            title.innerHTML=jsonData[i]['postTitle'];
+            title.textContent=jsonData[i]['postTitle'];
             center.appendChild(svg);
             center.appendChild(title);
 
@@ -208,13 +212,13 @@ function showList(labelsCount){
                 let LabelName=document.createElement("span");
                 LabelName.setAttribute("class","Label LabelName");
                 LabelName.setAttribute("style","background-color:"+jsonData['labelColorDict'][label]);
-                LabelName.innerHTML=label;
+                LabelName.textContent=label;
                 listLabels.appendChild(LabelName);
             }
             let LabelTime=document.createElement("span");
             LabelTime.setAttribute("class","Label LabelTime");
             LabelTime.setAttribute("style","background-color:"+jsonData[i]['dateLabelColor']);
-            LabelTime.innerHTML=jsonData[i]['createdDate'];
+            LabelTime.textContent=jsonData[i]['createdDate'];
             listLabels.appendChild(LabelTime);
 
             item.appendChild(center);
@@ -235,7 +239,7 @@ function updateShowTag(label){
 function setClassDisplay(label){
     let lists = document.getElementsByClassName("lists");
     let tagTitle = document.getElementsByClassName("tagTitle")[0];
-    tagTitle.innerHTML="Tag #"+label;
+    tagTitle.textContent="Tag #"+label;
     document.title=label+" - 青萝卜菜の博客";
     document.getElementsByClassName("subnav-search-input")[0].value='';
     if(label=="All"){
@@ -247,9 +251,9 @@ function setClassDisplay(label){
             lists[i].style.display='none';
         }
 
-        let labels = document.getElementsByClassName(label);
-        for(let i = 0; i < labels.length; i++){
-            labels[i].style.display='block';
+        for(let i = 0; i < lists.length; i++){
+            var dl = lists[i].getAttribute ? lists[i].getAttribute("data-labels") : null;
+            if(dl && dl.indexOf("|"+label+"|") >= 0){ lists[i].style.display='block'; }
         }
         document.getElementsByClassName("notFind")[0].style.display='none';
     }
@@ -263,7 +267,7 @@ function searchShow(){
     let lists = document.getElementsByClassName("lists");
     let tagTitle = document.getElementsByClassName("tagTitle")[0];
     let searchInput = document.getElementsByClassName("subnav-search-input")[0].value;
-    tagTitle.innerHTML="Search #"+searchInput;
+    tagTitle.textContent="Search #"+searchInput;
     if(searchInput==''){document.title="Search - 青萝卜菜の博客";}
     else{document.title=searchInput+" - 青萝卜菜の博客";}
     let a=0;
@@ -275,7 +279,7 @@ function searchShow(){
     if(a==0){
         let notFind=document.getElementsByClassName("notFind")[0];
         notFind.style.display='block';
-        notFind.innerHTML='Not Find "'+searchInput+'"';
+        notFind.textContent='Not Find "'+searchInput+'"';
     }
     else{document.getElementsByClassName("notFind")[0].style.display='none';}
 }

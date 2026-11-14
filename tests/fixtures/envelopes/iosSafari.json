@@ -1,0 +1,769 @@
+{
+  "v": 1,
+  "id": "<uuid>",
+  "ts": "2026-11-13T00:00:00.000Z",
+  "session": "<session>",
+  "page": {
+    "path": "/fixture",
+    "title": "夹具页",
+    "lang": "zh-CN",
+    "ref": "",
+    "nav": "navigate"
+  },
+  "cli": {
+    "clock": {
+      "off": 8,
+      "offset_min": -480,
+      "skew_s": null,
+      "skew_h": null,
+      "rtt_ms": null
+    },
+    "langs": [
+      "zh-CN",
+      "zh"
+    ],
+    "locale": "zh-CN",
+    "tz": "Asia/Hong_Kong",
+    "hour": {
+      "cycle": "h23",
+      "h12": false
+    },
+    "week": {
+      "firstDay": 1,
+      "weekend": [
+        6,
+        7
+      ],
+      "minDays": null
+    },
+    "fmt": "2024/1/2|1,234,567.891|1,234.5",
+    "icu": {
+      "alg": "supported-values-of",
+      "calendar": 18,
+      "collation": 10,
+      "currency": 159,
+      "numberingSystem": 78,
+      "timeZone": 418,
+      "unit": 45,
+      "segmenter": true
+    },
+    "kbd": "y|q",
+    "canvas": {
+      "h": "sha256:<redacted>",
+      "len": 22226
+    },
+    "rand": {
+      "same": true
+    },
+    "webgl": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "unmaskedVendor": "Google Inc. (NVIDIA)",
+      "unmaskedRenderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2080 Ti (0x00001E04) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "sl": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)",
+      "ext": 32
+    },
+    "voices": [
+      "<voice>"
+    ],
+    "mathfp": {
+      "alg": "mathfp-2",
+      "cases": 18,
+      "h": "sha256:<redacted>"
+    },
+    "fontfp": "sha256:<redacted>",
+    "fonts": {
+      "list": [
+        "Arial",
+        "Arial Black",
+        "Arial Narrow",
+        "Calibri",
+        "Cambria",
+        "Candara",
+        "Comic Sans MS",
+        "Consolas",
+        "Constantia",
+        "Corbel",
+        "Courier New",
+        "Georgia",
+        "Impact",
+        "Lucida Console",
+        "Lucida Sans Unicode",
+        "Malgun Gothic",
+        "Meiryo",
+        "Microsoft YaHei",
+        "Microsoft JhengHei",
+        "MS Gothic",
+        "Palatino Linotype",
+        "Segoe UI",
+        "SimSun",
+        "NSimSun",
+        "SimHei",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana",
+        "Wingdings"
+      ],
+      "hits": 30,
+      "tested": 45,
+      "truncated": false,
+      "scope": "固定候选名单（45 种）命中 30 种，不代表系统全部字体"
+    },
+    "emoji": {
+      "alg": "glyph-multibaseline",
+      "ref": {
+        "missing": 20.66,
+        "cjk": 32
+      },
+      "drawn": [
+        "13.0",
+        "14.0",
+        "15.0",
+        "15.1",
+        "16.0"
+      ],
+      "tofu": []
+    },
+    "domrect": "sha256:<redacted>",
+    "svgrect": "sha256:<redacted>",
+    "textm": "sha256:<redacted>",
+    "glimg": "sha256:<redacted>",
+    "keys": {
+      "window": 249,
+      "scope": "globals-enumerable",
+      "html": 147,
+      "css": 480
+    },
+    "timer": {
+      "res": 0.1,
+      "now": 2540,
+      "jitter": null,
+      "samples": 12
+    },
+    "callstack": {
+      "depth": 12421,
+      "limit": 30000,
+      "truncated": false
+    },
+    "engine": {
+      "js": "v8",
+      "render": "WebKit",
+      "basis": "error-message+ua"
+    },
+    "ai": {
+      "basis": "availability-sweep",
+      "model": "downloadable",
+      "translator_answered": true,
+      "langs": [],
+      "langs_total": 19
+    },
+    "audio": {
+      "alg": "offline-triangle-comp",
+      "rate": 44100,
+      "freq": 10000,
+      "step": 97,
+      "samples": 455,
+      "sum": "<redacted>"
+    },
+    "lies": [],
+    "cssv": "2024",
+    "smooth": {
+      "alg": "aa-pixels",
+      "gray": 63,
+      "color": 743,
+      "verdict": "subpixel"
+    },
+    "shield": {
+      "brave": false,
+      "noise": false,
+      "basis": "canvas_repeat"
+    },
+    "wasm": {
+      "alg": "validate-features",
+      "supported": 6,
+      "total": 6,
+      "has": [
+        "signext",
+        "bulk-memory",
+        "simd",
+        "threads",
+        "tail-call",
+        "reference-types"
+      ],
+      "missing": []
+    },
+    "fpid": "sha256:<redacted>",
+    "hwid": "sha256:<redacted>",
+    "ch": {
+      "alg": "ch/1",
+      "jsLow": {
+        "brands": [],
+        "mobile": false,
+        "platform": null
+      },
+      "jsHigh": {
+        "architecture": "",
+        "bitness": "",
+        "model": "",
+        "platformVersion": "",
+        "fullVersionList": [],
+        "formFactors": [],
+        "wow64": false
+      },
+      "empty": [
+        "architecture",
+        "bitness",
+        "model",
+        "platformVersion",
+        "fullVersionList",
+        "formFactors"
+      ]
+    },
+    "engver": {
+      "alg": "feature-floor",
+      "declared": "17",
+      "supported": 7,
+      "total": 7,
+      "floor_chromium": 122,
+      "newest": "set-union",
+      "basis": "feature-min-chromium"
+    },
+    "os": "iOS 17.6",
+    "browser": "Safari 17",
+    "form": "Mobile",
+    "arch": "unknown",
+    "screen": {
+      "w": 393,
+      "h": 852,
+      "aw": 393,
+      "ah": 852,
+      "dpr": 3,
+      "depth": 24
+    },
+    "model": {
+      "$": "unsupported"
+    },
+    "screens": {
+      "n": 1,
+      "ext": false,
+      "basis": "isExtended"
+    },
+    "win": {
+      "iw": 980,
+      "ih": 1644
+    },
+    "scrollbar": 0,
+    "gpu": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "unmasked": "ANGLE (NVIDIA, NVIDIA GeForce RTX 2080 Ti (0x00001E04) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    "ex_cn": {
+      "ip": "61.150.43.50",
+      "fam": 4,
+      "country": "中国",
+      "province": "陕西",
+      "city": "西安",
+      "isp": "电信"
+    },
+    "gpulim": {
+      "src": "webgpu",
+      "maxTexDim": 16384,
+      "features": [
+        "depth32float-stencil8",
+        "rg11b10ufloat-renderable",
+        "bgra8unorm-storage",
+        "texture-formats-tier1",
+        "texture-compression-bc",
+        "dual-source-blending",
+        "core-features-and-limits",
+        "float32-filterable",
+        "indirect-first-instance",
+        "float32-blendable",
+        "atomic-vec2u-min-max",
+        "subgroup-size-control",
+        "texture-compression-unaligned",
+        "depth-clip-control",
+        "texture-compression-bc-sliced-3d",
+        "timestamp-query",
+        "clip-distances",
+        "shader-f16",
+        "texture-formats-tier2",
+        "primitive-index",
+        "texture-component-swizzle",
+        "subgroups"
+      ]
+    },
+    "webgpu": {
+      "adapters": [
+        {
+          "vendor": "nvidia",
+          "arch": "turing",
+          "device": null,
+          "desc": null,
+          "pref": "high-performance",
+          "hasFallback": false
+        },
+        {
+          "vendor": "nvidia",
+          "arch": "turing",
+          "device": null,
+          "desc": null,
+          "pref": "low-power",
+          "hasFallback": false
+        }
+      ]
+    },
+    "glx": {
+      "maxTexture": 16384,
+      "maxRenderbuffer": 16384,
+      "maxViewport": [
+        32767,
+        32767
+      ],
+      "ext": 32
+    },
+    "cpu": 20,
+    "mem": 32,
+    "heap": 4192,
+    "touch": {
+      "points": 5,
+      "pointer": "coarse",
+      "anyPointer": "coarse",
+      "hover": false,
+      "anyHover": false,
+      "pointerEvents": true
+    },
+    "geoloc": {
+      "$": "not_run"
+    },
+    "battery": {
+      "level": 1,
+      "charging": true,
+      "chargingTime": 0
+    },
+    "gamepad": {
+      "connected": 0
+    },
+    "conn": {
+      "eff": "3g",
+      "rtt": 300,
+      "down": 1.4,
+      "save": false
+    },
+    "media": {
+      "total": 3,
+      "audioinput": 1,
+      "audiooutput": 1,
+      "videoinput": 1,
+      "labels": 0
+    },
+    "audiohw": {
+      "rate": 48000,
+      "base": 0.01,
+      "output": 0,
+      "channels": 2
+    },
+    "webrtc": {
+      "api": true,
+      "servers": 0,
+      "candidates": [
+        {
+          "type": "host",
+          "family": 4,
+          "scope": "local"
+        },
+        {
+          "type": "host",
+          "family": 4,
+          "scope": "local"
+        }
+      ],
+      "n": 2,
+      "public_n": 0,
+      "mdns": false,
+      "scope": "local"
+    },
+    "lan": {
+      "scope": "local",
+      "ips": [],
+      "v6": [],
+      "mdns": false,
+      "mdns_only": false,
+      "candidate_types": {
+        "host": 2
+      },
+      "reason": "no_candidate"
+    },
+    "v6mac": {
+      "addresses": [],
+      "has_v6": false,
+      "eui64": false,
+      "mac": null,
+      "basis": "eui64-iid",
+      "sources": [
+        "ice"
+      ]
+    },
+    "codecs": {
+      "h264": true,
+      "hev1": true,
+      "vp8": true,
+      "vp9": true,
+      "av01": true,
+      "opus": true,
+      "flac": false,
+      "mp3": true,
+      "aac": true,
+      "ac3": false,
+      "eac3": false,
+      "alac": false
+    },
+    "rtccodecs": {
+      "audio": [
+        "audio/opus",
+        "audio/red",
+        "audio/G722",
+        "audio/PCMU",
+        "audio/PCMA",
+        "audio/CN",
+        "audio/telephone-event",
+        "audio/telephone-event"
+      ],
+      "video": [
+        "video/VP8",
+        "video/rtx",
+        "video/H264",
+        "video/H264",
+        "video/H264",
+        "video/H264",
+        "video/H264",
+        "video/H264",
+        "video/AV1",
+        "video/VP9",
+        "video/VP9",
+        "video/H264",
+        "video/H265",
+        "video/red",
+        "video/ulpfec"
+      ],
+      "audioTotal": 8,
+      "videoTotal": 15,
+      "truncated": false
+    },
+    "recmime": {
+      "video/webm": true,
+      "video/webm;codecs=vp8": true,
+      "video/webm;codecs=vp9": false,
+      "video/webm;codecs=h264": true,
+      "video/x-matroska;codecs=avc1": true,
+      "audio/webm": true,
+      "audio/webm;codecs=opus": true,
+      "audio/ogg;codecs=opus": false,
+      "audio/mp4": true,
+      "video/mp4": true
+    },
+    "xr": {
+      "vr": false,
+      "ar": false
+    },
+    "hwdec": {
+      "h2648": {
+        "supported": true,
+        "smooth": true,
+        "powerEfficient": true
+      },
+      "hevc": {
+        "supported": true,
+        "smooth": true,
+        "powerEfficient": true
+      },
+      "av1": {
+        "supported": true,
+        "smooth": true,
+        "powerEfficient": false
+      },
+      "vp9": {
+        "supported": true,
+        "smooth": true,
+        "powerEfficient": true
+      }
+    },
+    "drm": {
+      "widevine": true,
+      "clearkey": true,
+      "playready": false,
+      "fairplay": false
+    },
+    "scheme": "light",
+    "motion": "no-preference",
+    "gamut": {
+      "gamut": "srgb",
+      "dynamic": "standard"
+    },
+    "a11y": {
+      "contrast": "no-preference",
+      "forced": false
+    },
+    "sysui": {
+      "alg": "isolated-medium",
+      "fontSize": 16,
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "accent": "rgb(0, 117, 255)"
+    },
+    "display": "browser",
+    "dnt": {
+      "dnt": null,
+      "gpc": false
+    },
+    "cookies": true,
+    "storage": {
+      "quota": 10737418240,
+      "usage": 0,
+      "details": 0
+    },
+    "apis": {
+      "usb": true,
+      "serial": true,
+      "hid": true,
+      "share": true,
+      "clipboard": true,
+      "wakeLock": true,
+      "credentials": true,
+      "serviceWorker": true,
+      "gpu": true,
+      "bluetooth": true,
+      "storage": true,
+      "presentation": true,
+      "contacts": false,
+      "nfc": false,
+      "idle": true,
+      "serialBasis": "navigator.serial"
+    },
+    "webdriver": false,
+    "pdf": true,
+    "auto": [],
+    "idstr": {
+      "vendor": "Google Inc.",
+      "productSub": "20030107",
+      "plugins": [
+        "PDF Viewer",
+        "Chrome PDF Viewer",
+        "Chromium PDF Viewer",
+        "Microsoft Edge PDF Viewer",
+        "WebKit built-in PDF"
+      ]
+    },
+    "agent": {
+      "kind": "",
+      "consistent": false,
+      "alg": "ua-ch-brand-consistency"
+    },
+    "perms": {
+      "geolocation": "prompt",
+      "notifications": "prompt",
+      "camera": "prompt",
+      "microphone": "prompt",
+      "clipboard-read": "prompt",
+      "local-fonts": "prompt",
+      "persistent-storage": "prompt",
+      "midi": "prompt",
+      "accelerometer": "granted"
+    },
+    "bt": {
+      "api": true,
+      "available": true
+    },
+    "bio": true,
+    "extwar": {
+      "tested": 6,
+      "hits": [],
+      "scope": "限量清单（6 个常见扩展的公开资源），命中不代表全部，未命中不代表没装"
+    },
+    "ext": [],
+    "history": 4,
+    "worker": {
+      "ok": true,
+      "uaSame": true
+    },
+    "traces": {
+      "alg": "storage-tag",
+      "first": false,
+      "kept": [
+        "localStorage",
+        "sessionStorage",
+        "cookie",
+        "windowName"
+      ],
+      "lost": [],
+      "blocked": [],
+      "ttl_days": 30
+    },
+    "ex_claude": {
+      "dest": "claude.ai",
+      "ip": "108.181.5.1",
+      "fam": 4,
+      "loc": "US",
+      "colo": "LAX",
+      "http": "http/2",
+      "tls": "TLSv1.3",
+      "ms": 210
+    },
+    "ex_intl": {
+      "ip": "108.181.5.1",
+      "fam": 4,
+      "country": "US",
+      "isp": "Psychz Networks",
+      "asn": 40676
+    },
+    "hz": 143,
+    "adblock": false,
+    "ex_cf": {
+      "dest": "www.cloudflare.com",
+      "ip": "108.181.5.1",
+      "fam": 4,
+      "loc": "US",
+      "colo": "LAX",
+      "http": "http/2",
+      "tls": "TLSv1.3",
+      "ms": 564
+    },
+    "ex_gpt": {
+      "dest": "chatgpt.com",
+      "ip": "108.181.5.1",
+      "fam": 4,
+      "loc": "US",
+      "colo": "LAX",
+      "http": "http/2",
+      "tls": "TLSv1.3",
+      "ms": 606
+    },
+    "etag": {
+      "$": "unreachable"
+    },
+    "trackers": {
+      "control_ok": true,
+      "targets": 7,
+      "reachable": [
+        "google-analytics",
+        "googletagmanager",
+        "facebook",
+        "hotjar",
+        "segment",
+        "criteo"
+      ],
+      "blocked": [
+        "doubleclick"
+      ],
+      "verdict": "blocked",
+      "note": "对照请求（cloudflare.com）通了，失败的目标算被拦截"
+    },
+    "sensors": {
+      "$": "not_run"
+    },
+    "stack": {
+      "v4": {
+        "ok": true,
+        "ip": "108.181.5.1"
+      },
+      "v6": {
+        "ok": false,
+        "state": "unreadable"
+      },
+      "dual": null
+    },
+    "dns": {
+      "resolver_ip": "219.144.80.148",
+      "family": 4,
+      "country": "CN",
+      "country_raw": "China",
+      "country_state": null,
+      "organization": "CHINANET SHAANXI province Cloud Base network",
+      "geo": "China - CHINANET SHAANXI province Cloud Base network",
+      "method": "edns-ip-api-query-nonce",
+      "method_version": "edns-ip-api/2",
+      "fields": [
+        "dns.ip",
+        "dns.geo"
+      ],
+      "ecs": {
+        "$": "unreadable"
+      },
+      "scope": "service-reported",
+      "waited_ms": 4109,
+      "inner_ms": 9600,
+      "outer_ms": 12000,
+      "at": "2026-11-13T06:45:08.877Z",
+      "ms": 4109
+    },
+    "kex": {
+      "$": "unsupported"
+    },
+    "warp": {
+      "$": "unsupported"
+    },
+    "proto": {
+      "$": "unsupported"
+    },
+    "edge": {
+      "$": "unsupported"
+    }
+  },
+  "meta": {
+    "dur_ms": 0,
+    "stuck": [],
+    "truncated": [],
+    "partial": false,
+    "privacy": {
+      "dnt": false,
+      "gpc": false,
+      "optout": false
+    },
+    "collector": "radish-1.8.5",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Mobile/15E148 Safari/604.1",
+    "profile": {
+      "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Mobile/15E148 Safari/604.1",
+      "meta": null,
+      "view": {
+        "width": 393,
+        "height": 659,
+        "dpr": 3,
+        "mobile": true,
+        "screenWidth": 393,
+        "screenHeight": 852
+      },
+      "touch": true
+    },
+    "provenance": {
+      "kind": "chrome-emulated",
+      "real_device": false,
+      "engine": "blink",
+      "browser": "Chrome/157.0.8103.52",
+      "process_os": "win32 10.0.26200",
+      "collector": "radish-1.8.5",
+      "emulated": {
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Mobile/15E148 Safari/604.1",
+        "userAgentMetadata": null,
+        "deviceMetrics": {
+          "width": 393,
+          "height": 659,
+          "dpr": 3,
+          "mobile": true,
+          "screenWidth": 393,
+          "screenHeight": 852
+        },
+        "touch": true
+      },
+      "proves": "桌面 Chromium 在给定 UA/屏幕参数下，采集器产生什么形状的信封",
+      "cannot_prove": [
+        "Firefox/Gecko 与 iOS/JavaScriptCore 的真实行为（UA 改了，引擎没变）",
+        "Android 系统接口、真实传感器读数、GPU 驱动与字体枚举",
+        "真实触屏、软键盘、屏幕旋转与省电策略下的读数"
+      ],
+      "page": "http://127.0.0.1:8099/ (仓库内静态页)"
+    }
+  }
+}

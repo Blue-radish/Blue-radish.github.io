@@ -1,0 +1,5424 @@
+{
+  "$doc": "博客采集器 → 后端的 cli 契约夹具（A-09）。由 tests/make-contract.js 生成，不要手改：改了要重跑生成器，摘要会跟着变。",
+  "alg": "blog-cli-contract/1",
+  "collector": "radish-2.0.0",
+  "generated_by": "tests/make-contract.js",
+  "source": "static/radish-collect.js",
+  "regenerate": "node tests\\make-contract.js（在博客仓库根目录；不需要 RadishCloud 在旁边）",
+  "deterministic": "同一份采集器代码重跑两次必须字节相同：id/session/ts、meta.dur_ms、cli.timer.now、cli.hz、cli.callstack.depth、各类摘要哈希、meta.h3.elapsed_ms 等易变值都换成了固定占位（见 volatile_paths），所以文件里没有生成时间。",
+  "shape_note": "数值只保留区间、字符串只保留枚举或格式；标记型的 {\"$\": 状态} 单独记成 marker；同一键在不同场景下形状不同就合成 union。volatile 的数值/字符串不钉取值——钉住一个每次都会变的数等于伪造确定性。number<host>（{\"type\":\"number\",\"host\":true}）是不钉值的另一类：值由运行采集器的 JS 引擎/ICU 决定，见 host_numbers。",
+  "host_numbers": {
+    "why": "假浏览器沙箱的全局对象就是 vm 的 global，所以引擎能力面（engver）、WebAssembly 特性面（wasm.supported）与 ICU 数据规模（icu 各类计数）量到的是**宿主 Node 的 V8 / ICU**：Node 22 与 Node 24 天然不同（例如 engver.supported 5 vs 9、wasm.supported 15 vs 16、icu.numberingSystem 77 vs 78）。真浏览器上这些数字来自浏览器本身。把宿主读数写进契约 = 夹具与构建机的 Node 版本耦合，所以这些路径只钉类型（number<host>），不钉取值；换 Node 时形状必须照样逐键相同。",
+    "patterns": [
+      "^cli\\.engver\\.(floor_chromium|floor_year|ceiling_chromium|ceiling_year|supported)$",
+      "^cli\\.wasm\\.supported$",
+      "^cli\\.icu\\.(calendar|collation|currency|numberingSystem|timeZone|unit)$"
+    ],
+    "paths": [
+      "cli.engver.ceiling_chromium",
+      "cli.engver.ceiling_year",
+      "cli.engver.floor_chromium",
+      "cli.engver.floor_year",
+      "cli.engver.supported",
+      "cli.icu.calendar",
+      "cli.icu.collation",
+      "cli.icu.currency",
+      "cli.icu.numberingSystem",
+      "cli.icu.timeZone",
+      "cli.icu.unit",
+      "cli.wasm.supported"
+    ],
+    "not_host": "其余数值仍然逐值比较（区间必须一致）：它们由采集器或沙箱自己写死，变了就是\"采集器换了口径\"。例如 cli.screens.n、cli.keys.window、cli.keys.css、cli.keys.items.computed-style-properties.n、cli.wasm.total、cli.wasm.sources.validate、cli.engver.total。"
+  },
+  "value_sensitive_keys": [
+    "cli.screens.n",
+    "cli.keys.window",
+    "cli.keys.css",
+    "cli.keys.items.computed-style-properties.n",
+    "cli.wasm.total",
+    "cli.wasm.sources.validate",
+    "cli.engver.total"
+  ],
+  "samples_note": "样本是**某一次真实运行的读数快照**（生成这台的 Node 上跑出来的），用来喂后端的整条渲染链，不参与 digest，也不与\"当前采集器重算的样本\"比对。所以样本里 host_numbers.paths 那些读数（以及 engver/wasm 的逐项 ok 布尔）会随生成机的引擎变；契约部分（cli_keys / shapes / markers / semantics / digest）不随 Node 版本变。",
+  "volatile_paths": {
+    "number": [
+      "^meta\\.dur_ms$",
+      "^meta\\.h3\\.(elapsed_ms|retries|attempts|answered)$",
+      "^cli\\.timer\\.(now|res|samples|jitter|minPositiveMs|maxPositiveMs)$",
+      "^cli\\.hz$",
+      "^cli\\.callstack\\.depth$",
+      "^cli\\.clock\\.(skew_s|skew_h|rtt_ms)$",
+      "^cli\\.agent\\.input\\.windowMs$",
+      "^cli\\.gamepad\\.windowMs$",
+      "^cli\\.adblock\\.[A-Za-z]+\\.ms$",
+      "^cli\\.etag\\..*\\.ms$",
+      "^cli\\.conn\\.(rtt|downlink)$"
+    ],
+    "string": [
+      "^id$",
+      "^ts$",
+      "^session$",
+      "^cli\\.rand\\.(value|h)$"
+    ]
+  },
+  "cli_key_count": 109,
+  "cli_keys": [
+    "a11y",
+    "adblock",
+    "agent",
+    "ai",
+    "apis",
+    "arch",
+    "audio",
+    "audiohw",
+    "auto",
+    "battery",
+    "bio",
+    "browser",
+    "bt",
+    "callstack",
+    "canvas",
+    "ch",
+    "clock",
+    "codecs",
+    "conn",
+    "cookies",
+    "cpu",
+    "cssv",
+    "display",
+    "dns",
+    "dnt",
+    "domrect",
+    "drm",
+    "edge",
+    "emoji",
+    "engine",
+    "engver",
+    "etag",
+    "ex_cf",
+    "ex_claude",
+    "ex_cn",
+    "ex_gpt",
+    "ex_intl",
+    "ext",
+    "extwar",
+    "fmt",
+    "fontfp",
+    "fonts",
+    "form",
+    "fpid",
+    "fpid_alg",
+    "gamepad",
+    "gamut",
+    "geoloc",
+    "glimg",
+    "glx",
+    "gpu",
+    "gpulim",
+    "heap",
+    "history",
+    "hour",
+    "hwdec",
+    "hwid",
+    "hwid_alg",
+    "hz",
+    "icu",
+    "idstr",
+    "kbd",
+    "kex",
+    "keys",
+    "lan",
+    "langs",
+    "lies",
+    "locale",
+    "mathfp",
+    "media",
+    "mem",
+    "model",
+    "motion",
+    "os",
+    "pdf",
+    "perms",
+    "proto",
+    "rand",
+    "recmime",
+    "rtccodecs",
+    "scheme",
+    "screen",
+    "screens",
+    "scrollbar",
+    "sensors",
+    "shield",
+    "smooth",
+    "stack",
+    "storage",
+    "svgrect",
+    "sysui",
+    "textm",
+    "timer",
+    "touch",
+    "traces",
+    "trackers",
+    "tz",
+    "v6mac",
+    "voices",
+    "warp",
+    "wasm",
+    "webdriver",
+    "webgl",
+    "webgpu",
+    "webrtc",
+    "week",
+    "win",
+    "worker",
+    "xr"
+  ],
+  "cli_keys_probe_only": [
+    "h2fp",
+    "ja4",
+    "quicfp",
+    "tcp_reason",
+    "tcpfp",
+    "tlsfp"
+  ],
+  "shapes": {
+    "a11y": {
+      "type": "object",
+      "props": {
+        "contrast": {
+          "type": "string"
+        },
+        "forced": {
+          "type": "boolean"
+        }
+      }
+    },
+    "adblock": {
+      "type": "object",
+      "props": {
+        "adUrl": {
+          "type": "object",
+          "props": {
+            "ms": {
+              "type": "null"
+            },
+            "state": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "url"
+            }
+          }
+        },
+        "alg": {
+          "type": "string",
+          "enum": [
+            "adblock/2"
+          ]
+        },
+        "bait": {
+          "type": "object",
+          "props": {
+            "hidden": {
+              "type": "boolean"
+            },
+            "waitMs": {
+              "type": "number",
+              "range": [
+                120,
+                120
+              ]
+            }
+          }
+        },
+        "basis": {
+          "type": "string"
+        },
+        "control": {
+          "type": "object",
+          "props": {
+            "ms": {
+              "type": "null"
+            },
+            "state": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "url"
+            }
+          }
+        },
+        "deadlineMs": {
+          "type": "number",
+          "range": [
+            800,
+            800
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "blocked",
+            "reachable"
+          ]
+        }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "agent/2"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "input": {
+          "type": "object",
+          "props": {
+            "keydown": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "mousemove": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "pointerdown": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "total": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "touchstart": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "trustedAll": {
+              "type": "null"
+            },
+            "untrusted": {
+              "type": "number",
+              "range": [
+                0,
+                0
+              ]
+            },
+            "windowMs": {
+              "type": "number",
+              "volatile": true
+            }
+          }
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "insufficient-observation",
+            "trusted-input",
+            "untrusted-input"
+          ]
+        },
+        "uaCh": {
+          "type": "object",
+          "props": {
+            "alg": {
+              "type": "string"
+            },
+            "basis": {
+              "type": "string"
+            },
+            "consistent": {
+              "type": "null"
+            },
+            "kind": {
+              "type": "string"
+            }
+          }
+        },
+        "userActivation": {
+          "type": "boolean"
+        },
+        "waitMs": {
+          "type": "number",
+          "range": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "ai": {
+      "type": "marker"
+    },
+    "apis": {
+      "type": "object",
+      "props": {
+        "aiBasis": {
+          "type": "string"
+        },
+        "alg": {
+          "type": "string",
+          "enum": [
+            "apis/2"
+          ]
+        },
+        "bluetooth": {
+          "type": "boolean"
+        },
+        "clipboard": {
+          "type": "boolean"
+        },
+        "contacts": {
+          "type": "boolean"
+        },
+        "contactsManager": {
+          "type": "boolean"
+        },
+        "credentials": {
+          "type": "boolean"
+        },
+        "digitalCredential": {
+          "type": "boolean"
+        },
+        "digitalCredentialsBasis": {
+          "type": "string"
+        },
+        "eyeDropper": {
+          "type": "boolean"
+        },
+        "fedcm": {
+          "type": "boolean"
+        },
+        "filePicker": {
+          "type": "boolean"
+        },
+        "gpu": {
+          "type": "boolean"
+        },
+        "hid": {
+          "type": "boolean"
+        },
+        "idle": {
+          "type": "boolean"
+        },
+        "idleDetector": {
+          "type": "boolean"
+        },
+        "languageModel": {
+          "type": "boolean"
+        },
+        "localFonts": {
+          "type": "boolean"
+        },
+        "midi": {
+          "type": "boolean"
+        },
+        "nfc": {
+          "type": "boolean"
+        },
+        "presentation": {
+          "type": "boolean"
+        },
+        "pressure": {
+          "type": "boolean"
+        },
+        "screenDetails": {
+          "type": "boolean"
+        },
+        "serial": {
+          "type": "boolean"
+        },
+        "serialBasis": {
+          "type": "null"
+        },
+        "serviceWorker": {
+          "type": "boolean"
+        },
+        "share": {
+          "type": "boolean"
+        },
+        "storage": {
+          "type": "boolean"
+        },
+        "translator": {
+          "type": "boolean"
+        },
+        "usb": {
+          "type": "boolean"
+        },
+        "wakeLock": {
+          "type": "boolean"
+        },
+        "webTransport": {
+          "type": "boolean"
+        }
+      }
+    },
+    "arch": {
+      "type": "string"
+    },
+    "audio": {
+      "type": "marker"
+    },
+    "audiohw": {
+      "type": "marker"
+    },
+    "auto": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "auto/2"
+          ]
+        },
+        "comboCount": {
+          "type": "number",
+          "range": [
+            0,
+            0
+          ]
+        },
+        "combos": {
+          "type": "array",
+          "of": null
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "none",
+            "weak",
+            "strong"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "signals": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "battery": {
+      "type": "marker"
+    },
+    "bio": {
+      "type": "marker"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "bt": {
+      "type": "marker"
+    },
+    "callstack": {
+      "type": "object",
+      "props": {
+        "depth": {
+          "type": "number",
+          "volatile": true
+        },
+        "limit": {
+          "type": "number",
+          "range": [
+            30000,
+            30000
+          ]
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "canvas": {
+      "type": "marker"
+    },
+    "ch": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "ch/merged",
+            "ch/srv-only"
+          ]
+        },
+        "srv": {
+          "type": "object",
+          "props": {
+            "sec-ch-ua": {
+              "type": "string"
+            },
+            "sec-ch-ua-platform": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "clock": {
+      "type": "object",
+      "props": {
+        "off": {
+          "type": "number",
+          "range": [
+            8,
+            8
+          ]
+        },
+        "offset_min": {
+          "type": "number",
+          "range": [
+            -480,
+            -480
+          ]
+        },
+        "rtt_ms": {
+          "type": "null"
+        },
+        "skew_h": {
+          "type": "number",
+          "volatile": true
+        },
+        "skew_s": {
+          "type": "number",
+          "volatile": true
+        }
+      }
+    },
+    "codecs": {
+      "type": "marker"
+    },
+    "conn": {
+      "type": "marker"
+    },
+    "cookies": {
+      "type": "boolean"
+    },
+    "cpu": {
+      "type": "number",
+      "range": [
+        8,
+        8
+      ]
+    },
+    "cssv": {
+      "type": "marker"
+    },
+    "display": {
+      "type": "marker"
+    },
+    "dns": {
+      "type": "marker"
+    },
+    "dnt": {
+      "type": "object",
+      "props": {
+        "dnt": {
+          "type": "null"
+        },
+        "gpc": {
+          "type": "boolean"
+        }
+      }
+    },
+    "domrect": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "domrect/2"
+          ]
+        },
+        "h": {
+          "type": "string",
+          "format": "identity-digest"
+        },
+        "items": {
+          "type": "object",
+          "props": {
+            "matrix3d": {
+              "type": "object",
+              "props": {
+                "h": {
+                  "type": "number",
+                  "range": [
+                    43.25,
+                    43.25
+                  ]
+                },
+                "rects": {
+                  "type": "number",
+                  "range": [
+                    2,
+                    2
+                  ]
+                },
+                "w": {
+                  "type": "number",
+                  "range": [
+                    137.5,
+                    137.5
+                  ]
+                },
+                "x": {
+                  "type": "number",
+                  "range": [
+                    1.5,
+                    1.5
+                  ]
+                },
+                "y": {
+                  "type": "number",
+                  "range": [
+                    2.5,
+                    2.5
+                  ]
+                }
+              }
+            },
+            "rotate": {
+              "type": "object",
+              "props": {
+                "h": {
+                  "type": "number",
+                  "range": [
+                    43.25,
+                    43.25
+                  ]
+                },
+                "rects": {
+                  "type": "number",
+                  "range": [
+                    2,
+                    2
+                  ]
+                },
+                "w": {
+                  "type": "number",
+                  "range": [
+                    137.5,
+                    137.5
+                  ]
+                },
+                "x": {
+                  "type": "number",
+                  "range": [
+                    1.5,
+                    1.5
+                  ]
+                },
+                "y": {
+                  "type": "number",
+                  "range": [
+                    2.5,
+                    2.5
+                  ]
+                }
+              }
+            },
+            "scale": {
+              "type": "object",
+              "props": {
+                "h": {
+                  "type": "number",
+                  "range": [
+                    43.25,
+                    43.25
+                  ]
+                },
+                "rects": {
+                  "type": "number",
+                  "range": [
+                    2,
+                    2
+                  ]
+                },
+                "w": {
+                  "type": "number",
+                  "range": [
+                    137.5,
+                    137.5
+                  ]
+                },
+                "x": {
+                  "type": "number",
+                  "range": [
+                    1.5,
+                    1.5
+                  ]
+                },
+                "y": {
+                  "type": "number",
+                  "range": [
+                    2.5,
+                    2.5
+                  ]
+                }
+              }
+            },
+            "skew": {
+              "type": "object",
+              "props": {
+                "h": {
+                  "type": "number",
+                  "range": [
+                    43.25,
+                    43.25
+                  ]
+                },
+                "rects": {
+                  "type": "number",
+                  "range": [
+                    2,
+                    2
+                  ]
+                },
+                "w": {
+                  "type": "number",
+                  "range": [
+                    137.5,
+                    137.5
+                  ]
+                },
+                "x": {
+                  "type": "number",
+                  "range": [
+                    1.5,
+                    1.5
+                  ]
+                },
+                "y": {
+                  "type": "number",
+                  "range": [
+                    2.5,
+                    2.5
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "ranges": {
+          "type": "marker"
+        },
+        "scope": {
+          "type": "string"
+        }
+      }
+    },
+    "drm": {
+      "type": "marker"
+    },
+    "edge": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "marker"
+    },
+    "engine": {
+      "type": "object",
+      "props": {
+        "basis": {
+          "type": "string"
+        },
+        "js": {
+          "type": "string"
+        },
+        "render": {
+          "type": "string"
+        }
+      }
+    },
+    "engver": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "feature-floor/2"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "ceiling_chromium": {
+          "type": "number",
+          "host": true
+        },
+        "ceiling_year": {
+          "type": "number",
+          "host": true
+        },
+        "declared": {
+          "type": "string",
+          "format": "version"
+        },
+        "floor_chromium": {
+          "type": "number",
+          "host": true
+        },
+        "floor_year": {
+          "type": "number",
+          "host": true
+        },
+        "items": {
+          "type": "object",
+          "props": {
+            "duration-format": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    129,
+                    129
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2024,
+                    2024
+                  ]
+                }
+              }
+            },
+            "error-iserror": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    134,
+                    134
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2025,
+                    2025
+                  ]
+                }
+              }
+            },
+            "findLast": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    97,
+                    97
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2022,
+                    2022
+                  ]
+                }
+              }
+            },
+            "float16array": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    135,
+                    135
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2025,
+                    2025
+                  ]
+                }
+              }
+            },
+            "fromAsync": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    121,
+                    121
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2024,
+                    2024
+                  ]
+                }
+              }
+            },
+            "groupBy": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    117,
+                    117
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2023,
+                    2023
+                  ]
+                }
+              }
+            },
+            "promise-try": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    128,
+                    128
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2024,
+                    2024
+                  ]
+                }
+              }
+            },
+            "regexp-escape": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    136,
+                    136
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2025,
+                    2025
+                  ]
+                }
+              }
+            },
+            "set-union": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    122,
+                    122
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2024,
+                    2024
+                  ]
+                }
+              }
+            },
+            "structuredClone": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    98,
+                    98
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2022,
+                    2022
+                  ]
+                }
+              }
+            },
+            "withResolvers": {
+              "type": "object",
+              "props": {
+                "min": {
+                  "type": "number",
+                  "range": [
+                    119,
+                    119
+                  ]
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "year": {
+                  "type": "number",
+                  "range": [
+                    2023,
+                    2023
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "newest": {
+          "type": "string"
+        },
+        "supported": {
+          "type": "number",
+          "host": true
+        },
+        "total": {
+          "type": "number",
+          "range": [
+            11,
+            11
+          ]
+        }
+      }
+    },
+    "etag": {
+      "type": "marker"
+    },
+    "ex_cf": {
+      "type": "marker"
+    },
+    "ex_claude": {
+      "type": "marker"
+    },
+    "ex_cn": {
+      "type": "marker"
+    },
+    "ex_gpt": {
+      "type": "marker"
+    },
+    "ex_intl": {
+      "type": "marker"
+    },
+    "ext": {
+      "type": "array",
+      "of": null
+    },
+    "extwar": {
+      "type": "marker"
+    },
+    "fmt": {
+      "type": "string"
+    },
+    "fontfp": {
+      "type": "marker"
+    },
+    "fonts": {
+      "type": "marker"
+    },
+    "form": {
+      "type": "object",
+      "props": {
+        "basis": {
+          "type": "string",
+          "enum": [
+            "ua-ch-form-factors",
+            "ua-mobile",
+            "touch-heuristic"
+          ]
+        },
+        "formFactors": {
+          "type": "array",
+          "of": null
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Desktop",
+            "Mobile",
+            "Tablet",
+            "Unknown"
+          ]
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "fpid": {
+      "type": "string",
+      "format": "identity-digest"
+    },
+    "fpid_alg": {
+      "type": "string",
+      "enum": [
+        "sha256/tmpl-2",
+        "fnv/tmpl-2-fallback"
+      ]
+    },
+    "gamepad": {
+      "type": "marker"
+    },
+    "gamut": {
+      "type": "object",
+      "props": {
+        "dynamic": {
+          "type": "string"
+        },
+        "gamut": {
+          "type": "string"
+        }
+      }
+    },
+    "geoloc": {
+      "type": "marker"
+    },
+    "glimg": {
+      "type": "marker"
+    },
+    "glx": {
+      "type": "marker"
+    },
+    "gpu": {
+      "type": "marker"
+    },
+    "gpulim": {
+      "type": "marker"
+    },
+    "heap": {
+      "type": "marker"
+    },
+    "history": {
+      "type": "number",
+      "range": [
+        3,
+        3
+      ]
+    },
+    "hour": {
+      "type": "object",
+      "props": {
+        "cycle": {
+          "type": "string"
+        },
+        "h12": {
+          "type": "boolean"
+        }
+      }
+    },
+    "hwdec": {
+      "type": "marker"
+    },
+    "hwid": {
+      "type": "string",
+      "format": "identity-digest"
+    },
+    "hwid_alg": {
+      "type": "string",
+      "enum": [
+        "sha256/hw-2",
+        "fnv/hw-2-fallback"
+      ]
+    },
+    "hz": {
+      "type": "number",
+      "volatile": true
+    },
+    "icu": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "supported-values-of"
+          ]
+        },
+        "calendar": {
+          "type": "number",
+          "host": true
+        },
+        "collation": {
+          "type": "number",
+          "host": true
+        },
+        "currency": {
+          "type": "number",
+          "host": true
+        },
+        "numberingSystem": {
+          "type": "number",
+          "host": true
+        },
+        "segmenter": {
+          "type": "boolean"
+        },
+        "timeZone": {
+          "type": "number",
+          "host": true
+        },
+        "unit": {
+          "type": "number",
+          "host": true
+        }
+      }
+    },
+    "idstr": {
+      "type": "object",
+      "props": {
+        "plugins": {
+          "type": "array",
+          "of": null
+        },
+        "productSub": {
+          "type": "string",
+          "format": "version"
+        },
+        "vendor": {
+          "type": "string"
+        }
+      }
+    },
+    "kbd": {
+      "type": "marker"
+    },
+    "kex": {
+      "type": "object",
+      "props": {
+        "group": {
+          "type": "string"
+        },
+        "sni": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string"
+        }
+      }
+    },
+    "keys": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "keys/2"
+          ]
+        },
+        "css": {
+          "type": "number",
+          "range": [
+            320,
+            320
+          ]
+        },
+        "html": {
+          "type": "null"
+        },
+        "items": {
+          "type": "object",
+          "props": {
+            "CSS": {
+              "type": "object",
+              "props": {
+                "how": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "null"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            },
+            "HTMLElement.prototype": {
+              "type": "object",
+              "props": {
+                "how": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "null"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            },
+            "computed-style-properties": {
+              "type": "object",
+              "props": {
+                "how": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "number",
+                  "range": [
+                    320,
+                    320
+                  ]
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            },
+            "enumerable-globals": {
+              "type": "object",
+              "props": {
+                "how": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "number",
+                  "range": [
+                    42,
+                    42
+                  ]
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            },
+            "own-property-names": {
+              "type": "object",
+              "props": {
+                "how": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "number",
+                  "range": [
+                    103,
+                    103
+                  ]
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "scope": {
+          "type": "string"
+        },
+        "window": {
+          "type": "number",
+          "range": [
+            42,
+            42
+          ]
+        }
+      }
+    },
+    "lan": {
+      "type": "marker"
+    },
+    "langs": {
+      "type": "array",
+      "of": {
+        "type": "string"
+      }
+    },
+    "lies": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "lies/2"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "ctx": {
+          "type": "string",
+          "enum": [
+            "iframe",
+            "unsupported"
+          ]
+        },
+        "getters": {
+          "type": "array",
+          "of": {
+            "type": "object",
+            "props": {
+              "k": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "of": {
+            "type": "object",
+            "props": {
+              "frame": {
+                "type": "null"
+              },
+              "k": {
+                "type": "string"
+              },
+              "page": {
+                "type": "boolean"
+              },
+              "proto": {
+                "type": "union",
+                "of": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "same": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        "list": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "n": {
+          "type": "number",
+          "range": [
+            5,
+            5
+          ]
+        },
+        "readings": {
+          "type": "array",
+          "of": null
+        },
+        "scope": {
+          "type": "string"
+        },
+        "why": {
+          "type": "string",
+          "enum": [
+            "same-origin-blank",
+            "no-contentWindow",
+            "no-frame-realm",
+            "no-iframe-element",
+            "iframe-threw",
+            "no-document"
+          ]
+        }
+      }
+    },
+    "locale": {
+      "type": "string"
+    },
+    "mathfp": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "mathfp-2"
+          ]
+        },
+        "cases": {
+          "type": "number",
+          "range": [
+            18,
+            18
+          ]
+        },
+        "h": {
+          "type": "string",
+          "format": "identity-digest"
+        }
+      }
+    },
+    "media": {
+      "type": "marker"
+    },
+    "mem": {
+      "type": "number",
+      "range": [
+        8,
+        8
+      ]
+    },
+    "model": {
+      "type": "marker"
+    },
+    "motion": {
+      "type": "string"
+    },
+    "os": {
+      "type": "string"
+    },
+    "pdf": {
+      "type": "boolean"
+    },
+    "perms": {
+      "type": "marker"
+    },
+    "proto": {
+      "type": "object",
+      "props": {
+        "http": {
+          "type": "string",
+          "format": "mime"
+        },
+        "tls": {
+          "type": "string"
+        }
+      }
+    },
+    "rand": {
+      "type": "marker"
+    },
+    "recmime": {
+      "type": "marker"
+    },
+    "rtccodecs": {
+      "type": "marker"
+    },
+    "scheme": {
+      "type": "string"
+    },
+    "screen": {
+      "type": "object",
+      "props": {
+        "ah": {
+          "type": "number",
+          "range": [
+            1040,
+            1040
+          ]
+        },
+        "aw": {
+          "type": "number",
+          "range": [
+            1920,
+            1920
+          ]
+        },
+        "depth": {
+          "type": "number",
+          "range": [
+            24,
+            24
+          ]
+        },
+        "dpr": {
+          "type": "number",
+          "range": [
+            1.25,
+            1.25
+          ]
+        },
+        "h": {
+          "type": "number",
+          "range": [
+            1080,
+            1080
+          ]
+        },
+        "w": {
+          "type": "number",
+          "range": [
+            1920,
+            1920
+          ]
+        }
+      }
+    },
+    "screens": {
+      "type": "object",
+      "props": {
+        "basis": {
+          "type": "string",
+          "enum": [
+            "isExtended"
+          ]
+        },
+        "ext": {
+          "type": "boolean"
+        },
+        "n": {
+          "type": "number",
+          "range": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    "scrollbar": {
+      "type": "number",
+      "range": [
+        15,
+        15
+      ]
+    },
+    "sensors": {
+      "type": "marker"
+    },
+    "shield": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "shield/2"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        },
+        "brave": {
+          "type": "boolean"
+        },
+        "canvasStable": {
+          "type": "null"
+        },
+        "mathStable": {
+          "type": "boolean"
+        },
+        "nativeToStringIntact": {
+          "type": "boolean"
+        },
+        "noise": {
+          "type": "null"
+        },
+        "note": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "likely-privacy-browser",
+            "canvas-noise",
+            "clean",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "smooth": {
+      "type": "marker"
+    },
+    "stack": {
+      "type": "object",
+      "props": {
+        "dual": {
+          "type": "null"
+        },
+        "v4": {
+          "type": "object",
+          "props": {
+            "ok": {
+              "type": "boolean"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
+        "v6": {
+          "type": "object",
+          "props": {
+            "ok": {
+              "type": "boolean"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "storage": {
+      "type": "marker"
+    },
+    "svgrect": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "svgrect/2"
+          ]
+        },
+        "box": {
+          "type": "object",
+          "props": {
+            "h": {
+              "type": "number",
+              "range": [
+                4.5,
+                4.5
+              ]
+            },
+            "w": {
+              "type": "number",
+              "range": [
+                3.5,
+                3.5
+              ]
+            },
+            "x": {
+              "type": "number",
+              "range": [
+                1.5,
+                1.5
+              ]
+            },
+            "y": {
+              "type": "number",
+              "range": [
+                2.5,
+                2.5
+              ]
+            }
+          }
+        },
+        "chars": {
+          "type": "null"
+        },
+        "h": {
+          "type": "string",
+          "format": "identity-digest"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "subLength": {
+          "type": "null"
+        },
+        "textLength": {
+          "type": "null"
+        },
+        "viewport": {
+          "type": "object",
+          "props": {
+            "h": {
+              "type": "number",
+              "range": [
+                43.25,
+                43.25
+              ]
+            },
+            "w": {
+              "type": "number",
+              "range": [
+                137.5,
+                137.5
+              ]
+            }
+          }
+        }
+      }
+    },
+    "sysui": {
+      "type": "object",
+      "props": {
+        "accent": {
+          "type": "string",
+          "format": "css-color"
+        },
+        "alg": {
+          "type": "string",
+          "enum": [
+            "isolated-medium"
+          ]
+        },
+        "background": {
+          "type": "null"
+        },
+        "color": {
+          "type": "null"
+        },
+        "fontSize": {
+          "type": "number",
+          "range": [
+            16,
+            16
+          ]
+        }
+      }
+    },
+    "textm": {
+      "type": "marker"
+    },
+    "timer": {
+      "type": "object",
+      "props": {
+        "jitter": {
+          "type": "number",
+          "volatile": true
+        },
+        "maxPositiveMs": {
+          "type": "number",
+          "volatile": true
+        },
+        "minPositiveMs": {
+          "type": "number",
+          "volatile": true
+        },
+        "now": {
+          "type": "number",
+          "volatile": true
+        },
+        "res": {
+          "type": "number",
+          "volatile": true
+        },
+        "samples": {
+          "type": "number",
+          "volatile": true
+        }
+      }
+    },
+    "touch": {
+      "type": "object",
+      "props": {
+        "anyHover": {
+          "type": "boolean"
+        },
+        "anyPointer": {
+          "type": "null"
+        },
+        "hover": {
+          "type": "boolean"
+        },
+        "pointer": {
+          "type": "null"
+        },
+        "pointerEvents": {
+          "type": "boolean"
+        },
+        "points": {
+          "type": "number",
+          "range": [
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "traces": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "storage-tag/2"
+          ]
+        },
+        "blocked": {
+          "type": "array",
+          "of": null
+        },
+        "first": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "object",
+          "props": {
+            "cacheStorage": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "null"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "cookie": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "null"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "indexDB": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "null"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "localStorage": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "null"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "sessionStorage": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "windowName": {
+              "type": "object",
+              "props": {
+                "prev": {
+                  "type": "boolean"
+                },
+                "readback": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "unsupported",
+                    "blocked",
+                    "written",
+                    "readback",
+                    "lost",
+                    "timeout"
+                  ]
+                },
+                "wrote": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "kept": {
+          "type": "array",
+          "of": null
+        },
+        "lost": {
+          "type": "array",
+          "of": null
+        },
+        "scope": {
+          "type": "string"
+        },
+        "ttl_days": {
+          "type": "number",
+          "range": [
+            30,
+            30
+          ]
+        }
+      }
+    },
+    "trackers": {
+      "type": "marker"
+    },
+    "tz": {
+      "type": "string",
+      "format": "mime"
+    },
+    "v6mac": {
+      "type": "marker"
+    },
+    "voices": {
+      "type": "marker"
+    },
+    "warp": {
+      "type": "object",
+      "props": {
+        "gateway": {
+          "type": "null"
+        },
+        "src": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "wasm": {
+      "type": "object",
+      "props": {
+        "alg": {
+          "type": "string",
+          "enum": [
+            "wasm/2"
+          ]
+        },
+        "control": {
+          "type": "string"
+        },
+        "has": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "items": {
+          "type": "object",
+          "props": {
+            "bulk-memory": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "exceptions": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "extended-const": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "gc": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "jspi": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "memory64": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "multi-memory": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "multi-value": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "mutable-globals": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "reference-types": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "relaxed-simd": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "sat-float-int": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "sign-ext": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "simd": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "tail-call": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "threads": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            },
+            "wide-arithmetic": {
+              "type": "object",
+              "props": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "missing": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "object",
+          "props": {
+            "api-existence": {
+              "type": "number",
+              "range": [
+                1,
+                1
+              ]
+            },
+            "validate": {
+              "type": "number",
+              "range": [
+                16,
+                16
+              ]
+            }
+          }
+        },
+        "src": {
+          "type": "string"
+        },
+        "supported": {
+          "type": "number",
+          "host": true
+        },
+        "total": {
+          "type": "number",
+          "range": [
+            17,
+            17
+          ]
+        },
+        "unreadable": {
+          "type": "array",
+          "of": null
+        }
+      }
+    },
+    "webdriver": {
+      "type": "boolean"
+    },
+    "webgl": {
+      "type": "marker"
+    },
+    "webgpu": {
+      "type": "marker"
+    },
+    "webrtc": {
+      "type": "marker"
+    },
+    "week": {
+      "type": "object",
+      "props": {
+        "firstDay": {
+          "type": "number",
+          "range": [
+            1,
+            1
+          ]
+        },
+        "minDays": {
+          "type": "number",
+          "range": [
+            1,
+            1
+          ]
+        },
+        "weekend": {
+          "type": "array",
+          "of": {
+            "type": "number",
+            "range": [
+              6,
+              7
+            ]
+          }
+        }
+      }
+    },
+    "win": {
+      "type": "object",
+      "props": {
+        "ih": {
+          "type": "number",
+          "range": [
+            1040,
+            1040
+          ]
+        },
+        "iw": {
+          "type": "number",
+          "range": [
+            1920,
+            1920
+          ]
+        },
+        "oh": {
+          "type": "number",
+          "range": [
+            1080,
+            1080
+          ]
+        },
+        "ow": {
+          "type": "number",
+          "range": [
+            1920,
+            1920
+          ]
+        }
+      }
+    },
+    "worker": {
+      "type": "marker"
+    },
+    "xr": {
+      "type": "marker"
+    },
+    "h2fp": {
+      "type": "object",
+      "props": {
+        "fp": {
+          "type": "string"
+        }
+      }
+    },
+    "ja4": {
+      "type": "string",
+      "format": "ja4"
+    },
+    "quicfp": {
+      "type": "string",
+      "format": "ja4"
+    },
+    "tcp_reason": {
+      "type": "string"
+    },
+    "tcpfp": {
+      "type": "marker"
+    },
+    "tlsfp": {
+      "type": "string"
+    }
+  },
+  "markers": [
+    "error",
+    "not_configured",
+    "not_run",
+    "timeout",
+    "truncated",
+    "unreachable",
+    "unreadable",
+    "unsupported"
+  ],
+  "markers_note": "这些是采集器实际会写进 {\"$\": …} 的缺失标记。后端 normalize.MISSING_MARKERS 是更宽的集合（多一个 denied：那是权限查询的结果值，不是标记），读写两侧都只把标记当\"缺失\"，绝不当取值。",
+  "semantics": {
+    "a11y": "系统辅助功能偏好：prefers-contrast 与 forced-colors 的实际取值，不是\"是否装了读屏软件\"",
+    "adblock": "广告拦截实测：广告 URL、同源对照、诱饵元素三路取证后给出的判定（verdict）与依据",
+    "agent": "本轮观测窗口内收到的输入事件计数、isTrusted 比例，以及 UA 与 Client Hints 的品牌一致性",
+    "ai": "浏览器内置 AI 能力（Translator / LanguageModel）的 availability 查询结果（慢车道跨域读）",
+    "apis": "敏感 Web 接口的存在性清单：只记接口在不在，不调用、不弹权限框、不发请求",
+    "arch": "CPU 架构字符串：优先取高熵 sec-ch-ua-arch，读不到才从 UA／平台推断",
+    "audio": "音频指纹摘要，外加采样率、帧数、声道与延迟的物理量交叉核对结果",
+    "audiohw": "音频硬件读数：输出设备数、采样率与最大声道数（AudioContext 侧）",
+    "auto": "自动化痕迹逐条清单（webdriver、驱动全局名、空插件与 PDF 冲突等）与组合弱信号分级",
+    "battery": "电池状态：电量、是否在充电、充电与放电的剩余时间",
+    "bio": "生物识别／通行密钥能力：getClientCapabilities 的逐项真值，缺该接口时退回 isUVPAA 单一读数",
+    "browser": "浏览器名与版本：UA 与高熵品牌交叉判定（安卓 Edge 不许写成 Chrome）",
+    "bt": "蓝牙接口可用性：navigator.bluetooth 是否存在（只看存在性）",
+    "callstack": "抛错后记录到的最大调用栈帧数、上限以及是否被截断，用来分辨引擎差异与调试器介入",
+    "canvas": "Canvas 2D 同一段绘制的摘要哈希与采样数据长度（渲染栈指纹）",
+    "ch": "Client Hints 两个来源并列：浏览器 JS 侧的低熵／高熵值与服务器实际收到的回显头",
+    "clock": "本地时制与 UTC 偏移，以及和服务端时间的偏差（偏差由 trace 时间反推，不写在标记里）",
+    "codecs": "视频编码格式支持矩阵：canPlayType 对每种格式给出的结果",
+    "conn": "Network Information 读数：有效连接类型、下行带宽估算与 RTT（浏览器近似值）",
+    "cookies": "Cookie 是否可用（navigator.cookieEnabled 的布尔值）",
+    "cpu": "逻辑核心数（navigator.hardwareConcurrency）",
+    "cssv": "CSS 特性逐条真值：supports 直问与样式表解析两条路径，并附首用版本与年份",
+    "display": "打开方式／显示模式（浏览器标签、standalone、全屏等）",
+    "dns": "经第三方解析回显服务看到的 DNS 解析出口（解析器 IP／ASN），慢车道单独起跑",
+    "dnt": "隐私信号原始值：DNT 头与 Sec-GPC（或对应的 navigator 属性），原样上报不做解释",
+    "domrect": "四种 CSS 变换下元素盒子的几何读数，外加 Range 选中文本的盒子与条数",
+    "drm": "DRM 支持情况：逐个 key system 探测可用性",
+    "edge": "离浏览器最近的 Cloudflare 边缘节点代码（来自页面侧 /cdn-cgi/trace）",
+    "emoji": "能否画出彩色 emoji：用缺字符与 CJK 双重基线判定，不报伪造的版本号",
+    "engine": "JS 引擎名（异常措辞实测）与渲染内核（品牌／UA 推断），两者各带依据",
+    "engver": "引擎真实版本的特性区间：声明版本 + 已支持特性的下限与未支持特性的上限",
+    "etag": "浏览器 HTTP 缓存的 ETag 令牌，以及首访（first_pass）与本轮回环（round_trip）两类条件请求证据；跨访问结论只由服务端按不同会话号给出（慢车道）",
+    "ex_cf": "对 Cloudflare 回显服务测得的出口 IP 与位置",
+    "ex_claude": "对 claude.ai 回显服务测得的出口 IP 与位置（用于分流对照）",
+    "ex_cn": "对国内回显服务测得的出口 IP、位置与运营商",
+    "ex_gpt": "对 ChatGPT 回显服务测得的出口 IP 与位置（用于分流对照）",
+    "ex_intl": "对国际 IP 查询服务测得的出口 IP 与位置",
+    "ext": "只有扩展才会建立的全局量（钱包注入点、Grammarly 等）的命中名单",
+    "extwar": "扩展 web_accessible_resources 扫描：有限目标表、命中项，以及每个目标的版本与验证日期",
+    "fmt": "数字与日期格式样例：实测拼出日期、千分位与小数分隔符的样子",
+    "fontfp": "候选字体命中名单的摘要哈希（名单本身在 fonts 里）",
+    "fonts": "固定候选字体名单的命中情况（命中数、候选总数、名单与来源），不是\"已安装字体清单\"",
+    "form": "设备形态（Desktop／Mobile／Tablet／Unknown）与判定依据（高熵 form factors、UA-mobile、触屏启发）",
+    "fpid": "环境模板摘要：UA、语言、屏幕、canvas、字体、引擎特性等输入算出的哈希（标量字符串）",
+    "fpid_alg": "fpid 的摘要算法与输入清单版本（tmpl-2；算不了 SHA256 时前缀 fnv，绝不冒充）",
+    "gamepad": "手柄读数：加载时数量、真实输入后重读的数量，以及是否还在等交互",
+    "gamut": "屏幕色域与动态范围偏好（prefers-color-gamut / prefers-dynamic-range）",
+    "geoloc": "精确定位读数（getCurrentPosition 结果）；需要访客授权，未参与本轮就记 not_run",
+    "glimg": "WebGL 片元着色器按坐标出图案后的像素回读摘要与统计（非恒定图案才留得下痕迹）",
+    "glx": "WebGL 能力：各项上限、着色器精度、版本串与扩展全名清单",
+    "gpu": "显卡厂商与渲染器原始字符串（优先 unmaskedRenderer，不截断成厂商名）",
+    "gpulim": "WebGPU 能力：适配器 limits 标量、全量 features，以及两个 powerPreference 的对照",
+    "heap": "JS 堆上限档位（performance.memory.jsHeapSizeLimit）",
+    "history": "本标签页的 history.length，即同一标签页内已发生的导航次数",
+    "hour": "时制（12／24 小时）与本轮本地小时读数",
+    "hwdec": "视频硬件解码能力：MediaCapabilities 对每种编码的判定",
+    "hwid": "硬件面摘要：屏幕、DPR、色深、核心数、内存、触控、GPU、字体命中与堆上限算出的哈希",
+    "hwid_alg": "hwid 的摘要算法与输入清单版本（hw-2；算不了 SHA256 时前缀 fnv，绝不冒充）",
+    "hz": "屏幕刷新率：用 requestAnimationFrame 的间隔实测并取中位（每台机器都不同）",
+    "icu": "ICU 数据面规模：supportedValuesOf 各类别（日历、排序、货币、时区等）能列出多少种值",
+    "idstr": "navigator 的身份性字符串：vendor、productSub 与插件名单（不含 UA）",
+    "kbd": "键盘布局：navigator.keyboard.getLayoutMap 的按键映射结果",
+    "kex": "TLS 密钥交换组与 SNI 是否明文（来自 trace，不是本地推断）",
+    "keys": "引擎接口数：可枚举全局、自有属性名、HTMLElement.prototype、CSS 命名空间与计算样式属性数（五种范围各归各）",
+    "lan": "局域网地址：WebRTC ICE 候选里的私网地址",
+    "langs": "navigator.languages 的前若干项，第一项当主语言",
+    "lies": "本页与同源空 iframe 的跨上下文对照：原生函数字符串、自有 prototype、陌生 this 的 getter 证据",
+    "locale": "Intl 解析出的区域设置（resolvedOptions().locale）",
+    "mathfp": "一组数学函数（三角函数、幂运算等）逐项输出结果的指纹摘要，用来分辨引擎的数值实现",
+    "media": "摄像头与麦克风的设备枚举结果（需要权限才列得出设备名）",
+    "mem": "内存档位（navigator.deviceMemory，浏览器给的近似值）",
+    "model": "设备型号：Android 用代码名查表得市场名，Apple 只给带置信度的候选，不编唯一结论",
+    "motion": "减少动画偏好（prefers-reduced-motion）",
+    "os": "操作系统名与版本：UA 与高熵平台版本交叉，缩减 UA 里的 \"Android 10\" 不当真实版本",
+    "pdf": "内置 PDF 阅读器是否可用（navigator.pdfViewerEnabled）",
+    "perms": "21 个权限名逐个 query() 的结果与计数：不合法名字、超时、异常各自分开记",
+    "proto": "本次连接的应用层协议与 TLS 版本（来自 trace）",
+    "rand": "同一段 canvas 绘制跑两遍是否一致，外加一枚随机值，用来识别加噪保护",
+    "recmime": "MediaRecorder 支持的录制容器与编码格式",
+    "rtccodecs": "WebRTC 可用的音视频编解码器（RTCRtpSender.getCapabilities）",
+    "scheme": "深浅色偏好（prefers-color-scheme）",
+    "screen": "主屏的 CSS 尺寸、可用区、设备像素比与色深",
+    "screens": "显示器数量结论：只有 isExtended 是布尔值时才给 n／ext，否则整项记缺失标记（不下\"单屏\"结论）",
+    "scrollbar": "滚动条宽度（离屏 div 的 offsetWidth 与 clientWidth 之差）",
+    "sensors": "运动与方向传感器读数；需要访客授权，未参与本轮就记 not_run",
+    "shield": "反指纹保护的四维弱证据（canvas 稳定性、数学稳定性、原生字符串完整性、隐私浏览器特征）与判定",
+    "smooth": "字体平滑方式：canvas 灰度／彩色像素比推断是否做次像素抗锯齿",
+    "stack": "IPv4 / IPv6 双栈可达性：分别打 v4-only 与 v6-only 目标",
+    "storage": "存储配额（navigator.storage.estimate 的 quota／usage）",
+    "svgrect": "SVG 文字的 getBBox 与 getComputedTextLength 等排版读数",
+    "sysui": "系统字号与强调色等界面读数（隔离容器里读计算样式）",
+    "textm": "3 个字体族 × 3 个字符串的 measureText 宽度与包围盒，附族间平均宽之差",
+    "timer": "计时精度：分辨率、当前时刻、样本数，以及连续读数的最小／最大正间隔与抖动",
+    "touch": "触控与指针能力：触点数、pointer／hover 媒体查询结果与 PointerEvent 存在性",
+    "traces": "存储留痕：六种存储各写一次并立刻读回核验，附跨访问留下的 kept／lost／blocked",
+    "trackers": "追踪拦截实测：第三方请求被拦的对照结果（慢车道）",
+    "tz": "Intl.DateTimeFormat 解析出的系统时区名（不是 IP 归属地时区，后者在 tzip）",
+    "v6mac": "IPv6 泄露的网卡 MAC：ICE 候选里的链路本地硬件地址",
+    "voices": "朗读语音：真实总数、这一份实际带出的条数与名单，以及是否被裁剪",
+    "warp": "Cloudflare WARP 状态与网关（来自 trace）",
+    "wasm": "17 项 WebAssembly 特性的逐项真值、每一项的判法来源，以及 control 基线",
+    "webdriver": "navigator.webdriver 是否为真：自动化提示，只作线索不改评分",
+    "webgl": "WebGL 厂商与渲染器字符串，以及支持的扩展数量",
+    "webgpu": "WebGPU 适配器描述与偏好（arch／architecture 等来自 adapter info）",
+    "webrtc": "WebRTC ICE 候选汇总（本地与公网候选地址）",
+    "week": "日历周设置：一周起始日、周末是星期几与最少天数",
+    "win": "窗口内外尺寸，以及窗口在屏幕上的位置（screenX／screenY、可用区左上角）",
+    "worker": "在 Worker 里复算 navigator 的五项读数，并逐项与主线程比对是否一致",
+    "xr": "VR／AR 能力：navigator.xr.isSessionSupported 的结果",
+    "tcpfp": "探针抓到的 TCP/IP 指纹；抓不了包时是单键缺失标记，原因在 tcp_reason（不进标记里）",
+    "tlsfp": "探针抓到的 TLS 指纹（ja3n，老探针给 ja3）",
+    "ja4": "探针抓到的 JA4 TLS 指纹（由服务端直连连接算出）",
+    "h2fp": "探针抓到的 HTTP/2 帧序列指纹",
+    "quicfp": "H3 补测样本的 JA4；缺这个键时**必须**看 meta.h3.state 才知道是没升级还是没测到",
+    "tcp_reason": "抓包失败的原因码（旁路元数据）：只在 tcpfp 是缺失标记时出现，不参与 127 项计数",
+    "etag.url": "被缓存的那个请求 URL（固定为 ETAG_URL，不含任何查询串）：读的人可直接核对缓存键里没有访问号",
+    "etag.first_pass": "第一次请求就带回了此前签发的令牌（服务端在首响头里认出来的），这才是跨访问复访证据",
+    "etag.round_trip": "同一轮里第二次请求被认作条件请求：只说明本轮缓存能带令牌，不等于上次访问留下过缓存",
+    "etag.id_sent": "这一轮有没有把访问号交给服务端；访问号只做记录关联（把同一次访问的多封信封串起来）",
+    "etag.sid_sent": "这一轮有没有把会话号交给服务端；会话号是跨访问判定的输入，没交时服务端只能说不知道",
+    "etag.report.cross_visit": "服务端按\"两次不同会话（sid）用过同一个令牌\"给的跨访问结论；false／null 都不许说成\"缓存认出了这台浏览器\"",
+    "etag.report.cross_visit_evidence": "上面那个结论的证据级别：distinct-session／single-session／no-session-id（老采集器没交会话号，宁可说不知道）",
+    "etag.report.visit_ids": "用过这个令牌的访问号个数：含同一次页面访问的半份 + 完整两封信封，只做记录关联，不构成跨访问证据",
+    "worker.ok": "Worker 是否真的跑起来并回了消息（false 时其余读数没有意义）",
+    "worker.uaSame": "主线程与 Worker 里的 navigator.userAgent 是否同一串（null = 有一边没读到，不许当一致）",
+    "worker.langsSame": "主线程与 Worker 里的 navigator.languages 是否一致（三态：true／false／null）",
+    "worker.platformSame": "主线程与 Worker 里的 navigator.platform 是否一致（三态）",
+    "worker.tzSame": "主线程与 Worker 里 Intl 解析出的时区是否一致（三态）",
+    "worker.main": "主线程侧的原始读数（languages／platform／timeZone），供逐项对照",
+    "worker.worker": "Worker 侧的原始读数，与主线程那一份并列保留",
+    "worker.basis": "这一份一致性的比对口径标记（当前固定 worker-vs-main）",
+    "screens.n": "显示器数量；只有 isExtended 为 true 时允许为 null（知道不止一块但数不出来）",
+    "screens.ext": "是否不止一块显示器（isExtended 的布尔值直接转写）",
+    "screens.basis": "这一份屏幕数量结论的依据（isExtended 表示来自该属性，不是猜的）",
+    "win.sx": "窗口左上角的 screenX；只有有限数值才写，读不到就没有这个键",
+    "win.sy": "窗口左上角的 screenY；只有有限数值才写",
+    "win.al": "屏幕可用区左上角的 availLeft（部分浏览器才给）",
+    "win.at": "屏幕可用区左上角的 availTop（部分浏览器才给）",
+    "extwar.targets": "扫描目标有限表：每项给扩展名、id、资源路径、版本与验证日期（没验证过的写 null）",
+    "extwar.matched": "HTTP 2xx 才算命中；status 0 与 opaque 不算命中",
+    "extwar.hits": "命中的扩展名数组（未命中 ≠ 未安装，文案不许由它推出结论）",
+    "timer.minPositiveMs": "连续两次读数里最小的正间隔（没有正间隔时为 null，不写假的 0）",
+    "timer.maxPositiveMs": "连续两次读数里最大的正间隔（有分辨率下限的设备上通常等于分辨率）",
+    "timer.jitter": "兼容字段，数值等于 maxPositiveMs（旧注释说最大值、旧代码取最小值的那处已改）",
+    "voices.total": "getVoices() 的真实条数，裁剪不改它",
+    "voices.shown": "这一份信封实际带出去的条数，等于 list.length",
+    "voices.cut": "只有在 shown < total 时才为 true（余量充足时一条都不裁）",
+    "voices.list": "带出去的语音条目：name／lang／localService／default",
+    "voices.source": "名单来源（speechSynthesis.getVoices 或老形状被包装时的 array）",
+    "form.formFactors": "高熵 Sec-CH-UA-Form-Factors 的原始数组（降级到 UA 判定时为空）",
+    "model.raw": "高熵 model 的原始代码名（表里没有也照留，不猜市场名）",
+    "model.decoded": "查表得到的市场名；表外或 Apple 候选情形为 null",
+    "model.candidates": "Apple 的候选机型：name／confidence（排序分，封顶 0.8）／basis",
+    "model.entrySource": "命中项在有限表里的来源（aosp-pixel、aosp-nexus、samsung-model-code）",
+    "gpulim.limits": "适配器 limits 里的标量字段（数值／布尔），键序按字典序",
+    "gpulim.adapter": "两个 powerPreference 各请求一次的适配器读数（与 webgpu 那一项共享同一次 requestAdapter）",
+    "gpulim.features": "适配器支持的全部 feature 名称",
+    "gpulim.webglFallback": "WebGL 侧的兜底读数，单独一块，禁止与 WebGPU limits 合并",
+    "glx.shaderPrecision": "getShaderPrecisionFormat 的顶点／片元高精度读数；读不出为 null，不写 0",
+    "glx.extNames": "扩展全名清单（ext 仍是数量，供老消费者）",
+    "bio.capabilities": "getClientCapabilities 逐项真值：只写浏览器真的给了的键，不补齐、不默认 false",
+    "gamepad.atLoad": "加载时读到的个数（Firefox 在手势前可能恒为 0）",
+    "gamepad.afterInput": "真实输入（pointerdown／keydown／touchstart）之后重读的个数；没等到输入为 null",
+    "gamepad.needsInteraction": "true 表示这一轮没等到输入，不等于没有手柄",
+    "gamepad.windowMs": "观测窗口长度；hasBeenActive 为真时是 0（不等待）",
+    "perms.items": "21 个权限名逐个 query() 的结果（granted／denied／prompt／unsupported／unsupported-name／error）",
+    "perms.counts": "上面结果的计数汇总，total 是名单长度",
+    "apis.pressure": "ComputePressure 接口是否存在（只看存在性，不调用）",
+    "apis.localFonts": "queryLocalFonts 是否存在（真正的本地字体清单需要访客授权，这里不调用）",
+    "apis.screenDetails": "getScreenDetails 是否存在（详细多屏枚举要授权）",
+    "apis.aiBasis": "内置 AI 相关字段的判法（presence-only 表示只看接口存在）",
+    "apis.digitalCredentialsBasis": "DigitalCredential 的判法标记",
+    "auto.signals": "命中的自动化痕迹名字清单（空插件列表本身不算证据）",
+    "auto.combos": "同时成立的组合弱信号（如 webdriver+empty-plugins）",
+    "auto.level": "分级：none（无信号）／weak（只有单条弱信号）／strong（webdriver 或驱动全局名等强痕迹）",
+    "agent.input": "本轮观测窗口内的输入事件计数、isTrusted 统计与真实窗口长度",
+    "agent.uaCh": "UA 与高熵品牌是否自相矛盾这一维度（挪进来的既有读数，字段不变）",
+    "agent.level": "判定：insufficient-observation（没观测到输入，不判自动化）／trusted-input／untrusted-input",
+    "agent.waitMs": "这一项愿意等多久（不是实际等到的窗口长度）",
+    "adblock.bait": "诱饵元素是否被隐藏（只看 cosmetic 过滤那一路）",
+    "adblock.adUrl": "广告 URL 的 no-cors 请求结果与耗时（opaque 证明不了状态码）",
+    "adblock.control": "同源对照 URL 的结果：对照取不到时整项 verdict 只能是 unknown",
+    "adblock.basis": "这一份判定依据（如 ad-url-unreachable、control-<state>）",
+    "traces.items": "六种存储各自的写入与读回结果（state 六态见 markers／附录 J.13）",
+    "traces.kept": "跨访问语义：上一轮留下的标记这一轮还读得到才算 kept",
+    "traces.lost": "写进去却没读回来、或读回值对不上的存储名清单",
+    "traces.blocked": "写入当场抛错的存储名清单（写失败直接记 blocked，不等下一次访问推断）",
+    "traces.first": "true 表示本轮没有任何旧标记（第一次来）",
+    "wasm.items": "17 项特性逐项的 {ok, source}；source 写明靠 validate 还是只看 API 存在性",
+    "wasm.has": "引擎接受的特性清单（与 missing 并起来恰好是全部 17 项，unreadable 的项不在其中）",
+    "wasm.missing": "引擎 validate 拒绝的特性清单（与 has 互补）",
+    "wasm.unreadable": "validate 当场抛错的特性（此时 ok 为 false，且不进 has／missing）",
+    "wasm.sources": "两种判法各判了几项，用来核对清单没被悄悄换掉",
+    "wasm.control": "空模块能否通过 validate：为 valid 才说明 validate 这条路本身可信",
+    "engver.declared": "UA／高熵品牌自报的版本（能被改写），与特性区间分属两层，不许互相顶替",
+    "engver.floor_chromium": "已支持特性里最高的最低版本，即\"至少这么新\"",
+    "engver.ceiling_chromium": "未支持特性里最低的版本减一，即\"至多这么新\"；全支持时为 null",
+    "engver.floor_year": "下限版本（floor_chromium）那一档对应的发布年份",
+    "engver.ceiling_year": "上限版本档对应的年份（落在两档之间时取不高于它的最近一档）",
+    "engver.items": "11 条特性逐项的 {ok, min, year}",
+    "lies.items": "本页与 iframe 两侧的 native code 判定、是否同一串、是否有自有 prototype",
+    "lies.getters": "把 Object.create(原型) 当 this 调 getter 的结果（原生访问器拒绝陌生 this）",
+    "lies.readings": "本页 vs iframe 的 8 项读数对照；拿不到同源窗口时为空",
+    "lies.list": "可疑项清单（老消费者按数组读它，键名与语义不变）",
+    "cssv.items": "14 条特性逐项的 supported（三态）与首用版本／年份",
+    "cssv.newest": "只由已支持特性算出的最新特性名，不是清单里的最大值",
+    "domrect.items": "四种变换（rotate／scale／skew／matrix3d）各一组的盒子与 rects 条数",
+    "domrect.ranges": "Range 选中中文与 emoji 文本后的盒子与条数；没有 createRange 时为缺失标记",
+    "svgrect.box": "SVG 文字 getBBox 的盒子读数（x／y／宽／高）",
+    "svgrect.textLength": "getComputedTextLength 的排版宽度（与 canvas 的 measureText 不是一回事）",
+    "textm.fonts": "各族平均宽度与样本数（单个绝对值跨机器不可比）",
+    "textm.diff": "第一个族与最后一个族的平均宽之差（族间差分才分得开系统）",
+    "glimg.side": "实际采样边长（上限不足时退到 32／16，如实记下）",
+    "glimg.nonzero": "非零字节数（非恒定图案应接近满值）",
+    "keys.items": "五项计数的范围说明：可枚举全局、自有属性名、HTMLElement.prototype、CSS 接口数、计算样式属性数",
+    "keys.window": "可枚举全局计数（含站点脚本自己加的键），与自有属性名不可互换",
+    "keys.html": "HTMLElement.prototype 的可枚举子集（旧字段，语义未变）",
+    "keys.css": "getComputedStyle(div).length，即计算样式属性条数（不是 CSS 接口数）",
+    "audio.checks": "物理量交叉核对逐项结果：{name, expected, actual, ok}",
+    "audio.mismatches": "不一致项的名字清单；不一致只是弱证据，不等于伪装",
+    "shield.verdict": "四态判定：likely-privacy-browser／canvas-noise／clean／unknown",
+    "shield.basis": "判定依据；canvas_unmeasured 表示没画成，绝不当成\"没有噪声\"",
+    "shield.canvasStable": "同一段绘制跑两遍是否一致（与 rand.same 说的是同一件事）",
+    "shield.nativeToStringIntact": "原生函数字符串是否还完整（被改过就轮不到 clean）",
+    "ch.jsLow": "浏览器 JS 侧读到的低熵 Client Hints（brands／mobile／platform）",
+    "ch.jsHigh": "浏览器 JS 侧读到的高熵 Client Hints（model、platformVersion、formFactors 等）",
+    "ch.srv": "服务器实际收到的 sec-ch-ua* 回显头",
+    "stack.v4": "IPv4-only 目标的可达性读数",
+    "stack.v6": "IPv6-only 目标的可达性读数",
+    "stack.dual": "两侧都可达时的双栈结论（读不全时为 null，不当成单栈）",
+    "clock.offset_min": "本地时区相对 UTC 的偏移分钟数",
+    "clock.off": "本地时制与偏移的合并读数（小时口径）",
+    "dnt.dnt": "DNT 头的原值（没有这个头就是 null，不是 false）",
+    "dnt.gpc": "Sec-GPC 是否开启（布尔）",
+    "screen.w": "主屏 CSS 宽度像素（screen.width，不是窗口宽度）",
+    "screen.dpr": "主屏设备像素比（CSS 像素到物理像素的倍率）",
+    "meta.h3.state": "H3 补测的结论态：h3-first／upgraded／tcp-only／udp-blocked／timeout／proto-unknown",
+    "meta.h3.first_proto": "首跳 /fp 报的协议（补测不覆盖它）",
+    "meta.h3.ja4": "拿到 H3 样本时它的 JA4（与 cli.quicfp 同值）",
+    "meta.h3.budget_exhausted": "补测途中预算用完（说明没跑满上限，\"没升级\"这个结论不成立）",
+    "meta.h3.note": "给人看的中文短句：只解释这一项发生了什么，不做结论外推"
+  },
+  "samples": [
+    {
+      "name": "normal",
+      "kind": "normal",
+      "note": "普通一次上报：完整 cli（不配探针时 109 键），meta.partial=false",
+      "envelope": {
+        "v": 1,
+        "id": "018f2c6e-6a1b-7c3d-9e4f-5a6b7c8d9e0f",
+        "ts": "2026-11-13T08:00:00.940+08:00",
+        "session": "a1b2c3d4e5",
+        "page": {
+          "lang": "zh-CN",
+          "nav": "navigate",
+          "path": "/post/x.html",
+          "ref": "",
+          "title": "测试页"
+        },
+        "cli": {
+          "a11y": {
+            "contrast": "no-preference",
+            "forced": false
+          },
+          "adblock": {
+            "adUrl": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+            },
+            "alg": "adblock/2",
+            "bait": {
+              "hidden": false,
+              "waitMs": 120
+            },
+            "basis": "control-unsupported",
+            "control": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://blue-radish.github.io/static/radish-collect.js"
+            },
+            "deadlineMs": 800,
+            "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
+            "verdict": "unknown"
+          },
+          "agent": {
+            "alg": "agent/2",
+            "basis": "observation-window-expired",
+            "input": {
+              "keydown": 0,
+              "mousemove": 0,
+              "pointerdown": 0,
+              "total": 0,
+              "touchstart": 0,
+              "trustedAll": null,
+              "untrusted": 0,
+              "windowMs": 0
+            },
+            "level": "insufficient-observation",
+            "uaCh": {
+              "alg": "ua-ch-brand-consistency",
+              "basis": "ua-ch-vs-ua",
+              "consistent": null,
+              "kind": "unknown"
+            },
+            "userActivation": false,
+            "waitMs": 0
+          },
+          "ai": {
+            "$": "unsupported"
+          },
+          "apis": {
+            "aiBasis": "presence-only",
+            "alg": "apis/2",
+            "bluetooth": false,
+            "clipboard": false,
+            "contacts": false,
+            "contactsManager": false,
+            "credentials": false,
+            "digitalCredential": false,
+            "digitalCredentialsBasis": "constructor-presence",
+            "eyeDropper": false,
+            "fedcm": false,
+            "filePicker": false,
+            "gpu": false,
+            "hid": false,
+            "idle": false,
+            "idleDetector": false,
+            "languageModel": false,
+            "localFonts": false,
+            "midi": false,
+            "nfc": false,
+            "presentation": false,
+            "pressure": false,
+            "screenDetails": false,
+            "serial": false,
+            "serialBasis": null,
+            "serviceWorker": false,
+            "share": false,
+            "storage": false,
+            "translator": false,
+            "usb": false,
+            "wakeLock": false,
+            "webTransport": false
+          },
+          "arch": "x86/64",
+          "audio": {
+            "$": "unsupported"
+          },
+          "audiohw": {
+            "$": "unsupported"
+          },
+          "auto": {
+            "alg": "auto/2",
+            "comboCount": 0,
+            "combos": [],
+            "level": "strong",
+            "note": "空插件列表本身不是证据：安卓 Chrome、iOS 浏览器、关掉内置 PDF 的桌面 Chrome 都能合法返回 0 个插件",
+            "signals": [
+              "node-buffer",
+              "plugins-empty-pdf-conflict"
+            ]
+          },
+          "battery": {
+            "$": "unsupported"
+          },
+          "bio": {
+            "$": "unsupported"
+          },
+          "browser": "Chrome 141",
+          "bt": {
+            "$": "unsupported"
+          },
+          "callstack": {
+            "depth": 12000,
+            "limit": 30000,
+            "truncated": false
+          },
+          "canvas": {
+            "$": "unsupported"
+          },
+          "ch": {
+            "alg": "ch/srv-only",
+            "srv": {
+              "sec-ch-ua": "\"Chromium\";v=\"141\"",
+              "sec-ch-ua-platform": "\"Windows\""
+            }
+          },
+          "clock": {
+            "off": 8,
+            "offset_min": -480,
+            "rtt_ms": null,
+            "skew_h": 0,
+            "skew_s": 0
+          },
+          "codecs": {
+            "$": "unsupported"
+          },
+          "conn": {
+            "$": "unsupported"
+          },
+          "cookies": true,
+          "cpu": 8,
+          "cssv": {
+            "$": "unsupported"
+          },
+          "display": {
+            "$": "unreadable"
+          },
+          "dns": {
+            "$": "unreadable"
+          },
+          "dnt": {
+            "dnt": null,
+            "gpc": false
+          },
+          "domrect": {
+            "alg": "domrect/2",
+            "h": "sha256:<redacted>",
+            "items": {
+              "matrix3d": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "rotate": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "scale": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "skew": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              }
+            },
+            "ranges": {
+              "$": "unsupported"
+            },
+            "scope": "absolute off-screen, 137.5x43.25 + 2.5px padding + 1px border, 四种 transform 各一组"
+          },
+          "drm": {
+            "$": "unsupported"
+          },
+          "edge": "LAX",
+          "emoji": {
+            "$": "unsupported"
+          },
+          "engine": {
+            "basis": "error-message+ua",
+            "js": "v8",
+            "render": "Blink"
+          },
+          "engver": {
+            "alg": "feature-floor/2",
+            "basis": "feature-min-chromium+ceiling-from-missing",
+            "ceiling_chromium": 97,
+            "ceiling_year": 2022,
+            "declared": "141",
+            "floor_chromium": 122,
+            "floor_year": 2024,
+            "items": {
+              "duration-format": {
+                "min": 129,
+                "ok": false,
+                "year": 2024
+              },
+              "error-iserror": {
+                "min": 134,
+                "ok": false,
+                "year": 2025
+              },
+              "findLast": {
+                "min": 97,
+                "ok": true,
+                "year": 2022
+              },
+              "float16array": {
+                "min": 135,
+                "ok": false,
+                "year": 2025
+              },
+              "fromAsync": {
+                "min": 121,
+                "ok": true,
+                "year": 2024
+              },
+              "groupBy": {
+                "min": 117,
+                "ok": true,
+                "year": 2023
+              },
+              "promise-try": {
+                "min": 128,
+                "ok": false,
+                "year": 2024
+              },
+              "regexp-escape": {
+                "min": 136,
+                "ok": false,
+                "year": 2025
+              },
+              "set-union": {
+                "min": 122,
+                "ok": true,
+                "year": 2024
+              },
+              "structuredClone": {
+                "min": 98,
+                "ok": false,
+                "year": 2022
+              },
+              "withResolvers": {
+                "min": 119,
+                "ok": true,
+                "year": 2023
+              }
+            },
+            "newest": "set-union",
+            "supported": 5,
+            "total": 11
+          },
+          "etag": {
+            "$": "unsupported"
+          },
+          "ex_cf": {
+            "$": "unreadable"
+          },
+          "ex_claude": {
+            "$": "unreadable"
+          },
+          "ex_cn": {
+            "$": "unreadable"
+          },
+          "ex_gpt": {
+            "$": "unreadable"
+          },
+          "ex_intl": {
+            "$": "unreadable"
+          },
+          "ext": [],
+          "extwar": {
+            "$": "unsupported"
+          },
+          "fmt": "2024/1/2|1,234,567.891|1,234.5",
+          "fontfp": {
+            "$": "unsupported"
+          },
+          "fonts": {
+            "$": "unsupported"
+          },
+          "form": {
+            "basis": "ua-mobile",
+            "formFactors": [],
+            "kind": "Desktop",
+            "source": "navigator.userAgent"
+          },
+          "fpid": "sha256:<redacted>",
+          "fpid_alg": "fnv/tmpl-2-fallback",
+          "gamepad": {
+            "$": "unsupported"
+          },
+          "gamut": {
+            "dynamic": "standard",
+            "gamut": "srgb"
+          },
+          "geoloc": {
+            "$": "not_run"
+          },
+          "glimg": {
+            "$": "unsupported"
+          },
+          "glx": {
+            "$": "unsupported"
+          },
+          "gpu": {
+            "$": "unsupported"
+          },
+          "gpulim": {
+            "$": "unsupported"
+          },
+          "heap": {
+            "$": "unsupported"
+          },
+          "history": 3,
+          "hour": {
+            "cycle": "h23",
+            "h12": false
+          },
+          "hwdec": {
+            "$": "unsupported"
+          },
+          "hwid": "sha256:<redacted>",
+          "hwid_alg": "fnv/hw-2-fallback",
+          "hz": 60,
+          "icu": {
+            "alg": "supported-values-of",
+            "calendar": 18,
+            "collation": 12,
+            "currency": 162,
+            "numberingSystem": 77,
+            "segmenter": true,
+            "timeZone": 418,
+            "unit": 45
+          },
+          "idstr": {
+            "plugins": [],
+            "productSub": "20030107",
+            "vendor": "Google Inc."
+          },
+          "kbd": {
+            "$": "unsupported"
+          },
+          "kex": {
+            "group": "X25519MLKEM768",
+            "sni": "plaintext",
+            "src": "trace"
+          },
+          "keys": {
+            "alg": "keys/2",
+            "css": 320,
+            "html": null,
+            "items": {
+              "CSS": {
+                "how": "Object.getOwnPropertyNames(CSS)",
+                "n": null,
+                "note": "CSS 命名空间对象（supports/escape/…），不是 CSS 属性条数"
+              },
+              "HTMLElement.prototype": {
+                "how": "Object.getOwnPropertyNames(HTMLElement.prototype)",
+                "n": null,
+                "note": "元素接口的方法与访问器；旧 html 字段是可枚举子集"
+              },
+              "computed-style-properties": {
+                "how": "getComputedStyle(div).length",
+                "n": 320,
+                "note": "旧 css 字段就是这一项"
+              },
+              "enumerable-globals": {
+                "how": "Object.keys(window)",
+                "n": 42,
+                "note": "含站点脚本自己加的键，风格线索不是版本读数"
+              },
+              "own-property-names": {
+                "how": "Object.getOwnPropertyNames(window)",
+                "n": 103,
+                "note": "含不可枚举的内建接口（WebGL2RenderingContext 之类），与可枚举计数不可互换"
+              }
+            },
+            "scope": "globals-enumerable",
+            "window": 42
+          },
+          "lan": {
+            "$": "unsupported"
+          },
+          "langs": [
+            "zh-CN",
+            "zh"
+          ],
+          "lies": {
+            "alg": "lies/2",
+            "basis": "native-code+own-prototype+stranger-getter; page vs clean iframe",
+            "ctx": "unsupported",
+            "getters": [
+              {
+                "k": "navigator.userAgent",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.platform",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.languages",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.hardwareConcurrency",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.deviceMemory",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.webdriver",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.plugins",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.vendor",
+                "state": "absent"
+              }
+            ],
+            "items": [
+              {
+                "frame": null,
+                "k": "Function.prototype.toString",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "setTimeout",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Date.prototype.getTimezoneOffset",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Math.random",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "toString.toString",
+                "page": true,
+                "proto": null,
+                "same": null
+              }
+            ],
+            "list": [
+              "setTimeout",
+              "setTimeout:own-prototype",
+              "Date.prototype.getTimezoneOffset",
+              "Date.prototype.getTimezoneOffset:own-prototype",
+              "plugins-empty-pdf-conflict",
+              "languages-missing"
+            ],
+            "n": 5,
+            "readings": [],
+            "scope": "只有本页（iframe 不可用，跨上下文部分记 unsupported）",
+            "why": "no-contentWindow"
+          },
+          "locale": "zh-CN",
+          "mathfp": {
+            "alg": "mathfp-2",
+            "cases": 18,
+            "h": "sha256:<redacted>"
+          },
+          "media": {
+            "$": "unsupported"
+          },
+          "mem": 8,
+          "model": {
+            "$": "unsupported"
+          },
+          "motion": "no-preference",
+          "os": "Windows",
+          "pdf": true,
+          "perms": {
+            "$": "unsupported"
+          },
+          "proto": {
+            "http": "HTTP/2",
+            "tls": "TLSv1.3"
+          },
+          "rand": {
+            "$": "unreadable"
+          },
+          "recmime": {
+            "$": "unsupported"
+          },
+          "rtccodecs": {
+            "$": "unsupported"
+          },
+          "scheme": "light",
+          "screen": {
+            "ah": 1040,
+            "aw": 1920,
+            "depth": 24,
+            "dpr": 1.25,
+            "h": 1080,
+            "w": 1920
+          },
+          "screens": {
+            "basis": "isExtended",
+            "ext": false,
+            "n": 1
+          },
+          "scrollbar": 15,
+          "sensors": {
+            "$": "not_run"
+          },
+          "shield": {
+            "alg": "shield/2",
+            "basis": "canvas_unmeasured",
+            "brave": false,
+            "canvasStable": null,
+            "mathStable": true,
+            "nativeToStringIntact": false,
+            "noise": null,
+            "note": "弱证据汇总，不判断是否伪装；canvasStable=null 表示两次绘制没做成（不能当成\"没有噪声\"）",
+            "verdict": "unknown"
+          },
+          "smooth": {
+            "$": "unsupported"
+          },
+          "stack": {
+            "dual": null,
+            "v4": {
+              "ok": false,
+              "state": "unreadable"
+            },
+            "v6": {
+              "ok": false,
+              "state": "unreadable"
+            }
+          },
+          "storage": {
+            "$": "unsupported"
+          },
+          "svgrect": {
+            "alg": "svgrect/2",
+            "box": {
+              "h": 4.5,
+              "w": 3.5,
+              "x": 1.5,
+              "y": 2.5
+            },
+            "chars": null,
+            "h": "sha256:<redacted>",
+            "scope": "off-screen zero-size wrapper; fontSize 13.5; 同一段文字一次取全",
+            "subLength": null,
+            "textLength": null,
+            "viewport": {
+              "h": 43.25,
+              "w": 137.5
+            }
+          },
+          "sysui": {
+            "accent": "rgb(0, 0, 0)",
+            "alg": "isolated-medium",
+            "background": null,
+            "color": null,
+            "fontSize": 16
+          },
+          "textm": {
+            "$": "unsupported"
+          },
+          "timer": {
+            "jitter": 0.5,
+            "maxPositiveMs": 0.5,
+            "minPositiveMs": 0.5,
+            "now": 1234.5,
+            "res": 0.5,
+            "samples": 64
+          },
+          "touch": {
+            "anyHover": false,
+            "anyPointer": null,
+            "hover": false,
+            "pointer": null,
+            "pointerEvents": false,
+            "points": 0
+          },
+          "traces": {
+            "alg": "storage-tag/2",
+            "blocked": [],
+            "first": true,
+            "items": {
+              "cacheStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "cookie": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "indexDB": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "localStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "sessionStorage": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              },
+              "windowName": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              }
+            },
+            "kept": [],
+            "lost": [],
+            "scope": "write-readback-per-store",
+            "ttl_days": 30
+          },
+          "trackers": {
+            "$": "unsupported"
+          },
+          "tz": "Asia/Shanghai",
+          "v6mac": {
+            "$": "unsupported"
+          },
+          "voices": {
+            "$": "unsupported"
+          },
+          "warp": {
+            "gateway": null,
+            "src": "trace",
+            "state": "off"
+          },
+          "wasm": {
+            "alg": "wasm/2",
+            "control": "valid",
+            "has": [
+              "simd",
+              "threads",
+              "exceptions",
+              "tail-call",
+              "reference-types",
+              "bulk-memory",
+              "multi-value",
+              "mutable-globals",
+              "sign-ext",
+              "sat-float-int",
+              "extended-const",
+              "relaxed-simd",
+              "gc",
+              "memory64",
+              "multi-memory"
+            ],
+            "items": {
+              "bulk-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "exceptions": {
+                "ok": true,
+                "source": "validate"
+              },
+              "extended-const": {
+                "ok": true,
+                "source": "validate"
+              },
+              "gc": {
+                "ok": true,
+                "source": "validate"
+              },
+              "jspi": {
+                "ok": false,
+                "source": "api-existence"
+              },
+              "memory64": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-value": {
+                "ok": true,
+                "source": "validate"
+              },
+              "mutable-globals": {
+                "ok": true,
+                "source": "validate"
+              },
+              "reference-types": {
+                "ok": true,
+                "source": "validate"
+              },
+              "relaxed-simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sat-float-int": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sign-ext": {
+                "ok": true,
+                "source": "validate"
+              },
+              "simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "tail-call": {
+                "ok": true,
+                "source": "validate"
+              },
+              "threads": {
+                "ok": true,
+                "source": "validate"
+              },
+              "wide-arithmetic": {
+                "ok": false,
+                "source": "validate"
+              }
+            },
+            "missing": [
+              "wide-arithmetic",
+              "jspi"
+            ],
+            "sources": {
+              "api-existence": 1,
+              "validate": 16
+            },
+            "src": "wasm-feature-detect-1.10.0",
+            "supported": 15,
+            "total": 17,
+            "unreadable": []
+          },
+          "webdriver": false,
+          "webgl": {
+            "$": "unsupported"
+          },
+          "webgpu": {
+            "$": "unsupported"
+          },
+          "webrtc": {
+            "$": "unsupported"
+          },
+          "week": {
+            "firstDay": 1,
+            "minDays": 1,
+            "weekend": [
+              6,
+              7
+            ]
+          },
+          "win": {
+            "ih": 1040,
+            "iw": 1920,
+            "oh": 1080,
+            "ow": 1920
+          },
+          "worker": {
+            "$": "unsupported"
+          },
+          "xr": {
+            "$": "unsupported"
+          }
+        },
+        "meta": {
+          "dur_ms": 940,
+          "stuck": [],
+          "truncated": [],
+          "partial": false,
+          "privacy": {
+            "dnt": false,
+            "gpc": false,
+            "optout": false
+          },
+          "collector": "radish-2.0.0",
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+        }
+      }
+    },
+    {
+      "name": "partial",
+      "kind": "partial",
+      "note": "离页半份：慢车道 ai/dns/etag/quicfp/trackers 还没有键，meta.partial=true",
+      "envelope": {
+        "v": 1,
+        "id": "018f2c6e-6a1b-7c3d-9e4f-5a6b7c8d9e0f",
+        "ts": "2026-11-13T08:00:00.940+08:00",
+        "session": "a1b2c3d4e5",
+        "page": {
+          "lang": "zh-CN",
+          "nav": "navigate",
+          "path": "/post/x.html",
+          "ref": "",
+          "title": "测试页"
+        },
+        "cli": {
+          "a11y": {
+            "contrast": "no-preference",
+            "forced": false
+          },
+          "adblock": {
+            "adUrl": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+            },
+            "alg": "adblock/2",
+            "bait": {
+              "hidden": false,
+              "waitMs": 120
+            },
+            "basis": "control-unsupported",
+            "control": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://blue-radish.github.io/static/radish-collect.js"
+            },
+            "deadlineMs": 800,
+            "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
+            "verdict": "unknown"
+          },
+          "agent": {
+            "alg": "agent/2",
+            "basis": "observation-window-expired",
+            "input": {
+              "keydown": 0,
+              "mousemove": 0,
+              "pointerdown": 0,
+              "total": 0,
+              "touchstart": 0,
+              "trustedAll": null,
+              "untrusted": 0,
+              "windowMs": 0
+            },
+            "level": "insufficient-observation",
+            "uaCh": {
+              "alg": "ua-ch-brand-consistency",
+              "basis": "ua-ch-vs-ua",
+              "consistent": null,
+              "kind": "unknown"
+            },
+            "userActivation": false,
+            "waitMs": 0
+          },
+          "apis": {
+            "aiBasis": "presence-only",
+            "alg": "apis/2",
+            "bluetooth": false,
+            "clipboard": false,
+            "contacts": false,
+            "contactsManager": false,
+            "credentials": false,
+            "digitalCredential": false,
+            "digitalCredentialsBasis": "constructor-presence",
+            "eyeDropper": false,
+            "fedcm": false,
+            "filePicker": false,
+            "gpu": false,
+            "hid": false,
+            "idle": false,
+            "idleDetector": false,
+            "languageModel": false,
+            "localFonts": false,
+            "midi": false,
+            "nfc": false,
+            "presentation": false,
+            "pressure": false,
+            "screenDetails": false,
+            "serial": false,
+            "serialBasis": null,
+            "serviceWorker": false,
+            "share": false,
+            "storage": false,
+            "translator": false,
+            "usb": false,
+            "wakeLock": false,
+            "webTransport": false
+          },
+          "arch": "x86/64",
+          "audio": {
+            "$": "unsupported"
+          },
+          "audiohw": {
+            "$": "unsupported"
+          },
+          "auto": {
+            "alg": "auto/2",
+            "comboCount": 0,
+            "combos": [],
+            "level": "strong",
+            "note": "空插件列表本身不是证据：安卓 Chrome、iOS 浏览器、关掉内置 PDF 的桌面 Chrome 都能合法返回 0 个插件",
+            "signals": [
+              "node-buffer",
+              "plugins-empty-pdf-conflict"
+            ]
+          },
+          "battery": {
+            "$": "unsupported"
+          },
+          "bio": {
+            "$": "unsupported"
+          },
+          "browser": "Chrome 141",
+          "bt": {
+            "$": "unsupported"
+          },
+          "callstack": {
+            "depth": 12000,
+            "limit": 30000,
+            "truncated": false
+          },
+          "canvas": {
+            "$": "unsupported"
+          },
+          "ch": {
+            "alg": "ch/srv-only",
+            "srv": {
+              "sec-ch-ua": "\"Chromium\";v=\"141\"",
+              "sec-ch-ua-platform": "\"Windows\""
+            }
+          },
+          "clock": {
+            "off": 8,
+            "offset_min": -480,
+            "rtt_ms": null,
+            "skew_h": 0,
+            "skew_s": 0
+          },
+          "codecs": {
+            "$": "unsupported"
+          },
+          "conn": {
+            "$": "unsupported"
+          },
+          "cookies": true,
+          "cpu": 8,
+          "cssv": {
+            "$": "unsupported"
+          },
+          "display": {
+            "$": "unreadable"
+          },
+          "dnt": {
+            "dnt": null,
+            "gpc": false
+          },
+          "domrect": {
+            "alg": "domrect/2",
+            "h": "sha256:<redacted>",
+            "items": {
+              "matrix3d": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "rotate": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "scale": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "skew": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              }
+            },
+            "ranges": {
+              "$": "unsupported"
+            },
+            "scope": "absolute off-screen, 137.5x43.25 + 2.5px padding + 1px border, 四种 transform 各一组"
+          },
+          "drm": {
+            "$": "unsupported"
+          },
+          "edge": "LAX",
+          "emoji": {
+            "$": "unsupported"
+          },
+          "engine": {
+            "basis": "error-message+ua",
+            "js": "v8",
+            "render": "Blink"
+          },
+          "engver": {
+            "alg": "feature-floor/2",
+            "basis": "feature-min-chromium+ceiling-from-missing",
+            "ceiling_chromium": 97,
+            "ceiling_year": 2022,
+            "declared": "141",
+            "floor_chromium": 122,
+            "floor_year": 2024,
+            "items": {
+              "duration-format": {
+                "min": 129,
+                "ok": false,
+                "year": 2024
+              },
+              "error-iserror": {
+                "min": 134,
+                "ok": false,
+                "year": 2025
+              },
+              "findLast": {
+                "min": 97,
+                "ok": true,
+                "year": 2022
+              },
+              "float16array": {
+                "min": 135,
+                "ok": false,
+                "year": 2025
+              },
+              "fromAsync": {
+                "min": 121,
+                "ok": true,
+                "year": 2024
+              },
+              "groupBy": {
+                "min": 117,
+                "ok": true,
+                "year": 2023
+              },
+              "promise-try": {
+                "min": 128,
+                "ok": false,
+                "year": 2024
+              },
+              "regexp-escape": {
+                "min": 136,
+                "ok": false,
+                "year": 2025
+              },
+              "set-union": {
+                "min": 122,
+                "ok": true,
+                "year": 2024
+              },
+              "structuredClone": {
+                "min": 98,
+                "ok": false,
+                "year": 2022
+              },
+              "withResolvers": {
+                "min": 119,
+                "ok": true,
+                "year": 2023
+              }
+            },
+            "newest": "set-union",
+            "supported": 5,
+            "total": 11
+          },
+          "ex_cf": {
+            "$": "unreadable"
+          },
+          "ex_claude": {
+            "$": "unreadable"
+          },
+          "ex_cn": {
+            "$": "unreadable"
+          },
+          "ex_gpt": {
+            "$": "unreadable"
+          },
+          "ex_intl": {
+            "$": "unreadable"
+          },
+          "ext": [],
+          "extwar": {
+            "$": "unsupported"
+          },
+          "fmt": "2024/1/2|1,234,567.891|1,234.5",
+          "fontfp": {
+            "$": "unsupported"
+          },
+          "fonts": {
+            "$": "unsupported"
+          },
+          "form": {
+            "basis": "ua-mobile",
+            "formFactors": [],
+            "kind": "Desktop",
+            "source": "navigator.userAgent"
+          },
+          "fpid": "sha256:<redacted>",
+          "fpid_alg": "fnv/tmpl-2-fallback",
+          "gamepad": {
+            "$": "unsupported"
+          },
+          "gamut": {
+            "dynamic": "standard",
+            "gamut": "srgb"
+          },
+          "geoloc": {
+            "$": "not_run"
+          },
+          "glimg": {
+            "$": "unsupported"
+          },
+          "glx": {
+            "$": "unsupported"
+          },
+          "gpu": {
+            "$": "unsupported"
+          },
+          "gpulim": {
+            "$": "unsupported"
+          },
+          "heap": {
+            "$": "unsupported"
+          },
+          "history": 3,
+          "hour": {
+            "cycle": "h23",
+            "h12": false
+          },
+          "hwdec": {
+            "$": "unsupported"
+          },
+          "hwid": "sha256:<redacted>",
+          "hwid_alg": "fnv/hw-2-fallback",
+          "hz": 60,
+          "icu": {
+            "alg": "supported-values-of",
+            "calendar": 18,
+            "collation": 12,
+            "currency": 162,
+            "numberingSystem": 77,
+            "segmenter": true,
+            "timeZone": 418,
+            "unit": 45
+          },
+          "idstr": {
+            "plugins": [],
+            "productSub": "20030107",
+            "vendor": "Google Inc."
+          },
+          "kbd": {
+            "$": "unsupported"
+          },
+          "kex": {
+            "group": "X25519MLKEM768",
+            "sni": "plaintext",
+            "src": "trace"
+          },
+          "keys": {
+            "alg": "keys/2",
+            "css": 320,
+            "html": null,
+            "items": {
+              "CSS": {
+                "how": "Object.getOwnPropertyNames(CSS)",
+                "n": null,
+                "note": "CSS 命名空间对象（supports/escape/…），不是 CSS 属性条数"
+              },
+              "HTMLElement.prototype": {
+                "how": "Object.getOwnPropertyNames(HTMLElement.prototype)",
+                "n": null,
+                "note": "元素接口的方法与访问器；旧 html 字段是可枚举子集"
+              },
+              "computed-style-properties": {
+                "how": "getComputedStyle(div).length",
+                "n": 320,
+                "note": "旧 css 字段就是这一项"
+              },
+              "enumerable-globals": {
+                "how": "Object.keys(window)",
+                "n": 42,
+                "note": "含站点脚本自己加的键，风格线索不是版本读数"
+              },
+              "own-property-names": {
+                "how": "Object.getOwnPropertyNames(window)",
+                "n": 103,
+                "note": "含不可枚举的内建接口（WebGL2RenderingContext 之类），与可枚举计数不可互换"
+              }
+            },
+            "scope": "globals-enumerable",
+            "window": 42
+          },
+          "lan": {
+            "$": "unsupported"
+          },
+          "langs": [
+            "zh-CN",
+            "zh"
+          ],
+          "lies": {
+            "alg": "lies/2",
+            "basis": "native-code+own-prototype+stranger-getter; page vs clean iframe",
+            "ctx": "unsupported",
+            "getters": [
+              {
+                "k": "navigator.userAgent",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.platform",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.languages",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.hardwareConcurrency",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.deviceMemory",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.webdriver",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.plugins",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.vendor",
+                "state": "absent"
+              }
+            ],
+            "items": [
+              {
+                "frame": null,
+                "k": "Function.prototype.toString",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "setTimeout",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Date.prototype.getTimezoneOffset",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Math.random",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "toString.toString",
+                "page": true,
+                "proto": null,
+                "same": null
+              }
+            ],
+            "list": [
+              "setTimeout",
+              "setTimeout:own-prototype",
+              "Date.prototype.getTimezoneOffset",
+              "Date.prototype.getTimezoneOffset:own-prototype",
+              "plugins-empty-pdf-conflict",
+              "languages-missing"
+            ],
+            "n": 5,
+            "readings": [],
+            "scope": "只有本页（iframe 不可用，跨上下文部分记 unsupported）",
+            "why": "no-contentWindow"
+          },
+          "locale": "zh-CN",
+          "mathfp": {
+            "alg": "mathfp-2",
+            "cases": 18,
+            "h": "sha256:<redacted>"
+          },
+          "media": {
+            "$": "unsupported"
+          },
+          "mem": 8,
+          "model": {
+            "$": "unsupported"
+          },
+          "motion": "no-preference",
+          "os": "Windows",
+          "pdf": true,
+          "perms": {
+            "$": "unsupported"
+          },
+          "proto": {
+            "http": "HTTP/2",
+            "tls": "TLSv1.3"
+          },
+          "rand": {
+            "$": "unreadable"
+          },
+          "recmime": {
+            "$": "unsupported"
+          },
+          "rtccodecs": {
+            "$": "unsupported"
+          },
+          "scheme": "light",
+          "screen": {
+            "ah": 1040,
+            "aw": 1920,
+            "depth": 24,
+            "dpr": 1.25,
+            "h": 1080,
+            "w": 1920
+          },
+          "screens": {
+            "basis": "isExtended",
+            "ext": false,
+            "n": 1
+          },
+          "scrollbar": 15,
+          "sensors": {
+            "$": "not_run"
+          },
+          "shield": {
+            "alg": "shield/2",
+            "basis": "canvas_unmeasured",
+            "brave": false,
+            "canvasStable": null,
+            "mathStable": true,
+            "nativeToStringIntact": false,
+            "noise": null,
+            "note": "弱证据汇总，不判断是否伪装；canvasStable=null 表示两次绘制没做成（不能当成\"没有噪声\"）",
+            "verdict": "unknown"
+          },
+          "smooth": {
+            "$": "unsupported"
+          },
+          "stack": {
+            "dual": null,
+            "v4": {
+              "ok": false,
+              "state": "unreadable"
+            },
+            "v6": {
+              "ok": false,
+              "state": "unreadable"
+            }
+          },
+          "storage": {
+            "$": "unsupported"
+          },
+          "svgrect": {
+            "alg": "svgrect/2",
+            "box": {
+              "h": 4.5,
+              "w": 3.5,
+              "x": 1.5,
+              "y": 2.5
+            },
+            "chars": null,
+            "h": "sha256:<redacted>",
+            "scope": "off-screen zero-size wrapper; fontSize 13.5; 同一段文字一次取全",
+            "subLength": null,
+            "textLength": null,
+            "viewport": {
+              "h": 43.25,
+              "w": 137.5
+            }
+          },
+          "sysui": {
+            "accent": "rgb(0, 0, 0)",
+            "alg": "isolated-medium",
+            "background": null,
+            "color": null,
+            "fontSize": 16
+          },
+          "textm": {
+            "$": "unsupported"
+          },
+          "timer": {
+            "jitter": 0.5,
+            "maxPositiveMs": 0.5,
+            "minPositiveMs": 0.5,
+            "now": 1234.5,
+            "res": 0.5,
+            "samples": 64
+          },
+          "touch": {
+            "anyHover": false,
+            "anyPointer": null,
+            "hover": false,
+            "pointer": null,
+            "pointerEvents": false,
+            "points": 0
+          },
+          "traces": {
+            "alg": "storage-tag/2",
+            "blocked": [],
+            "first": true,
+            "items": {
+              "cacheStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "cookie": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "indexDB": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "localStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "sessionStorage": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              },
+              "windowName": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              }
+            },
+            "kept": [],
+            "lost": [],
+            "scope": "write-readback-per-store",
+            "ttl_days": 30
+          },
+          "tz": "Asia/Shanghai",
+          "v6mac": {
+            "$": "unsupported"
+          },
+          "voices": {
+            "$": "unsupported"
+          },
+          "warp": {
+            "gateway": null,
+            "src": "trace",
+            "state": "off"
+          },
+          "wasm": {
+            "alg": "wasm/2",
+            "control": "valid",
+            "has": [
+              "simd",
+              "threads",
+              "exceptions",
+              "tail-call",
+              "reference-types",
+              "bulk-memory",
+              "multi-value",
+              "mutable-globals",
+              "sign-ext",
+              "sat-float-int",
+              "extended-const",
+              "relaxed-simd",
+              "gc",
+              "memory64",
+              "multi-memory"
+            ],
+            "items": {
+              "bulk-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "exceptions": {
+                "ok": true,
+                "source": "validate"
+              },
+              "extended-const": {
+                "ok": true,
+                "source": "validate"
+              },
+              "gc": {
+                "ok": true,
+                "source": "validate"
+              },
+              "jspi": {
+                "ok": false,
+                "source": "api-existence"
+              },
+              "memory64": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-value": {
+                "ok": true,
+                "source": "validate"
+              },
+              "mutable-globals": {
+                "ok": true,
+                "source": "validate"
+              },
+              "reference-types": {
+                "ok": true,
+                "source": "validate"
+              },
+              "relaxed-simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sat-float-int": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sign-ext": {
+                "ok": true,
+                "source": "validate"
+              },
+              "simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "tail-call": {
+                "ok": true,
+                "source": "validate"
+              },
+              "threads": {
+                "ok": true,
+                "source": "validate"
+              },
+              "wide-arithmetic": {
+                "ok": false,
+                "source": "validate"
+              }
+            },
+            "missing": [
+              "wide-arithmetic",
+              "jspi"
+            ],
+            "sources": {
+              "api-existence": 1,
+              "validate": 16
+            },
+            "src": "wasm-feature-detect-1.10.0",
+            "supported": 15,
+            "total": 17,
+            "unreadable": []
+          },
+          "webdriver": false,
+          "webgl": {
+            "$": "unsupported"
+          },
+          "webgpu": {
+            "$": "unsupported"
+          },
+          "webrtc": {
+            "$": "unsupported"
+          },
+          "week": {
+            "firstDay": 1,
+            "minDays": 1,
+            "weekend": [
+              6,
+              7
+            ]
+          },
+          "win": {
+            "ih": 1040,
+            "iw": 1920,
+            "oh": 1080,
+            "ow": 1920
+          },
+          "worker": {
+            "$": "unsupported"
+          },
+          "xr": {
+            "$": "unsupported"
+          }
+        },
+        "meta": {
+          "dur_ms": 420,
+          "stuck": [],
+          "truncated": [],
+          "partial": true,
+          "privacy": {
+            "dnt": false,
+            "gpc": false,
+            "optout": false
+          },
+          "collector": "radish-2.0.0",
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+        }
+      }
+    },
+    {
+      "name": "optout",
+      "kind": "optout",
+      "note": "DNT/GPC 退出收集：整块 cli 为空，meta.privacy.optout=true",
+      "envelope": {
+        "v": 1,
+        "id": "018f2c6e-6a1b-7c3d-9e4f-5a6b7c8d9e0f",
+        "ts": "2026-11-13T08:00:00.940+08:00",
+        "session": "a1b2c3d4e5",
+        "page": {
+          "lang": "zh-CN",
+          "nav": "navigate",
+          "path": "/post/x.html",
+          "ref": "",
+          "title": "测试页"
+        },
+        "cli": {},
+        "meta": {
+          "dur_ms": 940,
+          "stuck": [],
+          "truncated": [],
+          "partial": false,
+          "privacy": {
+            "dnt": true,
+            "gpc": false,
+            "optout": true
+          },
+          "collector": "radish-2.0.0",
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+        }
+      }
+    },
+    {
+      "name": "probe",
+      "kind": "probe",
+      "note": "探针应答但抓包不可用：tcpfp 是单键标记 + 旁路原因 tcp_reason；TLS/H2 读数保留；H3 补测拿到 h3 样本（meta.h3.state=\"upgraded\"，cli.quicfp 有值）",
+      "envelope": {
+        "v": 1,
+        "id": "018f2c6e-6a1b-7c3d-9e4f-5a6b7c8d9e0f",
+        "ts": "2026-11-13T08:00:00.940+08:00",
+        "session": "a1b2c3d4e5",
+        "page": {
+          "lang": "zh-CN",
+          "nav": "navigate",
+          "path": "/post/x.html",
+          "ref": "",
+          "title": "测试页"
+        },
+        "cli": {
+          "a11y": {
+            "contrast": "no-preference",
+            "forced": false
+          },
+          "adblock": {
+            "adUrl": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+            },
+            "alg": "adblock/2",
+            "bait": {
+              "hidden": false,
+              "waitMs": 120
+            },
+            "basis": "control-unsupported",
+            "control": {
+              "ms": null,
+              "state": "unsupported",
+              "url": "https://blue-radish.github.io/static/radish-collect.js"
+            },
+            "deadlineMs": 800,
+            "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
+            "verdict": "unknown"
+          },
+          "agent": {
+            "alg": "agent/2",
+            "basis": "observation-window-expired",
+            "input": {
+              "keydown": 0,
+              "mousemove": 0,
+              "pointerdown": 0,
+              "total": 0,
+              "touchstart": 0,
+              "trustedAll": null,
+              "untrusted": 0,
+              "windowMs": 0
+            },
+            "level": "insufficient-observation",
+            "uaCh": {
+              "alg": "ua-ch-brand-consistency",
+              "basis": "ua-ch-vs-ua",
+              "consistent": null,
+              "kind": "unknown"
+            },
+            "userActivation": false,
+            "waitMs": 0
+          },
+          "ai": {
+            "$": "unsupported"
+          },
+          "apis": {
+            "aiBasis": "presence-only",
+            "alg": "apis/2",
+            "bluetooth": false,
+            "clipboard": false,
+            "contacts": false,
+            "contactsManager": false,
+            "credentials": false,
+            "digitalCredential": false,
+            "digitalCredentialsBasis": "constructor-presence",
+            "eyeDropper": false,
+            "fedcm": false,
+            "filePicker": false,
+            "gpu": false,
+            "hid": false,
+            "idle": false,
+            "idleDetector": false,
+            "languageModel": false,
+            "localFonts": false,
+            "midi": false,
+            "nfc": false,
+            "presentation": false,
+            "pressure": false,
+            "screenDetails": false,
+            "serial": false,
+            "serialBasis": null,
+            "serviceWorker": false,
+            "share": false,
+            "storage": false,
+            "translator": false,
+            "usb": false,
+            "wakeLock": false,
+            "webTransport": false
+          },
+          "arch": "x86/64",
+          "audio": {
+            "$": "unsupported"
+          },
+          "audiohw": {
+            "$": "unsupported"
+          },
+          "auto": {
+            "alg": "auto/2",
+            "comboCount": 0,
+            "combos": [],
+            "level": "strong",
+            "note": "空插件列表本身不是证据：安卓 Chrome、iOS 浏览器、关掉内置 PDF 的桌面 Chrome 都能合法返回 0 个插件",
+            "signals": [
+              "node-buffer",
+              "plugins-empty-pdf-conflict"
+            ]
+          },
+          "battery": {
+            "$": "unsupported"
+          },
+          "bio": {
+            "$": "unsupported"
+          },
+          "browser": "Chrome 141",
+          "bt": {
+            "$": "unsupported"
+          },
+          "callstack": {
+            "depth": 12000,
+            "limit": 30000,
+            "truncated": false
+          },
+          "canvas": {
+            "$": "unsupported"
+          },
+          "ch": {
+            "alg": "ch/srv-only",
+            "srv": {
+              "sec-ch-ua": "\"Chromium\";v=\"141\"",
+              "sec-ch-ua-platform": "\"Windows\""
+            }
+          },
+          "clock": {
+            "off": 8,
+            "offset_min": -480,
+            "rtt_ms": null,
+            "skew_h": 0,
+            "skew_s": 0
+          },
+          "codecs": {
+            "$": "unsupported"
+          },
+          "conn": {
+            "$": "unsupported"
+          },
+          "cookies": true,
+          "cpu": 8,
+          "cssv": {
+            "$": "unsupported"
+          },
+          "display": {
+            "$": "unreadable"
+          },
+          "dns": {
+            "$": "unreadable"
+          },
+          "dnt": {
+            "dnt": null,
+            "gpc": false
+          },
+          "domrect": {
+            "alg": "domrect/2",
+            "h": "sha256:<redacted>",
+            "items": {
+              "matrix3d": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "rotate": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "scale": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              },
+              "skew": {
+                "h": 43.25,
+                "rects": 2,
+                "w": 137.5,
+                "x": 1.5,
+                "y": 2.5
+              }
+            },
+            "ranges": {
+              "$": "unsupported"
+            },
+            "scope": "absolute off-screen, 137.5x43.25 + 2.5px padding + 1px border, 四种 transform 各一组"
+          },
+          "drm": {
+            "$": "unsupported"
+          },
+          "edge": "LAX",
+          "emoji": {
+            "$": "unsupported"
+          },
+          "engine": {
+            "basis": "error-message+ua",
+            "js": "v8",
+            "render": "Blink"
+          },
+          "engver": {
+            "alg": "feature-floor/2",
+            "basis": "feature-min-chromium+ceiling-from-missing",
+            "ceiling_chromium": 97,
+            "ceiling_year": 2022,
+            "declared": "141",
+            "floor_chromium": 122,
+            "floor_year": 2024,
+            "items": {
+              "duration-format": {
+                "min": 129,
+                "ok": false,
+                "year": 2024
+              },
+              "error-iserror": {
+                "min": 134,
+                "ok": false,
+                "year": 2025
+              },
+              "findLast": {
+                "min": 97,
+                "ok": true,
+                "year": 2022
+              },
+              "float16array": {
+                "min": 135,
+                "ok": false,
+                "year": 2025
+              },
+              "fromAsync": {
+                "min": 121,
+                "ok": true,
+                "year": 2024
+              },
+              "groupBy": {
+                "min": 117,
+                "ok": true,
+                "year": 2023
+              },
+              "promise-try": {
+                "min": 128,
+                "ok": false,
+                "year": 2024
+              },
+              "regexp-escape": {
+                "min": 136,
+                "ok": false,
+                "year": 2025
+              },
+              "set-union": {
+                "min": 122,
+                "ok": true,
+                "year": 2024
+              },
+              "structuredClone": {
+                "min": 98,
+                "ok": false,
+                "year": 2022
+              },
+              "withResolvers": {
+                "min": 119,
+                "ok": true,
+                "year": 2023
+              }
+            },
+            "newest": "set-union",
+            "supported": 5,
+            "total": 11
+          },
+          "etag": {
+            "$": "unsupported"
+          },
+          "ex_cf": {
+            "$": "unreadable"
+          },
+          "ex_claude": {
+            "$": "unreadable"
+          },
+          "ex_cn": {
+            "$": "unreadable"
+          },
+          "ex_gpt": {
+            "$": "unreadable"
+          },
+          "ex_intl": {
+            "$": "unreadable"
+          },
+          "ext": [],
+          "extwar": {
+            "$": "unsupported"
+          },
+          "fmt": "2024/1/2|1,234,567.891|1,234.5",
+          "fontfp": {
+            "$": "unsupported"
+          },
+          "fonts": {
+            "$": "unsupported"
+          },
+          "form": {
+            "basis": "ua-mobile",
+            "formFactors": [],
+            "kind": "Desktop",
+            "source": "navigator.userAgent"
+          },
+          "fpid": "sha256:<redacted>",
+          "fpid_alg": "fnv/tmpl-2-fallback",
+          "gamepad": {
+            "$": "unsupported"
+          },
+          "gamut": {
+            "dynamic": "standard",
+            "gamut": "srgb"
+          },
+          "geoloc": {
+            "$": "not_run"
+          },
+          "glimg": {
+            "$": "unsupported"
+          },
+          "glx": {
+            "$": "unsupported"
+          },
+          "gpu": {
+            "$": "unsupported"
+          },
+          "gpulim": {
+            "$": "unsupported"
+          },
+          "h2fp": {
+            "fp": "m,a,s,p"
+          },
+          "heap": {
+            "$": "unsupported"
+          },
+          "history": 3,
+          "hour": {
+            "cycle": "h23",
+            "h12": false
+          },
+          "hwdec": {
+            "$": "unsupported"
+          },
+          "hwid": "sha256:<redacted>",
+          "hwid_alg": "fnv/hw-2-fallback",
+          "hz": 60,
+          "icu": {
+            "alg": "supported-values-of",
+            "calendar": 18,
+            "collation": 12,
+            "currency": 162,
+            "numberingSystem": 77,
+            "segmenter": true,
+            "timeZone": 418,
+            "unit": 45
+          },
+          "idstr": {
+            "plugins": [],
+            "productSub": "20030107",
+            "vendor": "Google Inc."
+          },
+          "ja4": "t13d1516h2_8daaf6152771_02713d6af862",
+          "kbd": {
+            "$": "unsupported"
+          },
+          "kex": {
+            "group": "X25519MLKEM768",
+            "sni": "plaintext",
+            "src": "trace"
+          },
+          "keys": {
+            "alg": "keys/2",
+            "css": 320,
+            "html": null,
+            "items": {
+              "CSS": {
+                "how": "Object.getOwnPropertyNames(CSS)",
+                "n": null,
+                "note": "CSS 命名空间对象（supports/escape/…），不是 CSS 属性条数"
+              },
+              "HTMLElement.prototype": {
+                "how": "Object.getOwnPropertyNames(HTMLElement.prototype)",
+                "n": null,
+                "note": "元素接口的方法与访问器；旧 html 字段是可枚举子集"
+              },
+              "computed-style-properties": {
+                "how": "getComputedStyle(div).length",
+                "n": 320,
+                "note": "旧 css 字段就是这一项"
+              },
+              "enumerable-globals": {
+                "how": "Object.keys(window)",
+                "n": 42,
+                "note": "含站点脚本自己加的键，风格线索不是版本读数"
+              },
+              "own-property-names": {
+                "how": "Object.getOwnPropertyNames(window)",
+                "n": 103,
+                "note": "含不可枚举的内建接口（WebGL2RenderingContext 之类），与可枚举计数不可互换"
+              }
+            },
+            "scope": "globals-enumerable",
+            "window": 42
+          },
+          "lan": {
+            "$": "unsupported"
+          },
+          "langs": [
+            "zh-CN",
+            "zh"
+          ],
+          "lies": {
+            "alg": "lies/2",
+            "basis": "native-code+own-prototype+stranger-getter; page vs clean iframe",
+            "ctx": "unsupported",
+            "getters": [
+              {
+                "k": "navigator.userAgent",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.platform",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.languages",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.hardwareConcurrency",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.deviceMemory",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.webdriver",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.plugins",
+                "state": "absent"
+              },
+              {
+                "k": "navigator.vendor",
+                "state": "absent"
+              }
+            ],
+            "items": [
+              {
+                "frame": null,
+                "k": "Function.prototype.toString",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "setTimeout",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Date.prototype.getTimezoneOffset",
+                "page": false,
+                "proto": true,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "Math.random",
+                "page": true,
+                "proto": false,
+                "same": null
+              },
+              {
+                "frame": null,
+                "k": "toString.toString",
+                "page": true,
+                "proto": null,
+                "same": null
+              }
+            ],
+            "list": [
+              "setTimeout",
+              "setTimeout:own-prototype",
+              "Date.prototype.getTimezoneOffset",
+              "Date.prototype.getTimezoneOffset:own-prototype",
+              "plugins-empty-pdf-conflict",
+              "languages-missing"
+            ],
+            "n": 5,
+            "readings": [],
+            "scope": "只有本页（iframe 不可用，跨上下文部分记 unsupported）",
+            "why": "no-contentWindow"
+          },
+          "locale": "zh-CN",
+          "mathfp": {
+            "alg": "mathfp-2",
+            "cases": 18,
+            "h": "sha256:<redacted>"
+          },
+          "media": {
+            "$": "unsupported"
+          },
+          "mem": 8,
+          "model": {
+            "$": "unsupported"
+          },
+          "motion": "no-preference",
+          "os": "Windows",
+          "pdf": true,
+          "perms": {
+            "$": "unsupported"
+          },
+          "proto": {
+            "http": "HTTP/2",
+            "tls": "TLSv1.3"
+          },
+          "quicfp": "t13d1516h3_8daaf6152771_02713d6af862",
+          "rand": {
+            "$": "unreadable"
+          },
+          "recmime": {
+            "$": "unsupported"
+          },
+          "rtccodecs": {
+            "$": "unsupported"
+          },
+          "scheme": "light",
+          "screen": {
+            "ah": 1040,
+            "aw": 1920,
+            "depth": 24,
+            "dpr": 1.25,
+            "h": 1080,
+            "w": 1920
+          },
+          "screens": {
+            "basis": "isExtended",
+            "ext": false,
+            "n": 1
+          },
+          "scrollbar": 15,
+          "sensors": {
+            "$": "not_run"
+          },
+          "shield": {
+            "alg": "shield/2",
+            "basis": "canvas_unmeasured",
+            "brave": false,
+            "canvasStable": null,
+            "mathStable": true,
+            "nativeToStringIntact": false,
+            "noise": null,
+            "note": "弱证据汇总，不判断是否伪装；canvasStable=null 表示两次绘制没做成（不能当成\"没有噪声\"）",
+            "verdict": "unknown"
+          },
+          "smooth": {
+            "$": "unsupported"
+          },
+          "stack": {
+            "dual": null,
+            "v4": {
+              "ok": false,
+              "state": "unreadable"
+            },
+            "v6": {
+              "ok": false,
+              "state": "unreadable"
+            }
+          },
+          "storage": {
+            "$": "unsupported"
+          },
+          "svgrect": {
+            "alg": "svgrect/2",
+            "box": {
+              "h": 4.5,
+              "w": 3.5,
+              "x": 1.5,
+              "y": 2.5
+            },
+            "chars": null,
+            "h": "sha256:<redacted>",
+            "scope": "off-screen zero-size wrapper; fontSize 13.5; 同一段文字一次取全",
+            "subLength": null,
+            "textLength": null,
+            "viewport": {
+              "h": 43.25,
+              "w": 137.5
+            }
+          },
+          "sysui": {
+            "accent": "rgb(0, 0, 0)",
+            "alg": "isolated-medium",
+            "background": null,
+            "color": null,
+            "fontSize": 16
+          },
+          "tcp_reason": "npcap-not-installed",
+          "tcpfp": {
+            "$": "not_configured"
+          },
+          "textm": {
+            "$": "unsupported"
+          },
+          "timer": {
+            "jitter": 0.5,
+            "maxPositiveMs": 0.5,
+            "minPositiveMs": 0.5,
+            "now": 1234.5,
+            "res": 0.5,
+            "samples": 64
+          },
+          "tlsfp": "ja3n-documentation",
+          "touch": {
+            "anyHover": false,
+            "anyPointer": null,
+            "hover": false,
+            "pointer": null,
+            "pointerEvents": false,
+            "points": 0
+          },
+          "traces": {
+            "alg": "storage-tag/2",
+            "blocked": [],
+            "first": true,
+            "items": {
+              "cacheStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "cookie": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "indexDB": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "localStorage": {
+                "prev": false,
+                "readback": null,
+                "state": "unsupported",
+                "wrote": false
+              },
+              "sessionStorage": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              },
+              "windowName": {
+                "prev": false,
+                "readback": "ok",
+                "state": "readback",
+                "wrote": true
+              }
+            },
+            "kept": [],
+            "lost": [],
+            "scope": "write-readback-per-store",
+            "ttl_days": 30
+          },
+          "trackers": {
+            "$": "unsupported"
+          },
+          "tz": "Asia/Shanghai",
+          "v6mac": {
+            "$": "unsupported"
+          },
+          "voices": {
+            "$": "unsupported"
+          },
+          "warp": {
+            "gateway": null,
+            "src": "trace",
+            "state": "off"
+          },
+          "wasm": {
+            "alg": "wasm/2",
+            "control": "valid",
+            "has": [
+              "simd",
+              "threads",
+              "exceptions",
+              "tail-call",
+              "reference-types",
+              "bulk-memory",
+              "multi-value",
+              "mutable-globals",
+              "sign-ext",
+              "sat-float-int",
+              "extended-const",
+              "relaxed-simd",
+              "gc",
+              "memory64",
+              "multi-memory"
+            ],
+            "items": {
+              "bulk-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "exceptions": {
+                "ok": true,
+                "source": "validate"
+              },
+              "extended-const": {
+                "ok": true,
+                "source": "validate"
+              },
+              "gc": {
+                "ok": true,
+                "source": "validate"
+              },
+              "jspi": {
+                "ok": false,
+                "source": "api-existence"
+              },
+              "memory64": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-memory": {
+                "ok": true,
+                "source": "validate"
+              },
+              "multi-value": {
+                "ok": true,
+                "source": "validate"
+              },
+              "mutable-globals": {
+                "ok": true,
+                "source": "validate"
+              },
+              "reference-types": {
+                "ok": true,
+                "source": "validate"
+              },
+              "relaxed-simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sat-float-int": {
+                "ok": true,
+                "source": "validate"
+              },
+              "sign-ext": {
+                "ok": true,
+                "source": "validate"
+              },
+              "simd": {
+                "ok": true,
+                "source": "validate"
+              },
+              "tail-call": {
+                "ok": true,
+                "source": "validate"
+              },
+              "threads": {
+                "ok": true,
+                "source": "validate"
+              },
+              "wide-arithmetic": {
+                "ok": false,
+                "source": "validate"
+              }
+            },
+            "missing": [
+              "wide-arithmetic",
+              "jspi"
+            ],
+            "sources": {
+              "api-existence": 1,
+              "validate": 16
+            },
+            "src": "wasm-feature-detect-1.10.0",
+            "supported": 15,
+            "total": 17,
+            "unreadable": []
+          },
+          "webdriver": false,
+          "webgl": {
+            "$": "unsupported"
+          },
+          "webgpu": {
+            "$": "unsupported"
+          },
+          "webrtc": {
+            "$": "unsupported"
+          },
+          "week": {
+            "firstDay": 1,
+            "minDays": 1,
+            "weekend": [
+              6,
+              7
+            ]
+          },
+          "win": {
+            "ih": 1040,
+            "iw": 1920,
+            "oh": 1080,
+            "ow": 1920
+          },
+          "worker": {
+            "$": "unsupported"
+          },
+          "xr": {
+            "$": "unsupported"
+          }
+        },
+        "meta": {
+          "dur_ms": 940,
+          "stuck": [],
+          "truncated": [],
+          "partial": false,
+          "privacy": {
+            "dnt": false,
+            "gpc": false,
+            "optout": false
+          },
+          "collector": "radish-2.0.0",
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+          "h3": {
+            "alg": "h3-retry/1",
+            "answered": 1,
+            "attempts": 1,
+            "budget_exhausted": false,
+            "budget_ms": 4500,
+            "elapsed_ms": 2138,
+            "first_proto": "h2",
+            "gap_ms": 700,
+            "h3_proto": "h3",
+            "ja4": "t13d1516h3_8daaf6152771_02713d6af862",
+            "max_retries": 3,
+            "note": "补测第 1 次拿到了 HTTP/3 样本；首跳的 tcpfp/ja4/h2fp 保持原样，没有被覆盖",
+            "request_ms": 2000,
+            "retries": 1,
+            "state": "upgraded"
+          }
+        }
+      }
+    }
+  ],
+  "digest_scope": "sha256 of canonical JSON（对象键排序、无空格）of {cli_keys, shapes, markers, semantics}",
+  "digest": "sha256:a8b92146bace78206cafb37ee2b7a4f1903fb9a978778ea072609685d1c8a7ec"
+}

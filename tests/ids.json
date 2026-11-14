@@ -1,0 +1,783 @@
+{
+  "groups": {
+    "net": [
+      {
+        "id": "ip",
+        "mech": "CF-Connecting-IP",
+        "prov": "E"
+      },
+      {
+        "id": "geo",
+        "mech": "request.cf.city",
+        "prov": "E"
+      },
+      {
+        "id": "coords",
+        "mech": "request.cf.latitude",
+        "prov": "E"
+      },
+      {
+        "id": "isp",
+        "mech": "request.cf.asOrganization",
+        "prov": "O"
+      },
+      {
+        "id": "dns",
+        "mech": "edns.ip-api.com",
+        "prov": "C*"
+      },
+      {
+        "id": "tzip",
+        "mech": "request.cf.timezone",
+        "prov": "E"
+      },
+      {
+        "id": "ptr",
+        "mech": "DNS PTR",
+        "prov": "O"
+      },
+      {
+        "id": "edge",
+        "mech": "request.cf.colo",
+        "prov": "E"
+      },
+      {
+        "id": "proto",
+        "mech": "request.cf.tlsVersion",
+        "prov": "C*"
+      },
+      {
+        "id": "kex",
+        "mech": "/cdn-cgi/trace · kex, sni",
+        "prov": "C*"
+      },
+      {
+        "id": "warp",
+        "mech": "/cdn-cgi/trace · warp",
+        "prov": "C*"
+      },
+      {
+        "id": "tlsfp",
+        "mech": "TLS ClientHello",
+        "prov": "P"
+      },
+      {
+        "id": "tcpfp",
+        "mech": "probe.1ms.dog · TCP SYN",
+        "prov": "P"
+      },
+      {
+        "id": "ja4",
+        "mech": "probe.1ms.dog · JA4",
+        "prov": "P"
+      },
+      {
+        "id": "h2fp",
+        "mech": "probe.1ms.dog · HTTP/2 SETTINGS",
+        "prov": "P"
+      },
+      {
+        "id": "quicfp",
+        "mech": "probe.1ms.dog · HTTP/3 · QUIC JA4",
+        "prov": "P"
+      },
+      {
+        "id": "clock",
+        "mech": "Date.now()",
+        "prov": "C"
+      },
+      {
+        "id": "webrtc",
+        "mech": "RTCPeerConnection · STUN",
+        "prov": "C"
+      },
+      {
+        "id": "lan",
+        "mech": "WebRTC host candidate",
+        "prov": "C"
+      },
+      {
+        "id": "v6mac",
+        "mech": "IPv6 EUI-64 (ff:fe)",
+        "prov": "C"
+      },
+      {
+        "id": "tor",
+        "mech": "Tor bulk exit list（源站缓存，不传访客 IP）",
+        "prov": "O"
+      }
+    ],
+    "exit": [
+      {
+        "id": "ex_cn",
+        "mech": "myip.ipip.net",
+        "prov": "C*"
+      },
+      {
+        "id": "ex_intl",
+        "mech": "api.ip.sb",
+        "prov": "C*"
+      },
+      {
+        "id": "ex_gpt",
+        "mech": "chatgpt.com/cdn-cgi/trace",
+        "prov": "C*"
+      },
+      {
+        "id": "ex_claude",
+        "mech": "claude.ai/cdn-cgi/trace",
+        "prov": "C*"
+      },
+      {
+        "id": "ex_cf",
+        "mech": "www.cloudflare.com/cdn-cgi/trace",
+        "prov": "C*"
+      },
+      {
+        "id": "stack",
+        "mech": "Cloudflare Radar · IPv4 / IPv6",
+        "prov": "C*"
+      }
+    ],
+    "hdr": [
+      {
+        "id": "h_ua",
+        "mech": "User-Agent",
+        "prov": "E"
+      },
+      {
+        "id": "h_lang",
+        "mech": "Accept-Language",
+        "prov": "E"
+      },
+      {
+        "id": "h_chua",
+        "mech": "Sec-CH-UA",
+        "prov": "E"
+      },
+      {
+        "id": "h_plat",
+        "mech": "Sec-CH-UA-Platform",
+        "prov": "E"
+      },
+      {
+        "id": "ch",
+        "mech": "Sec-CH-UA-* (Accept-CH)",
+        "prov": "O"
+      },
+      {
+        "id": "h_enc",
+        "mech": "Accept-Encoding",
+        "prov": "E"
+      },
+      {
+        "id": "h_dnt",
+        "mech": "DNT · Sec-GPC",
+        "prov": "E"
+      },
+      {
+        "id": "h_ref",
+        "mech": "Referer · document.referrer",
+        "prov": "E"
+      }
+    ],
+    "loc": [
+      {
+        "id": "langs",
+        "mech": "navigator.languages",
+        "prov": "C"
+      },
+      {
+        "id": "locale",
+        "mech": "Intl.DateTimeFormat",
+        "prov": "C"
+      },
+      {
+        "id": "tz",
+        "mech": "Intl …timeZone",
+        "prov": "C"
+      },
+      {
+        "id": "hour",
+        "mech": "Intl …hourCycle",
+        "prov": "C"
+      },
+      {
+        "id": "week",
+        "mech": "Intl.Locale weekInfo",
+        "prov": "C"
+      },
+      {
+        "id": "fmt",
+        "mech": "Intl.NumberFormat",
+        "prov": "C"
+      },
+      {
+        "id": "icu",
+        "mech": "Intl.supportedValuesOf",
+        "prov": "C"
+      },
+      {
+        "id": "kbd",
+        "mech": "navigator.keyboard",
+        "prov": "C"
+      },
+      {
+        "id": "voices",
+        "mech": "speechSynthesis",
+        "prov": "C"
+      }
+    ],
+    "fp": [
+      {
+        "id": "engine",
+        "mech": "Error.message",
+        "prov": "C"
+      },
+      {
+        "id": "engver",
+        "mech": "JS feature probes",
+        "prov": "C"
+      },
+      {
+        "id": "lies",
+        "mech": "Function.prototype.toString · iframe",
+        "prov": "C"
+      },
+      {
+        "id": "cssv",
+        "mech": "CSS.supports",
+        "prov": "C"
+      },
+      {
+        "id": "smooth",
+        "mech": "canvas text antialiasing",
+        "prov": "C"
+      },
+      {
+        "id": "canvas",
+        "mech": "canvas.toDataURL",
+        "prov": "C"
+      },
+      {
+        "id": "webgl",
+        "mech": "WebGL getParameter",
+        "prov": "C"
+      },
+      {
+        "id": "audio",
+        "mech": "OfflineAudioContext",
+        "prov": "C"
+      },
+      {
+        "id": "mathfp",
+        "mech": "Math.* → SHA-256",
+        "prov": "C"
+      },
+      {
+        "id": "emoji",
+        "mech": "emoji measureText",
+        "prov": "C"
+      },
+      {
+        "id": "fontfp",
+        "mech": "fonts → SHA-256",
+        "prov": "C"
+      },
+      {
+        "id": "domrect",
+        "mech": "getClientRects · Range",
+        "prov": "C"
+      },
+      {
+        "id": "svgrect",
+        "mech": "SVG getBBox · getComputedTextLength",
+        "prov": "C"
+      },
+      {
+        "id": "textm",
+        "mech": "measureText actualBoundingBox",
+        "prov": "C"
+      },
+      {
+        "id": "glimg",
+        "mech": "WebGL readPixels",
+        "prov": "C"
+      },
+      {
+        "id": "keys",
+        "mech": "window · HTMLElement · CSS keys",
+        "prov": "C"
+      },
+      {
+        "id": "timer",
+        "mech": "performance.now() resolution",
+        "prov": "C"
+      },
+      {
+        "id": "callstack",
+        "mech": "recursion depth",
+        "prov": "C"
+      },
+      {
+        "id": "fpid",
+        "mech": "SHA-256",
+        "prov": "C"
+      },
+      {
+        "id": "hwid",
+        "mech": "screen · cores · GPU · fonts → SHA-256",
+        "prov": "C"
+      },
+      {
+        "id": "etag",
+        "mech": "HTTP cache · ETag / If-None-Match",
+        "prov": "O"
+      },
+      {
+        "id": "rand",
+        "mech": "canvas × 2",
+        "prov": "C"
+      },
+      {
+        "id": "shield",
+        "mech": "navigator.brave · noise · lies",
+        "prov": "C"
+      },
+      {
+        "id": "wasm",
+        "mech": "WebAssembly.validate",
+        "prov": "C"
+      }
+    ],
+    "dev": [
+      {
+        "id": "os",
+        "mech": "userAgentData",
+        "prov": "C"
+      },
+      {
+        "id": "browser",
+        "mech": "userAgentData.brands",
+        "prov": "C"
+      },
+      {
+        "id": "arch",
+        "mech": "…architecture · bitness",
+        "prov": "C"
+      },
+      {
+        "id": "form",
+        "mech": "userAgentData formFactors",
+        "prov": "C"
+      },
+      {
+        "id": "model",
+        "mech": "screen · GPU · Client Hints model",
+        "prov": "C"
+      },
+      {
+        "id": "screen",
+        "mech": "screen · devicePixelRatio",
+        "prov": "C"
+      },
+      {
+        "id": "hz",
+        "mech": "requestAnimationFrame",
+        "prov": "C"
+      },
+      {
+        "id": "screens",
+        "mech": "screen.isExtended · screenX",
+        "prov": "C"
+      },
+      {
+        "id": "win",
+        "mech": "innerWidth · availHeight",
+        "prov": "C"
+      },
+      {
+        "id": "scrollbar",
+        "mech": "offsetWidth − clientWidth",
+        "prov": "C"
+      },
+      {
+        "id": "gpu",
+        "mech": "WebGL RENDERER",
+        "prov": "C"
+      },
+      {
+        "id": "webgpu",
+        "mech": "navigator.gpu adapter.info",
+        "prov": "C"
+      },
+      {
+        "id": "gpulim",
+        "mech": "GPUAdapter limits · features",
+        "prov": "C"
+      },
+      {
+        "id": "glx",
+        "mech": "WebGL2 · MAX_TEXTURE_SIZE",
+        "prov": "C"
+      },
+      {
+        "id": "cpu",
+        "mech": "hardwareConcurrency",
+        "prov": "C"
+      },
+      {
+        "id": "mem",
+        "mech": "navigator.deviceMemory",
+        "prov": "C"
+      },
+      {
+        "id": "heap",
+        "mech": "performance.memory",
+        "prov": "C"
+      },
+      {
+        "id": "touch",
+        "mech": "maxTouchPoints · pointer",
+        "prov": "C"
+      },
+      {
+        "id": "battery",
+        "mech": "navigator.getBattery",
+        "prov": "C"
+      },
+      {
+        "id": "geoloc",
+        "mech": "geolocation (on request)",
+        "prov": "C"
+      },
+      {
+        "id": "sensors",
+        "mech": "devicemotion (on request)",
+        "prov": "C"
+      },
+      {
+        "id": "conn",
+        "mech": "navigator.connection",
+        "prov": "C"
+      },
+      {
+        "id": "media",
+        "mech": "enumerateDevices",
+        "prov": "C"
+      },
+      {
+        "id": "audiohw",
+        "mech": "AudioContext.sampleRate",
+        "prov": "C"
+      },
+      {
+        "id": "bio",
+        "mech": "PublicKeyCredential",
+        "prov": "C"
+      },
+      {
+        "id": "bt",
+        "mech": "bluetooth.getAvailability",
+        "prov": "C"
+      },
+      {
+        "id": "gamepad",
+        "mech": "getGamepads (on request)",
+        "prov": "C"
+      },
+      {
+        "id": "xr",
+        "mech": "navigator.xr.isSessionSupported",
+        "prov": "C"
+      },
+      {
+        "id": "codecs",
+        "mech": "MediaSource.isTypeSupported",
+        "prov": "C"
+      },
+      {
+        "id": "rtccodecs",
+        "mech": "RTCRtpSender.getCapabilities",
+        "prov": "C"
+      },
+      {
+        "id": "recmime",
+        "mech": "MediaRecorder.isTypeSupported",
+        "prov": "C"
+      },
+      {
+        "id": "hwdec",
+        "mech": "mediaCapabilities.decodingInfo",
+        "prov": "C"
+      },
+      {
+        "id": "drm",
+        "mech": "requestMediaKeySystemAccess",
+        "prov": "C"
+      },
+      {
+        "id": "storage",
+        "mech": "storage.estimate",
+        "prov": "C"
+      },
+      {
+        "id": "vm",
+        "mech": "GPU renderer 推断 hypervisor（源站）",
+        "prov": "O"
+      }
+    ],
+    "brw": [
+      {
+        "id": "scheme",
+        "mech": "prefers-color-scheme",
+        "prov": "C"
+      },
+      {
+        "id": "motion",
+        "mech": "prefers-reduced-motion",
+        "prov": "C"
+      },
+      {
+        "id": "gamut",
+        "mech": "color-gamut · dynamic-range",
+        "prov": "C"
+      },
+      {
+        "id": "a11y",
+        "mech": "prefers-contrast · forced-colors",
+        "prov": "C"
+      },
+      {
+        "id": "sysui",
+        "mech": "font-size: medium · AccentColor",
+        "prov": "C"
+      },
+      {
+        "id": "display",
+        "mech": "display-mode",
+        "prov": "C"
+      },
+      {
+        "id": "dnt",
+        "mech": "doNotTrack · GPC",
+        "prov": "C"
+      },
+      {
+        "id": "cookies",
+        "mech": "navigator.cookieEnabled",
+        "prov": "C"
+      },
+      {
+        "id": "perms",
+        "mech": "permissions.query",
+        "prov": "C"
+      },
+      {
+        "id": "apis",
+        "mech": "usb · serial · hid · IdleDetector …",
+        "prov": "C"
+      },
+      {
+        "id": "pdf",
+        "mech": "pdfViewerEnabled",
+        "prov": "C"
+      },
+      {
+        "id": "ai",
+        "mech": "LanguageModel · Translator.availability",
+        "prov": "C"
+      },
+      {
+        "id": "webdriver",
+        "mech": "navigator.webdriver",
+        "prov": "C"
+      },
+      {
+        "id": "auto",
+        "mech": "headless · CDP · Electron traces",
+        "prov": "C"
+      },
+      {
+        "id": "idstr",
+        "mech": "navigator.vendor · productSub · plugins",
+        "prov": "C"
+      },
+      {
+        "id": "agent",
+        "mech": "mousemove → pointerdown · isTrusted",
+        "prov": "C"
+      },
+      {
+        "id": "worker",
+        "mech": "Worker · navigator",
+        "prov": "C"
+      },
+      {
+        "id": "adblock",
+        "mech": "bait element",
+        "prov": "C"
+      },
+      {
+        "id": "trackers",
+        "mech": "7 tracker scripts (on request)",
+        "prov": "C"
+      },
+      {
+        "id": "ext",
+        "mech": "window.ethereum · DOM marks",
+        "prov": "C"
+      },
+      {
+        "id": "extwar",
+        "mech": "chrome-extension:// files",
+        "prov": "C"
+      },
+      {
+        "id": "history",
+        "mech": "history.length",
+        "prov": "C"
+      },
+      {
+        "id": "traces",
+        "mech": "localStorage · IndexedDB · Cache · window.name",
+        "prov": "C"
+      },
+      {
+        "id": "fonts",
+        "mech": "canvas measureText",
+        "prov": "C"
+      },
+      "etag"
+    ]
+  },
+  "all": [
+    "ip",
+    "geo",
+    "coords",
+    "isp",
+    "dns",
+    "tzip",
+    "ptr",
+    "edge",
+    "proto",
+    "kex",
+    "warp",
+    "tlsfp",
+    "tcpfp",
+    "ja4",
+    "h2fp",
+    "quicfp",
+    "clock",
+    "webrtc",
+    "lan",
+    "v6mac",
+    "tor",
+    "ex_cn",
+    "ex_intl",
+    "ex_gpt",
+    "ex_claude",
+    "ex_cf",
+    "stack",
+    "h_ua",
+    "h_lang",
+    "h_chua",
+    "h_plat",
+    "ch",
+    "h_enc",
+    "h_dnt",
+    "h_ref",
+    "langs",
+    "locale",
+    "tz",
+    "hour",
+    "week",
+    "fmt",
+    "icu",
+    "kbd",
+    "voices",
+    "engine",
+    "engver",
+    "lies",
+    "cssv",
+    "smooth",
+    "canvas",
+    "webgl",
+    "audio",
+    "mathfp",
+    "emoji",
+    "fontfp",
+    "domrect",
+    "svgrect",
+    "textm",
+    "glimg",
+    "keys",
+    "timer",
+    "callstack",
+    "fpid",
+    "hwid",
+    "etag",
+    "rand",
+    "shield",
+    "wasm",
+    "os",
+    "browser",
+    "arch",
+    "form",
+    "model",
+    "screen",
+    "hz",
+    "screens",
+    "win",
+    "scrollbar",
+    "gpu",
+    "webgpu",
+    "gpulim",
+    "glx",
+    "cpu",
+    "mem",
+    "heap",
+    "touch",
+    "battery",
+    "geoloc",
+    "sensors",
+    "conn",
+    "media",
+    "audiohw",
+    "bio",
+    "bt",
+    "gamepad",
+    "xr",
+    "codecs",
+    "rtccodecs",
+    "recmime",
+    "hwdec",
+    "drm",
+    "storage",
+    "vm",
+    "scheme",
+    "motion",
+    "gamut",
+    "a11y",
+    "sysui",
+    "display",
+    "dnt",
+    "cookies",
+    "perms",
+    "apis",
+    "pdf",
+    "ai",
+    "webdriver",
+    "auto",
+    "idstr",
+    "agent",
+    "worker",
+    "adblock",
+    "trackers",
+    "ext",
+    "extwar",
+    "history",
+    "traces",
+    "fonts"
+  ]
+}
