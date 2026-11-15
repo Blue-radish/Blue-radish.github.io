@@ -730,6 +730,25 @@ test('G12：工作流没有 write-all，且产物自检与行为测试都跑在�
   assert.ok(checkAt > 0 && uploadAt > checkAt, '自检与测试必须在打包上传之前');
 });
 
+test('G13：static/ 的每个文件在 docs/ 里都有逐字节相同的副本，同步只走 tools/sync-artifact.js', () => {
+  // 为什么有规矩：Pages 只发布 docs/，docs/ 是构建产物，static/ 才是源。
+  // 两份文件靠"记得手抄一遍"来维持，迟早漏一处（改了源忘了产物，线上还是旧代码）。
+  const from = path.join(ROOT, 'static');
+  const names = fs.readdirSync(from).filter((f) => fs.statSync(path.join(from, f)).isFile());
+  assert.ok(names.length > 0, 'static/ 里一个文件都没有？');
+  for (const name of names) {
+    const a = path.join(from, name);
+    const b = path.join(ROOT, 'docs', name);
+    assert.ok(fs.existsSync(b), 'docs/ 里缺 ' + name + '（跑 node tools/sync-artifact.js）');
+    assert.ok(fs.readFileSync(a).equals(fs.readFileSync(b)),
+      'docs/' + name + ' 与 static/' + name + ' 不一致（跑 node tools/sync-artifact.js）');
+  }
+  const sync = fs.readFileSync(path.join(ROOT, 'tools', 'sync-artifact.js'), 'utf8');
+  assert.match(sync, /'static'/, '同步脚本要以 static/ 为准');
+  const wf = fs.readFileSync(path.join(ROOT, '.github', 'workflows', 'Gmeek.yml'), 'utf8');
+  assert.match(wf, /node tools\/sync-artifact\.js/, '工作流要显式同步 static/，别只依赖上游的副作用');
+});
+
 test('BLOG-11：config.json 里的脚本版本号要和采集器版本一致', () => {
   const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'), 'utf8'));
   const m = String(cfg.allHead || '').match(/radish-collect\.js\?v=([0-9.]+)/);

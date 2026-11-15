@@ -73,6 +73,11 @@ jobs:
           cp -a /opt/Gmeek/backup ${{ github.workspace }} 
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
 
+      # Gmeek 生成时会把 static/ 复制进 docs/。这一步是同一件事的显式写法：
+      # 产物同步不再依赖上游的隐藏副作用，本地和 CI 走的是同一个脚本。
+      - name: Sync static assets
+        run: node tools/sync-artifact.js
+
       # 模板由上游生成，修复必须落在生成之后；匹配不上就失败，避免漏洞悄悄回来
       - name: Patch generated html
         run: node tools/patch-generated.js
