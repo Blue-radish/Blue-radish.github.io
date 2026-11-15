@@ -10,7 +10,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-2.0.1';
+  var VERSION = 'radish-2.0.2';
   // 上报地址内置默认值；换机或本地调试时改 script 标签上的 data-base，
   // 例如 <script src='/radish-collect.js' data-base='http://127.0.0.1:11451'>
   // 页面里不再需要写任何全局变量。
@@ -23,7 +23,7 @@
     if (_ds.dnsMs) CLOUD.dnsMs = _ds.dnsMs;
     if (_ds.stun) CLOUD.stun = _ds.stun.split(',');
   } catch (e) { }
-  var CLOUD_BASE = String((CLOUD && CLOUD.base) || 'https://radishcloud.20050416.shop').replace(/\/+$/, '').replace(/\s+$/, '');
+  var CLOUD_BASE = String((CLOUD && CLOUD.base) || 'https://radishcloud.072120.xyz').replace(/\/+$/, '').replace(/\s+$/, '');
   var ENDPOINT = (CLOUD && CLOUD.endpoint) || (CLOUD_BASE + '/v1/collect');
   var TRACE_URL = (CLOUD && CLOUD.trace) || (CLOUD_BASE + '/cdn-cgi/trace');
   var HINTS_URL = (CLOUD && CLOUD.hints) || (CLOUD_BASE + '/v1/hints');
@@ -2284,36 +2284,15 @@ function declaredVersion(env) {
       }).catch(function () { return rough(); });
     }, M('unsupported'));
   });
-  // 机型映射（model）。参考站做两件事，这里跟着做：
-  //   ① Android：高熵 Sec-CH-UA-Model 给的常常是**代码名**（panther / SM-G991B），
-  //      配一张有限的"代码名 → 市场名"表来翻。表必须有 mapVersion 与 source，
-  //      只收确知且能注来源的条目；表外的一律 decoded:null，绝不猜。
-  //   ② Apple：iOS/iPadOS 没有机型字段（UA 与 CH 都不给），只能用「屏幕逻辑尺寸 +
-  //      devicePixelRatio + GPU renderer」给出**候选**，永不输出唯一结论。
-  var MODEL_MAP_VERSION = 'android-codenames-2024a';
-  var MODEL_MAP_SOURCE = 'AOSP 设备代码名 + 厂商官方机型列表（2024-11 核对）';
-  // [代码名, 市场名, 条目来源]
-  var MODEL_CODES = [
-    ['tokay', 'Pixel 9', 'aosp-pixel'], ['caiman', 'Pixel 9 Pro', 'aosp-pixel'],
-    ['komodo', 'Pixel 9 Pro XL', 'aosp-pixel'], ['comet', 'Pixel 9 Pro Fold', 'aosp-pixel'],
-    ['shiba', 'Pixel 8', 'aosp-pixel'], ['husky', 'Pixel 8 Pro', 'aosp-pixel'],
-    ['akita', 'Pixel 8a', 'aosp-pixel'],
-    ['panther', 'Pixel 7', 'aosp-pixel'], ['cheetah', 'Pixel 7 Pro', 'aosp-pixel'],
-    ['lynx', 'Pixel 7a', 'aosp-pixel'],
-    ['oriole', 'Pixel 6', 'aosp-pixel'], ['raven', 'Pixel 6 Pro', 'aosp-pixel'],
-    ['bluejay', 'Pixel 6a', 'aosp-pixel'],
-    ['redfin', 'Pixel 5', 'aosp-pixel'], ['barbet', 'Pixel 5a', 'aosp-pixel'],
-    ['sunfish', 'Pixel 4a', 'aosp-pixel'], ['flame', 'Pixel 4', 'aosp-pixel'],
-    ['coral', 'Pixel 4 XL', 'aosp-pixel'], ['blueline', 'Pixel 3', 'aosp-pixel'],
-    ['crosshatch', 'Pixel 3 XL', 'aosp-pixel'], ['walleye', 'Pixel 2', 'aosp-pixel'],
-    ['taimen', 'Pixel 2 XL', 'aosp-pixel'], ['felix', 'Pixel Fold', 'aosp-pixel'],
-    ['tangorpro', 'Pixel Tablet', 'aosp-pixel'],
-    ['bullhead', 'Nexus 5X', 'aosp-nexus'], ['angler', 'Nexus 6P', 'aosp-nexus'],
-    ['SM-G991B', 'Galaxy S21 5G', 'samsung-model-code'],
-    ['SM-G996B', 'Galaxy S21+ 5G', 'samsung-model-code'],
-    ['SM-G998B', 'Galaxy S21 Ultra 5G', 'samsung-model-code'],
-    ['SM-S911B', 'Galaxy S23', 'samsung-model-code']
-  ];
+  // 机型（model）。采集端只做一件事：把 Sec-CH-UA-Model / UA 里的**原始型号串**如实交出去
+  // —— panther、SM-G991B、NX733J 这类代码名，或者本来就是市场名的 "Pixel 9"。
+  //
+  // 代码名 → 市场名的映射表**不在采集端**：那张表会变、会涨，两份表一旦不同步，同一个型号
+  // 就会有两处说法。所以 2026-11-15 起把本地那张 30 条表整个删掉，只交代码名，由服务端统一映射
+  // （映射表外就照读数写代码名，绝不猜）。采集端不许再长出一张表来。
+  //
+  // Apple 那一套留着：iOS/iPadOS 的 UA 与 CH 都不给机型字段，只能用「屏幕逻辑尺寸 +
+  // devicePixelRatio + GPU renderer」给**候选**，永不输出唯一结论。
   var APPLE_MAP_VERSION = 'ios-screen-2024a';
   var APPLE_MAP_SOURCE = 'iPhone/iPad 各型号的逻辑分辨率与 DPR（厂商规格 + iOS Safari viewport 实测）';
   // [候选机型, 短边 CSS px, 长边 CSS px, devicePixelRatio]
@@ -2336,21 +2315,6 @@ function declaredVersion(env) {
     ['iPad Pro 11"', 834, 1194, 2],
     ['iPad mini 6', 744, 1133, 2]
   ];
-  function decodeModelCode(raw) {
-    if (!raw) return null;
-    var t = String(raw).trim();
-    if (!t) return null;
-    for (var i = 0; i < MODEL_CODES.length; i++) {
-      if (String(MODEL_CODES[i][0]).toLowerCase() === t.toLowerCase()) {
-        return { name: MODEL_CODES[i][1], matched: MODEL_CODES[i][0], entrySource: MODEL_CODES[i][2], exact: true };
-      }
-      // 高熵有时直接给市场名：这时不需要翻译，但可以确认"表里有这一条"
-      if (String(MODEL_CODES[i][1]).toLowerCase() === t.toLowerCase()) {
-        return { name: MODEL_CODES[i][1], matched: MODEL_CODES[i][0], entrySource: MODEL_CODES[i][2], exact: true };
-      }
-    }
-    return null;
-  }
   // Apple 候选推断：置信度只表达"在这几条候选里排第几档"，不是"就是这台机器"。
   //   0.55 基础分（屏幕逻辑尺寸 + DPR 完全匹配）
   //   +0.10 UA 设备族一致（iPhone/iPad 前缀对得上）
@@ -2397,22 +2361,12 @@ function declaredVersion(env) {
       var ua = env.navigator.userAgent || '';
       var uad = uaData(env);
       var finish = function (raw) {
-        var dec = decodeModelCode(raw);
         var out = {
-          alg: 'model/2',
-          raw: raw || null,
-          decoded: dec ? dec.name : null,
+          alg: 'model/3',
+          raw: raw ? String(raw) : null,
           candidates: [],
-          basis: dec ? 'ua-ch-model+map' : (raw ? 'ua-ch-model-unmapped' : 'no-model-field'),
-          mapVersion: MODEL_MAP_VERSION,
-          source: MODEL_MAP_SOURCE
+          basis: raw ? 'ua-ch-model-only' : 'no-model-field'
         };
-        if (dec) {
-          out.matched = dec.matched;
-          out.entrySource = dec.entrySource;
-          out.candidates = [{ name: dec.name, confidence: 1, basis: 'codename-table' }];
-          return out;
-        }
         // 没有高熵 model 的 Apple 设备：给候选，不给结论
         if (!raw) {
           var ap = appleCandidates(env, ua);
@@ -2429,7 +2383,7 @@ function declaredVersion(env) {
           // 桌面/未知设备本来就没有机型字段：这是"这平台没有"，不是"采集失败"
           return M('unsupported');
         }
-        // 有原始值但表里没有：如实说"解不出"，不编一个名字出来
+        // 有代码名就原样交出去：翻译是服务端的事，这里不猜、也不装懂
         return out;
       };
       if (uad && uad.getHighEntropyValues) {
@@ -5146,9 +5100,6 @@ function declaredVersion(env) {
     SITE_GLOBALS: SITE_GLOBALS,
     EXT_PATH_TIMEOUT: EXT_PATH_TIMEOUT,
     // G 127：第一批新增的有限表与期限，同样只给测试与体检工具读
-    MODEL_CODES: MODEL_CODES,
-    MODEL_MAP_VERSION: MODEL_MAP_VERSION,
-    MODEL_MAP_SOURCE: MODEL_MAP_SOURCE,
     APPLE_MODELS: APPLE_MODELS,
     APPLE_MAP_VERSION: APPLE_MAP_VERSION,
     APPLE_MAP_SOURCE: APPLE_MAP_SOURCE,

@@ -163,7 +163,7 @@ function startLocalServer() {
   const http = require('node:http');
   const root = path.join(__dirname, '..');
   const page = `<!doctype html><meta charset="utf-8"><title>perf</title>
-<script src="/docs/radish-collect.js" data-base="https://radishcloud.20050416.shop"></script>`;
+<script src="/docs/radish-collect.js" data-base="https://radishcloud.072120.xyz"></script>`;
   const server = http.createServer((req, res) => {
     const url = req.url.split('?')[0];
     if (url === '/' || url === '/index.html') {

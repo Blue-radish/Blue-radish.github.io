@@ -749,6 +749,17 @@ test('G13：static/ 的每个文件在 docs/ 里都有逐字节相同的副本�
   assert.match(wf, /node tools\/sync-artifact\.js/, '工作流要显式同步 static/，别只依赖上游的副作用');
 });
 
+test('G14：采集端不许再长出一张"代码名 → 市场名"的表（映射在服务端）', () => {
+  // 2026-11-15 起口径：采集端只交原始型号串，映射表由服务端统一维护。
+  // 两张表迟早不同步，同一个型号会出现两处说法——所以这里把"本地表"整个钉死。
+  const src = fs.readFileSync(path.join(ROOT, 'static', 'radish-collect.js'), 'utf8');
+  assert.ok(!/MODEL_CODES/.test(src), '采集器里又出现了 MODEL_CODES：映射表应该只在服务端');
+  assert.ok(!/android-codenames/.test(src), '采集器里又出现了代码名表版本号');
+  assert.ok(!/decodeModelCode/.test(src), '采集器里又出现了查表函数');
+  assert.match(src, /alg: 'model\/3'/, '模型读数的算法版本要是 model/3（只交代码名）');
+  assert.match(src, /ua-ch-model-only/, 'basis 要是 ua-ch-model-only');
+});
+
 test('BLOG-11：config.json 里的脚本版本号要和采集器版本一致', () => {
   const cfg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'), 'utf8'));
   const m = String(cfg.allHead || '').match(/radish-collect\.js\?v=([0-9.]+)/);

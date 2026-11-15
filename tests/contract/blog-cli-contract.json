@@ -1,7 +1,7 @@
 {
   "$doc": "博客采集器 → 后端的 cli 契约夹具（A-09）。由 tests/make-contract.js 生成，不要手改：改了要重跑生成器，摘要会跟着变。",
   "alg": "blog-cli-contract/1",
-  "collector": "radish-2.0.1",
+  "collector": "radish-2.0.2",
   "generated_by": "tests/make-contract.js",
   "source": "static/radish-collect.js",
   "regenerate": "node tests\\make-contract.js（在博客仓库根目录；不需要 RadishCloud 在旁边）",
@@ -2659,7 +2659,7 @@
     "mathfp": "一组数学函数（三角函数、幂运算等）逐项输出结果的指纹摘要，用来分辨引擎的数值实现",
     "media": "摄像头与麦克风的设备枚举结果（需要权限才列得出设备名）",
     "mem": "内存档位（navigator.deviceMemory，浏览器给的近似值）",
-    "model": "设备型号：Android 用代码名查表得市场名，Apple 只给带置信度的候选，不编唯一结论",
+    "model": "设备型号：Android 只交原始代码名（映射表在服务端），Apple 只给带置信度的候选，不编唯一结论",
     "motion": "减少动画偏好（prefers-reduced-motion）",
     "os": "操作系统名与版本：UA 与高熵平台版本交叉，缩减 UA 里的 \"Android 10\" 不当真实版本",
     "pdf": "内置 PDF 阅读器是否可用（navigator.pdfViewerEnabled）",
@@ -2738,10 +2738,10 @@
     "voices.list": "带出去的语音条目：name／lang／localService／default",
     "voices.source": "名单来源（speechSynthesis.getVoices 或老形状被包装时的 array）",
     "form.formFactors": "高熵 Sec-CH-UA-Form-Factors 的原始数组（降级到 UA 判定时为空）",
-    "model.raw": "高熵 model 的原始代码名（表里没有也照留，不猜市场名）",
-    "model.decoded": "查表得到的市场名；表外或 Apple 候选情形为 null",
+    "model.raw": "高熵 model 的原始型号串（代码名或市场名，原样交出去，采集端不翻译）",
+    "model.decoded": "采集端不再输出；2.0.1 及更早的历史记录里可能是采集端的查表结果（现在由服务端映射）",
     "model.candidates": "Apple 的候选机型：name／confidence（排序分，封顶 0.8）／basis",
-    "model.entrySource": "命中项在有限表里的来源（aosp-pixel、aosp-nexus、samsung-model-code）",
+    "model.entrySource": "采集端不再输出；历史记录里是查表命中项的来源（aosp-pixel、aosp-nexus、samsung-model-code）",
     "gpulim.limits": "适配器 limits 里的标量字段（数值／布尔），键序按字典序",
     "gpulim.adapter": "两个 powerPreference 各请求一次的适配器读数（与 webgpu 那一项共享同一次 requestAdapter）",
     "gpulim.features": "适配器支持的全部 feature 名称",
@@ -3678,7 +3678,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.1",
+          "collector": "radish-2.0.2",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -4518,7 +4518,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.1",
+          "collector": "radish-2.0.2",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -4550,7 +4550,7 @@
             "gpc": false,
             "optout": true
           },
-          "collector": "radish-2.0.1",
+          "collector": "radish-2.0.2",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -5412,7 +5412,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.1",
+          "collector": "radish-2.0.2",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
           "h3": {
             "alg": "h3-retry/1",
@@ -5436,5 +5436,5 @@
     }
   ],
   "digest_scope": "sha256 of canonical JSON（对象键排序、无空格）of {cli_keys, shapes, markers, semantics}",
-  "digest": "sha256:d0ed1d7e0dacf31d3a461ab19524fc37325c94d04af36fcea02ebe36728541cb"
+  "digest": "sha256:b6b94df9ff8169b2dce669382ff069e32d54a19720273e471fc0225a5eacc127"
 }

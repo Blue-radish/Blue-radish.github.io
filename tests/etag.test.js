@@ -107,7 +107,7 @@ test('A-01 ①：被缓存的 /v1/etag 请求不含 ?，也不含 id=', async ()
     assert.ok(!c.opts.headers, '不许手写 If-None-Match 之类的条件头');
   }
   // 读出来的资源 URL 也要能让读者核对
-  assert.strictEqual(tag.url, 'https://radishcloud.20050416.shop/v1/etag');
+  assert.strictEqual(tag.url, 'https://radishcloud.072120.xyz/v1/etag');
   assert.ok(tag.url.indexOf('?') < 0);
 });
 
@@ -121,7 +121,7 @@ test('A-01 ②：两次访问（两个不同访问号）里 /v1/etag 的 URL 完
   const urlsA = a.calls.filter((c) => c.kind === 'etag').map((c) => c.url);
   const urlsB = b.calls.filter((c) => c.kind === 'etag').map((c) => c.url);
   assert.deepStrictEqual(urlsA, urlsB, '两次访问的被缓存 URL 必须逐字节相同（缓存键 = 方法 + URI）');
-  assert.deepStrictEqual(urlsA, Array('https://radishcloud.20050416.shop/v1/etag'),
+  assert.deepStrictEqual(urlsA, Array('https://radishcloud.072120.xyz/v1/etag'),
     '被缓存的 URL 只能是 ETAG_URL 本身');
   // 访问号与会话号确实换了地方：关联请求里的 id / sid 随这一轮变
   const repA = a.calls.filter((c) => c.kind === 'report')[0];

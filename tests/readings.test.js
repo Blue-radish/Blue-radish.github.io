@@ -172,10 +172,11 @@ test('B5：iPhone UA 没有 UA-CH 时也判 Mobile（不是 Desktop）', async (
 // ===== g127-c-model.test.js =====
 {
 'use strict';
-// G 127 · C：model（dev）机型名称映射。
-// 返回 {raw, decoded, candidates, basis, mapVersion, source}：
-//   Android  高熵 model 常给代码名（panther / SM-G991B），配一张**带来源与版本**的
-//            有限表翻译；表外的一律 decoded:null，不猜。
+// G 127 · C：model（dev）机型读数。
+// 返回 {raw, candidates, basis}（Apple 情形还有 mapVersion / source / matchedBy）：
+//   Android  只把高熵 model 的**原始型号串**交出去（panther / SM-G991B / NX733J），
+//            **采集端不查表、不翻译**——代码名 → 市场名的映射表在服务端统一维护，
+//            两边各存一份迟早会给出两个说法。所以这里没有 decoded、也没有表版本。
 //   Apple    UA 与 CH 都不给机型，只能用「屏幕逻辑尺寸 + DPR + GPU renderer」给候选，
 //            永不输出唯一结论。
 const test = require('node:test');
@@ -196,35 +197,33 @@ function androidEnv(model) {
   return env;
 }
 
-test('C1：Android 已知代码名翻成市场名，表带版本与来源', async () => {
+test('C1：Android 代码名原样交出，采集端不翻译（映射表在服务端）', async () => {
   const RC = loadCollector(androidEnv('panther'));
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   const m = plain(e.cli.model);
-  assert.strictEqual(m.raw, 'panther');
-  assert.strictEqual(m.decoded, 'Pixel 7');
-  assert.strictEqual(m.matched, 'panther');
-  assert.strictEqual(m.mapVersion, 'android-codenames-2024a');
-  assert.strictEqual(m.mapVersion, RC.MODEL_MAP_VERSION);
-  assert.ok(/AOSP/.test(m.source), 'source 要能注到出处：' + m.source);
-  assert.deepStrictEqual(m.candidates, [{ name: 'Pixel 7', confidence: 1, basis: 'codename-table' }]);
-  assert.strictEqual(m.basis, 'ua-ch-model+map');
+  assert.strictEqual(m.raw, 'panther', '原始代码名必须原样交出去');
+  assert.strictEqual(m.decoded, undefined, '采集端不再有自己的映射结果');
+  assert.strictEqual(m.basis, 'ua-ch-model-only');
+  assert.deepStrictEqual(m.candidates, []);
+  assert.strictEqual(m.mapVersion, undefined, 'Android 这边不再有任何表版本');
+  assert.strictEqual(RC.MODEL_CODES, undefined, '本地那张 30 条代码名表必须删掉，不许再长回来');
 });
 
-test('C2：三星机型码也走同一张表', async () => {
+test('C2：厂商型号码也照原样交出去（不再有查表痕迹）', async () => {
   const e = await loadCollector(androidEnv('SM-G991B')).buildEnvelope(undefined, collectorCtx());
   const m = plain(e.cli.model);
-  assert.strictEqual(m.decoded, 'Galaxy S21 5G');
-  assert.strictEqual(m.entrySource, 'samsung-model-code');
+  assert.strictEqual(m.raw, 'SM-G991B');
+  assert.strictEqual(m.decoded, undefined);
+  assert.strictEqual(m.entrySource, undefined, 'entrySource 是查表才有的字段');
+  assert.strictEqual(m.basis, 'ua-ch-model-only');
 });
 
-test('C3：表里没有的代码名 decoded:null（不编名字），raw 与 basis 如实保留', async () => {
+test('C3：表内表外现在同一种形状——采到的串是什么就报什么', async () => {
   const e = await loadCollector(androidEnv('SM-Q999Z')).buildEnvelope(undefined, collectorCtx());
   const m = plain(e.cli.model);
   assert.strictEqual(m.raw, 'SM-Q999Z');
-  assert.strictEqual(m.decoded, null);
   assert.deepStrictEqual(m.candidates, []);
-  assert.strictEqual(m.basis, 'ua-ch-model-unmapped');
-  assert.strictEqual(m.mapVersion, 'android-codenames-2024a');
+  assert.strictEqual(m.basis, 'ua-ch-model-only', '不再有"解不出"这种状态：服务端拿到串自己映射');
 });
 
 test('C4：Apple 用屏幕逻辑尺寸 + DPR 给候选，绝不给唯一结论', async () => {
@@ -236,7 +235,7 @@ test('C4：Apple 用屏幕逻辑尺寸 + DPR 给候选，绝不给唯一结论',
   const e = await RC.buildEnvelope(undefined, collectorCtx());
   const m = plain(e.cli.model);
   assert.strictEqual(m.raw, null, 'iOS 没有机型字段');
-  assert.strictEqual(m.decoded, null, '候选不是结论');
+  assert.strictEqual(m.decoded, undefined, '候选不是结论，采集端也不翻译');
   assert.strictEqual(m.basis, 'screen-gpu-candidate');
   assert.strictEqual(m.mapVersion, RC.APPLE_MAP_VERSION);
   assert.ok(m.candidates.length >= 1, '至少给出一条候选');
@@ -251,13 +250,17 @@ test('C5：桌面没有机型字段时是 unsupported（不是编一个 candidat
   assert.deepStrictEqual(plain(e.cli.model), { $: 'unsupported' });
 });
 
-test('C6：表是有限的、每条都有来源（防止有人往表里塞没出处的条目）', () => {
+test('C6：采集端不再有代码名表；Apple 候选表仍是有限的、形状固定', () => {
   const RC = loadCollector(fakeEnv());
-  const allowed = ['aosp-pixel', 'aosp-nexus', 'samsung-model-code'];
-  assert.ok(RC.MODEL_CODES.length >= 20, '表条目数：' + RC.MODEL_CODES.length);
-  for (const row of RC.MODEL_CODES) {
-    assert.strictEqual(row.length, 3, '每条必须是 [代码名, 市场名, 来源]：' + JSON.stringify(row));
-    assert.ok(allowed.includes(row[2]), '来源必须是已核对的出处：' + row[2]);
+  // 代码名 → 市场名那张表整套搬到服务端了，采集端一旦长回来就是两份表打架
+  assert.strictEqual(RC.MODEL_CODES, undefined, '本地代码名表必须不存在');
+  const rows = RC.APPLE_MODELS;
+  assert.ok(Array.isArray(rows) && rows.length >= 10, 'Apple 候选表条目数：' + (rows && rows.length));
+  for (const row of rows) {
+    assert.strictEqual(row.length, 4, '每条必须是 [机型, 短边, 长边, dpr]：' + JSON.stringify(row));
+    assert.strictEqual(typeof row[0], 'string');
+    assert.ok(row[1] > 0 && row[2] >= row[1], '尺寸顺序要对：' + JSON.stringify(row));
+    assert.ok([1, 2, 3].includes(row[3]), 'dpr 是有限档位：' + row[3]);
   }
 });
 }
