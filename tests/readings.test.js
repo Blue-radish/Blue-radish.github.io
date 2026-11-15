@@ -2341,11 +2341,15 @@ const assert = require('node:assert');
 const { loadCollector, fakeEnv, collectorCtx, plain } = require('./harness');
 
 function adEnv(rules) {
+  // delay: {ad, control} 让假 fetch 花一点真实时间——真正的跨域请求不可能"瞬间"走完，
+  // 而采集器现在会拆穿"快到没走网络"的 reachable（见 L8）。
   const env = fakeEnv();
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   env.fetch = (url) => {
     const kind = /googlesyndication/.test(String(url)) ? 'ad' : 'control';
     const r = rules[kind];
-    if (r === 'ok') return Promise.resolve({ ok: false, type: 'opaque', status: 0 });
+    const wait = (rules.delay && rules.delay[kind]) || 30;
+    if (r === 'ok') return sleep(wait).then(() => ({ ok: false, type: 'opaque', status: 0 }));
     return Promise.reject(new TypeError('Failed to fetch'));
   };
   return env;
@@ -2355,7 +2359,7 @@ test('L1：对照通 + 广告 URL 不通 → blocked', async () => {
   const env = adEnv({ control: 'ok', ad: 'fail' });
   const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
   const a = plain(e.cli.adblock);
-  assert.strictEqual(a.alg, 'adblock/2');
+  assert.strictEqual(a.alg, 'adblock/3');
   assert.strictEqual(a.control.state, 'reachable');
   assert.strictEqual(a.adUrl.state, 'unreachable');
   assert.strictEqual(a.verdict, 'blocked');
@@ -2417,9 +2421,77 @@ test('L6：广告 URL 与对照各发一次请求（不多打第三方）', asyn
   const adCalls = seen.filter((c) => /googlesyndication/.test(c.url));
   assert.strictEqual(adCalls.length, 1);
   assert.strictEqual(adCalls[0].mode, 'no-cors');
-  const controlCalls = seen.filter((c) => /radish-collect\.js$/.test(c.url));
+  const controlCalls = seen.filter((c) => /postList\.json$/.test(c.url));
   assert.strictEqual(controlCalls.length, 1, '对照只发一次：' + JSON.stringify(controlCalls));
-  assert.ok(/radish-collect\.js$/.test(controlCalls[0].url), '对照用同源静态资源（本脚本）：' + controlCalls[0].url);
+  assert.ok(/^https:\/\/blue-radish\.github\.io\/postList\.json$/.test(controlCalls[0].url),
+    '对照用同源小文件（3.5KB、无查询串），别再用 278KB 的本脚本：' + controlCalls[0].url);
+});
+
+test('L7：对照与广告 URL 各用自己的闸门（对照 1500ms、广告 800ms）', async () => {
+  const env = adEnv({ control: 'ok', ad: 'ok' });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.deadlineMs, 800, '广告 URL 自己的闸门');
+  assert.strictEqual(a.controlDeadlineMs, 1500, '对照的闸门要比广告 URL 宽');
+  assert.ok(/\/postList\.json$/.test(a.control.url), '对照取同源小文件：' + a.control.url);
+  assert.strictEqual(a.control.via, 'small-file', '正常路径要标明对照走的是小文件');
+});
+
+test('L8：9ms 就"通"要认成 redirect 型拦截，不能记成没装拦截（线上真见过）', async () => {
+  const env = adEnv({ control: 'ok', ad: 'ok', delay: { ad: 9, control: 227 } });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.adUrl.state, 'rewritten', '被本地占位响应顶替要如实记：' + JSON.stringify(a.adUrl));
+  assert.strictEqual(a.adUrl.fetch, 'reachable', '原始 fetch 结果要留痕，别抹掉');
+  assert.strictEqual(a.verdict, 'blocked', '参考站判是装了拦截器，这里不能写没装');
+  assert.strictEqual(a.basis, 'ad-url-rewritten');
+  assert.ok(a.adUrl.fastBelowMs > 15 && a.adUrl.fastBelowMs < 100, '阈值要比地板宽、跟着对照耗时走：' + a.adUrl.fastBelowMs);
+  assert.ok(/改写/.test(a.note), 'note 要说明判定理由：' + a.note);
+});
+
+test('L11：绝对耗时不算快、但比同源对照快一个量级 → 同样算 rewritten', async () => {
+  const env = adEnv({ control: 'ok', ad: 'ok', delay: { ad: 40, control: 400 } });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.adUrl.state, 'rewritten');
+  assert.strictEqual(a.verdict, 'blocked');
+  assert.strictEqual(a.basis, 'ad-url-rewritten');
+});
+
+test('L12：快网下对照也很快时，不能把正常的"通"误伤成 rewritten', async () => {
+  const env = adEnv({ control: 'ok', ad: 'ok', delay: { ad: 20, control: 25 } });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.adUrl.state, 'reachable', '对照只有 25ms：只用地板 15ms，20ms 的"通"不该被误伤');
+  assert.strictEqual(a.verdict, 'reachable');
+  assert.strictEqual(a.basis, 'ad-url+control-reachable');
+});
+
+test('L9：同源小文件没回来时退一步用本脚本的缓存副本，并在 via 里标出来', async () => {
+  const env = fakeEnv();
+  env.document.currentScript = { src: 'https://blue-radish.github.io/radish-collect.js?v=2.0.1' };
+  env.fetch = (url, opts) => {
+    const s = String(url);
+    if (/postList\.json/.test(s)) return Promise.reject(new TypeError('Failed to fetch'));
+    if (/googlesyndication/.test(s)) return new Promise((r) => setTimeout(() => r({ type: 'opaque' }), 40));
+    if (opts && opts.cache === 'default') return Promise.resolve({ type: 'basic' });   // 缓存命中
+    return Promise.reject(new TypeError('Failed to fetch'));
+  };
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.control.state, 'reachable');
+  assert.strictEqual(a.control.via, 'self-src-cache', '兜底来源要留痕：' + JSON.stringify(a.control));
+  assert.strictEqual(a.verdict, 'reachable');
+});
+
+test('L10：对照 814ms 才回来不再被判 unknown（线上就是这个数）', async () => {
+  const env = adEnv({ control: 'ok', ad: 'fail', delay: { control: 814 } });
+  const e = await loadCollector(env).buildEnvelope(undefined, collectorCtx());
+  const a = plain(e.cli.adblock);
+  assert.strictEqual(a.control.state, 'reachable', '慢一点不等于取不到：' + JSON.stringify(a.control));
+  assert.ok(a.control.ms >= 800, '确实慢：' + a.control.ms);
+  assert.strictEqual(a.verdict, 'blocked', '对照回来了，广告 URL 没回来 → 才能判 blocked');
+  assert.strictEqual(a.basis, 'ad-url-unreachable');
 });
 }
 

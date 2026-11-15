@@ -10,7 +10,7 @@
   'use strict';
   if (typeof window !== 'undefined' && window.__radish) return;
 
-  var VERSION = 'radish-2.0.0';
+  var VERSION = 'radish-2.0.1';
   // 上报地址内置默认值；换机或本地调试时改 script 标签上的 data-base，
   // 例如 <script src='/radish-collect.js' data-base='http://127.0.0.1:11451'>
   // 页面里不再需要写任何全局变量。
@@ -3712,12 +3712,33 @@ function declaredVersion(env) {
     });
   });
   // adblock（brw）：① DOM 诱饵元素（cosmetic 规则会把它隐藏）+ ② 一个已知广告脚本 URL
-  // 的 no-cors 请求 + ③ 一个**同源静态资源**对照。
-  // 读法（口径写死）：对照取不到 → verdict 'unknown'，任何"被拦截"的结论都不成立；
-  // 对照通、广告 URL 取不到 → 'blocked'（no-cors 只能说明"没取到"，拦截是主要但非唯一原因）；
-  // 两条都通 → 'reachable'。广告 URL 用 no-cors 发，响应是 opaque，证明不了状态码与脚本内容。
+  // 的 no-cors 请求 + ③ 一个**同源小文件**对照。
+  //
+  // 2026-11-15 修：对照的闸门必须比广告 URL 宽。上一版两者共用 800ms，而对照取的是本脚本
+  // 自己（278KB，还带 no-store），线上实测 814ms 才回来 → 每次都被判 timeout → 整项稳定
+  // unknown（服务端因此永远读不到广告拦截的结论）。现在对照改取同源小文件
+  // （postList.json，3.5KB，不带查询串），仍然走真实网络（no-store），代价却小得多；
+  // 它有自己的闸门 1500ms，够 Cloudflare 回源。只有它失败时才退一步用本脚本的缓存副本
+  // （cache=default），并在 controlVia 里标出来——缓存命中只说明"浏览器愿意给这个 URL"，
+  // 不证明网络此刻通，上层可以据此决定要不要采信。
+  //
+  // 读法（口径）：对照取不到 → verdict 'unknown'，任何"被拦截"的结论都不成立；
+  // 广告 URL **被本地占位响应顶替**（见下面的 redirect 型拦截）→ 'blocked'；
+  // 广告 URL 取不到 → 'blocked'；诱饵被隐藏 → 'blocked'（cosmetic 过滤）；
+  // 都通、且速度像真的走了一趟网络，才记 'reachable'。
+  //
+  // 为什么不能只看"fetch 有没有 resolve"：uBlock 这类插件的 redirect=noop.js 会把请求
+  // 换成一份本地空文件，请求照样成功返回，fetch 只能看到"走完了网络栈"，于是被误判成
+  // "没装拦截"。线上真见过 adUrl 9ms/5ms 就 resolve 的机器（同源对照要 227ms/814ms），
+  // 而跨洋打 googlesyndication 不可能几毫秒回来。所以耗时本身就是证据：
+  // 带 no-store 不可能命中缓存，比同源小文件还快一个量级 → 记 adUrl.state 'rewritten'。
   var AD_URL = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-  var AD_TIMEOUT = 800;
+  var AD_TIMEOUT = 800;         // 广告 URL 自己的闸门
+  var CONTROL_TIMEOUT = 1500;   // 同源对照自己的闸门（比广告 URL 宽）
+  var AD_FAST_MS = 15;          // no-store 的请求比这更快，说明没真的走网络
+  var CONTROL_FALLBACK_MS = 600; // 兜底那一发：脚本已在浏览器缓存里，正常只要几毫秒
+  var AD_FAST_CONTROL_MS = 45;  // 对照慢到这个程度，"比对照快 3 倍"才有意义
+  var AD_FAST_RATIO = 3;        // 阈值 = max(AD_FAST_MS, 对照耗时 / 3)
   probe('adblock', function (env, ctx) {
     return safe(function () {
       var doc = env.document;
@@ -3735,15 +3756,11 @@ function declaredVersion(env) {
           }, 120);
         } catch (e) { res({ hidden: null, waitMs: null }); }
       });
-      // 对照用**本脚本自己的 URL**：它一定存在（页面刚加载过它），也不再额外打第三方。
-      var controlUrl = SELF_SRC || safe(function () {
-        return String((env.location && env.location.origin) || '') + '/static/radish-collect.js';
-      }, '');
       var f = env.fetch;
-      function probeUrl(url, ms) {
+      function probeUrl(url, ms, cache) {
         if (typeof f !== 'function' || !url) return Promise.resolve({ url: url || null, state: 'unsupported', ms: null });
         var started = Date.now();
-        var opts = { mode: 'no-cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' };
+        var opts = { mode: 'no-cors', cache: cache || 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' };
         var sig = requestSignal(env, ctx, ms);
         if (sig) opts.signal = sig;
         return within(
@@ -3752,21 +3769,48 @@ function declaredVersion(env) {
           ms, 'timeout'
         ).then(function (state) { return { url: url, state: state, ms: Date.now() - started }; });
       }
-      return Promise.all([baitP, probeUrl(AD_URL, AD_TIMEOUT), probeUrl(controlUrl, AD_TIMEOUT)]).then(function (r) {
+      // 对照：同源小文件优先；它没回来时才用本脚本的缓存副本兜底（并标注来源）
+      var origin = safe(function () { return String((env.location && env.location.origin) || ''); }, '');
+      var controlP = probeUrl(origin + '/postList.json', CONTROL_TIMEOUT).then(function (c) {
+        c.via = 'small-file';
+        if (c.state === 'reachable' || !SELF_SRC) return c;
+        return probeUrl(SELF_SRC, CONTROL_FALLBACK_MS, 'default').then(function (c2) {
+          if (c2.state !== 'reachable') return c;   // 两次都没回来：以第一次（真实网络）为准
+          return { url: c2.url, state: c2.state, ms: c2.ms, via: 'self-src-cache' };
+        }, function () { return c; });
+      });
+      return Promise.all([baitP, probeUrl(AD_URL, AD_TIMEOUT), controlP]).then(function (r) {
         var bait = r[0], ad = r[1], control = r[2];
+        // redirect 型拦截：resolve 了，但快到不可能真的走网络。
+        // 判据 = max(15ms, 同源对照耗时/3)：同源小文件是本机上最快的请求，
+        // 跨域冷连接不可能比它还快三倍；对照本身很快时（<45ms）就只用地板值。
+        var fastBelow = AD_FAST_MS;
+        if (typeof control.ms === 'number' && control.ms >= AD_FAST_CONTROL_MS) {
+          fastBelow = Math.max(AD_FAST_MS, Math.round(control.ms / AD_FAST_RATIO));
+        }
+        var adFast = ad.state === 'reachable' && typeof ad.ms === 'number' && ad.ms <= fastBelow;
+        if (adFast) {
+          ad = { url: ad.url, state: 'rewritten', ms: ad.ms, fetch: 'reachable', fastBelowMs: fastBelow };
+        }
         var out = {
-          alg: 'adblock/2',
+          alg: 'adblock/3',
           bait: bait,
           adUrl: ad,
           control: control,
           verdict: 'unknown',
           basis: '',
-          deadlineMs: AD_TIMEOUT
+          deadlineMs: AD_TIMEOUT,
+          controlDeadlineMs: CONTROL_TIMEOUT
         };
         if (control.state !== 'reachable') {
           out.verdict = 'unknown';
           out.basis = 'control-' + control.state;
           out.note = '同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数';
+        } else if (ad.state === 'rewritten') {
+          out.verdict = 'blocked';
+          out.basis = 'ad-url-rewritten';
+          out.note = '广告 URL 在 ' + ad.ms + 'ms 就"走完了"（阈值 ' + ad.fastBelowMs + 'ms，请求带 no-store）：' +
+            '这是拦截器把请求改写成本地占位响应（redirect=noop 之类）的样子，按被拦截计';
         } else if (ad.state !== 'reachable') {
           out.verdict = 'blocked';
           out.basis = 'ad-url-' + ad.state;

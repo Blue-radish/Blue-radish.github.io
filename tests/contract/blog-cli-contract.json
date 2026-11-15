@@ -1,7 +1,7 @@
 {
   "$doc": "博客采集器 → 后端的 cli 契约夹具（A-09）。由 tests/make-contract.js 生成，不要手改：改了要重跑生成器，摘要会跟着变。",
   "alg": "blog-cli-contract/1",
-  "collector": "radish-2.0.0",
+  "collector": "radish-2.0.1",
   "generated_by": "tests/make-contract.js",
   "source": "static/radish-collect.js",
   "regenerate": "node tests\\make-contract.js（在博客仓库根目录；不需要 RadishCloud 在旁边）",
@@ -214,7 +214,7 @@
         "alg": {
           "type": "string",
           "enum": [
-            "adblock/2"
+            "adblock/3"
           ]
         },
         "bait": {
@@ -247,8 +247,18 @@
             "url": {
               "type": "string",
               "format": "url"
+            },
+            "via": {
+              "type": "string"
             }
           }
+        },
+        "controlDeadlineMs": {
+          "type": "number",
+          "range": [
+            1500,
+            1500
+          ]
         },
         "deadlineMs": {
           "type": "number",
@@ -2848,7 +2858,7 @@
               "state": "unsupported",
               "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
             },
-            "alg": "adblock/2",
+            "alg": "adblock/3",
             "bait": {
               "hidden": false,
               "waitMs": 120
@@ -2857,8 +2867,10 @@
             "control": {
               "ms": null,
               "state": "unsupported",
-              "url": "https://blue-radish.github.io/static/radish-collect.js"
+              "url": "https://blue-radish.github.io/postList.json",
+              "via": "small-file"
             },
+            "controlDeadlineMs": 1500,
             "deadlineMs": 800,
             "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
             "verdict": "unknown"
@@ -3666,7 +3678,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.0",
+          "collector": "radish-2.0.1",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -3698,7 +3710,7 @@
               "state": "unsupported",
               "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
             },
-            "alg": "adblock/2",
+            "alg": "adblock/3",
             "bait": {
               "hidden": false,
               "waitMs": 120
@@ -3707,8 +3719,10 @@
             "control": {
               "ms": null,
               "state": "unsupported",
-              "url": "https://blue-radish.github.io/static/radish-collect.js"
+              "url": "https://blue-radish.github.io/postList.json",
+              "via": "small-file"
             },
+            "controlDeadlineMs": 1500,
             "deadlineMs": 800,
             "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
             "verdict": "unknown"
@@ -4504,7 +4518,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.0",
+          "collector": "radish-2.0.1",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -4536,7 +4550,7 @@
             "gpc": false,
             "optout": true
           },
-          "collector": "radish-2.0.0",
+          "collector": "radish-2.0.1",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
         }
       }
@@ -4568,7 +4582,7 @@
               "state": "unsupported",
               "url": "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
             },
-            "alg": "adblock/2",
+            "alg": "adblock/3",
             "bait": {
               "hidden": false,
               "waitMs": 120
@@ -4577,8 +4591,10 @@
             "control": {
               "ms": null,
               "state": "unsupported",
-              "url": "https://blue-radish.github.io/static/radish-collect.js"
+              "url": "https://blue-radish.github.io/postList.json",
+              "via": "small-file"
             },
+            "controlDeadlineMs": 1500,
             "deadlineMs": 800,
             "note": "同源对照没取到：分不清是网络不通还是请求被挡，广告 URL 的结果一律不算数",
             "verdict": "unknown"
@@ -5396,7 +5412,7 @@
             "gpc": false,
             "optout": false
           },
-          "collector": "radish-2.0.0",
+          "collector": "radish-2.0.1",
           "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
           "h3": {
             "alg": "h3-retry/1",
@@ -5420,5 +5436,5 @@
     }
   ],
   "digest_scope": "sha256 of canonical JSON（对象键排序、无空格）of {cli_keys, shapes, markers, semantics}",
-  "digest": "sha256:a8b92146bace78206cafb37ee2b7a4f1903fb9a978778ea072609685d1c8a7ec"
+  "digest": "sha256:d0ed1d7e0dacf31d3a461ab19524fc37325c94d04af36fcea02ebe36728541cb"
 }

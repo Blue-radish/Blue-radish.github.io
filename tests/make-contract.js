@@ -242,7 +242,7 @@ const ENUMS = [
   [/^cli\.apis\.alg$/, ['apis/2']],
   [/^cli\.auto\.alg$/, ['auto/2']],
   [/^cli\.agent\.alg$/, ['agent/2']],
-  [/^cli\.adblock\.alg$/, ['adblock/2']],
+  [/^cli\.adblock\.alg$/, ['adblock/3']],
   [/^cli\.traces\.alg$/, ['storage-tag/2']],
   [/^cli\.mathfp\.alg$/, ['mathfp-2']],
   [/^cli\.icu\.alg$/, ['supported-values-of']],
